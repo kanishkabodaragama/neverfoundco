@@ -36,7 +36,7 @@ export function NeverFoundHomePage() {
         <section className="relative min-h-[760px] overflow-hidden bg-[#F7F1E6] text-[#10131A]">
           <Image
             alt="Pixel character standing on a cliff looking at a city skyline"
-            className="object-contain object-center"
+            className="object-cover object-[62%_center]"
             fill
             priority
             sizes="100vw"
