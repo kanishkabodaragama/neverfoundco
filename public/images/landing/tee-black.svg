@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 620" role="img" aria-labelledby="title">
+  <title id="title">Black graphic t-shirt placeholder</title>
+  <rect width="620" height="620" fill="#ead8bd"/>
+  <path d="M190 120l70-42h100l70 42 83 76-61 77-40-35v265H208V238l-40 35-61-77z" fill="#111715" stroke="#172c23" stroke-width="14"/>
+  <path d="M244 225c71-73 135-58 168 41 24 73-13 133-94 160-88-27-121-97-74-201z" fill="#2f8088"/>
+  <path d="M262 270h104m-84 53h70m-102 51h126" stroke="#d9532f" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="390" cy="235" r="31" fill="#efc067"/>
+</svg>
+

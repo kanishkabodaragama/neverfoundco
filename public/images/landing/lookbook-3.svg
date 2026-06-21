@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" role="img" aria-labelledby="title">
+  <title id="title">Street skyline and graphic tee placeholder</title>
+  <rect width="760" height="420" fill="#87a7ad"/>
+  <rect x="0" y="275" width="760" height="145" fill="#173c30"/>
+  <path d="M485 112h56v163h-56zm70 45h42v118h-42zm60-80h72v198h-72z" fill="#ead8bd" opacity=".65"/>
+  <path d="M170 100c55-38 139-25 178 36 43 67 11 163-64 187-79-17-127-128-114-223z" fill="#ead8bd" stroke="#111715" stroke-width="13"/>
+  <rect x="218" y="164" width="88" height="100" fill="#f5ead5" stroke="#111715" stroke-width="8"/>
+  <path d="M231 201h63m-44 38h75" stroke="#d9532f" stroke-width="14" stroke-linecap="round"/>
+</svg>
+

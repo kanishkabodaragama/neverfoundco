@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 620" role="img" aria-labelledby="title">
+  <title id="title">Cream graphic t-shirt placeholder</title>
+  <rect width="620" height="620" fill="#efe0c6"/>
+  <path d="M190 120l70-42h100l70 42 83 76-61 77-40-35v265H208V238l-40 35-61-77z" fill="#f5ead5" stroke="#172c23" stroke-width="14"/>
+  <circle cx="310" cy="278" r="72" fill="#d9532f"/>
+  <path d="M240 360c54-100 106-114 158-3" fill="none" stroke="#173c30" stroke-width="24" stroke-linecap="round"/>
+  <path d="M272 262h76m-96 45h118m-91 44h70" stroke="#efc067" stroke-width="18" stroke-linecap="round"/>
+</svg>
+

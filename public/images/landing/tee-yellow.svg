@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 620" role="img" aria-labelledby="title">
+  <title id="title">Faded yellow graphic t-shirt placeholder</title>
+  <rect width="620" height="620" fill="#ead8bd"/>
+  <path d="M190 120l70-42h100l70 42 83 76-61 77-40-35v265H208V238l-40 35-61-77z" fill="#e9d39a" stroke="#172c23" stroke-width="14"/>
+  <path d="M226 374l85-176 88 176z" fill="#173c30"/>
+  <path d="M253 334h116m-90-53h61" stroke="#d9532f" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="312" cy="226" r="30" fill="#efc067"/>
+</svg>
+

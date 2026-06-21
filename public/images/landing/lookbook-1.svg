@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" role="img" aria-labelledby="title">
+  <title id="title">Lookbook photo placeholder with model in graphic tee</title>
+  <rect width="760" height="420" fill="#162d25"/>
+  <circle cx="560" cy="102" r="92" fill="#efc067"/>
+  <path d="M0 318c140-76 278-71 414-16s244 44 346-19v137H0z" fill="#d9532f"/>
+  <path d="M246 116c73-62 180-43 225 42 49 93 9 203-87 231-100-23-152-167-138-273z" fill="#ead8bd" stroke="#111715" stroke-width="14"/>
+  <rect x="298" y="186" width="118" height="124" fill="#f5ead5" stroke="#111715" stroke-width="9"/>
+  <path d="M315 232h78m-59 42h91" stroke="#d9532f" stroke-width="17" stroke-linecap="round"/>
+</svg>
+

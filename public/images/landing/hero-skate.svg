@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 760" role="img" aria-labelledby="title desc">
+  <title id="title">Skater wearing a graphic tee</title>
+  <desc id="desc">Retro grainy illustration of a skateboarder in a bowl with palm trees.</desc>
+  <defs>
+    <filter id="noise">
+      <feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="3" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feBlend mode="multiply" in2="SourceGraphic"/>
+    </filter>
+    <linearGradient id="sky" x1="0" x2="1">
+      <stop offset="0" stop-color="#4d8f9b"/>
+      <stop offset="1" stop-color="#d7b483"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="760" fill="url(#sky)"/>
+  <g opacity=".35">
+    <circle cx="720" cy="215" r="80" fill="#f1d29a"/>
+    <rect y="560" width="900" height="200" fill="#123f32"/>
+  </g>
+  <g stroke="#10271f" stroke-width="10" stroke-linecap="round">
+    <path d="M0 620c160-130 320-130 490-35s295 76 410-14" fill="none"/>
+    <path d="M20 700c190-95 340-82 510-24 137 46 250 34 370-30" fill="none" opacity=".6"/>
+  </g>
+  <g fill="#123f32">
+    <path d="M75 520h18V320H75z"/>
+    <path d="M58 332l27-110 28 110-29-30z"/>
+    <path d="M760 545h18V345h-18z"/>
+    <path d="M742 358l27-115 31 115-31-33z"/>
+    <path d="M830 560h14V410h-14z"/>
+    <path d="M815 420l23-89 25 89-25-24z"/>
+  </g>
+  <g transform="translate(360 95) rotate(8)">
+    <path d="M265 215c60 13 103 48 131 100" fill="none" stroke="#172c23" stroke-width="28" stroke-linecap="round"/>
+    <path d="M113 218c-54 25-91 64-111 119" fill="none" stroke="#172c23" stroke-width="28" stroke-linecap="round"/>
+    <path d="M100 470c85 31 205 37 326 17" fill="none" stroke="#172c23" stroke-width="34" stroke-linecap="round"/>
+    <path d="M100 468c107 46 230 50 346 17" fill="none" stroke="#d9532f" stroke-width="16" stroke-linecap="round"/>
+    <path d="M170 95c54-51 156-45 200 20 38 57 33 179-33 250-51 55-143 58-200 9-68-59-51-198 33-279z" fill="#ead8bd" stroke="#142b22" stroke-width="12"/>
+    <path d="M200 130c50-43 126-33 158 20 27 44 23 135-26 185-38 39-101 42-143 6-52-45-39-155 11-211z" fill="#f0e3cc"/>
+    <path d="M220 178h115v112H220z" fill="#d9532f" stroke="#142b22" stroke-width="9"/>
+    <path d="M238 206c26-24 56-25 86-2m-78 45c31 22 58 21 83-2" fill="none" stroke="#f3d98e" stroke-width="9" stroke-linecap="round"/>
+    <path d="M206 84c48-54 124-59 170-6-66 6-122 25-170 6z" fill="#121715" stroke="#142b22" stroke-width="10"/>
+    <path d="M122 360c-34 64-48 127-39 190m267-188c40 61 67 116 83 178" fill="none" stroke="#efe0c6" stroke-width="43" stroke-linecap="round"/>
+    <path d="M101 550c37 25 81 32 132 20m179-23c45 14 86 11 123-8" fill="none" stroke="#efc067" stroke-width="29" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(270 620) rotate(-5)">
+    <rect x="0" y="0" width="390" height="24" rx="12" fill="#121715"/>
+    <circle cx="90" cy="42" r="25" fill="#e8d6bb" stroke="#121715" stroke-width="10"/>
+    <circle cx="300" cy="42" r="25" fill="#e8d6bb" stroke="#121715" stroke-width="10"/>
+  </g>
+  <rect width="900" height="760" filter="url(#noise)" opacity=".18"/>
+</svg>
+

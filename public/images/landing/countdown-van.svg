@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 360" role="img" aria-labelledby="title">
+  <title id="title">Retro van at sunset placeholder</title>
+  <rect width="780" height="360" fill="#c94f2e"/>
+  <circle cx="585" cy="98" r="72" fill="#efc067" opacity=".65"/>
+  <path d="M70 230c110-62 227-75 350-40 120 35 213 23 290-37v207H70z" fill="#173c30" opacity=".45"/>
+  <g transform="translate(120 155)">
+    <path d="M0 58c18-54 80-82 185-82h107c57 0 99 28 126 82v77H0z" fill="#d8bf8f" stroke="#111715" stroke-width="12"/>
+    <rect x="57" y="15" width="76" height="52" fill="#87a7ad" stroke="#111715" stroke-width="8"/>
+    <rect x="154" y="15" width="76" height="52" fill="#87a7ad" stroke="#111715" stroke-width="8"/>
+    <circle cx="90" cy="142" r="33" fill="#111715"/>
+    <circle cx="326" cy="142" r="33" fill="#111715"/>
+    <path d="M252 37h80" stroke="#d9532f" stroke-width="14" stroke-linecap="round"/>
+  </g>
+  <g fill="#111715">
+    <path d="M42 196h12V66H42z"/>
+    <path d="M25 79l23-69 26 69-26-17z"/>
+    <path d="M708 185h11V75h-11z"/>
+    <path d="M692 87l21-62 24 62-24-15z"/>
+  </g>
+</svg>
