@@ -13,7 +13,7 @@ export function ContactForm() {
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
-      <h2 className="text-3xl font-black uppercase tracking-[-0.04em]">
+      <h2 className="font-pixel text-base uppercase">
         Send Us A Message
       </h2>
       {[
@@ -24,7 +24,7 @@ export function ContactForm() {
         <label className="block" key={name}>
           <span className="sr-only">{label}</span>
           <input
-            className="min-h-12 w-full border-2 border-[#17251f] bg-transparent px-5 text-sm font-black uppercase outline-none placeholder:text-[#17251f] focus:bg-[#f0dfc4]"
+            className="min-h-12 w-full border border-[#FFF9EF]/20 bg-transparent px-4 text-sm font-black uppercase outline-none placeholder:text-[#FFF9EF]/50 focus:border-[#F05267]"
             name={name}
             placeholder={label}
             required
@@ -35,20 +35,19 @@ export function ContactForm() {
       <label className="block">
         <span className="sr-only">Your Message</span>
         <textarea
-          className="min-h-36 w-full resize-none border-2 border-[#17251f] bg-transparent px-5 py-4 text-sm font-black uppercase outline-none placeholder:text-[#17251f] focus:bg-[#f0dfc4]"
+          className="min-h-32 w-full resize-none border border-[#FFF9EF]/20 bg-transparent px-4 py-4 text-sm font-black uppercase outline-none placeholder:text-[#FFF9EF]/50 focus:border-[#F05267]"
           name="message"
           placeholder="Your Message"
           required
         />
       </label>
       <button
-        className="bg-[#c94f2e] px-9 py-4 text-sm font-black uppercase text-[#ead8bd] transition hover:bg-[#17251f]"
+        className="pixel-edge bg-[#F05267] px-8 py-4 text-sm font-black uppercase text-[#FFF9EF] transition hover:translate-x-0.5"
         type="submit"
       >
         Send Message -&gt;
       </button>
-      {message ? <p className="font-hand text-xl text-[#d9532f]">{message}</p> : null}
+      {message ? <p className="text-sm font-black uppercase text-[#F05267]">{message}</p> : null}
     </form>
   );
 }
-

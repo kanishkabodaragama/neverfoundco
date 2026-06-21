@@ -1,8 +1,17 @@
 import Link from "next/link";
+import Image from "next/image";
 export function Footer() {
   return (
-    <footer className="bg-[#070B12] px-5 py-8 text-[#FFF9EF] md:px-8 lg:px-10 xl:px-12">
-      <div className="mx-auto flex max-w-[1440px] flex-col gap-6 md:flex-row md:items-center md:justify-between">
+    <footer className="relative overflow-hidden bg-[#B8A8E8] px-5 py-10 text-[#10131A] md:px-8 lg:px-10 xl:px-12">
+      <Image
+        alt="Pixel planet footer background"
+        className="object-cover object-center opacity-45"
+        fill
+        sizes="100vw"
+        src="/images/arcade/pixel-planet.png"
+      />
+      <div className="absolute inset-0 bg-[#B8A8E8]/70" />
+      <div className="relative z-10 mx-auto flex w-full flex-col gap-6 md:flex-row md:items-center md:justify-between">
         <p className="font-pixel text-xs uppercase leading-relaxed">
           ▣ © Never Found 1999
           <br />
@@ -16,7 +25,7 @@ export function Footer() {
           <Link href="/privacy">Privacy</Link>
           <Link href="/terms">Terms</Link>
         </div>
-        <span className="pixel-blink text-2xl text-[#B8A8E8]">▣</span>
+        <span className="pixel-blink text-2xl text-[#F05267]">▣</span>
       </div>
     </footer>
   );

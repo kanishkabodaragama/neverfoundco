@@ -6,21 +6,25 @@ const products = [
     title: "PIXEL LOGO HOODIE",
     price: "$89.00",
     image: "/images/landing/tee-black.svg",
+    slug: "lost-paradise-tee",
   },
   {
     title: "GLITCH TEE",
     price: "$45.00",
     image: "/images/landing/tee-cream.svg",
+    slug: "heat-wave-tee",
   },
   {
     title: "8-BIT CAP",
     price: "$35.00",
     image: "/images/landing/tee-yellow.svg",
+    slug: "dream-state-tee",
   },
   {
     title: "PIXEL TOTE BAG",
     price: "$39.00",
     image: "/images/landing/tee-sold.svg",
+    slug: "daydream-tee",
   },
 ];
 
@@ -32,14 +36,13 @@ export function NeverFoundHomePage() {
         <section className="relative min-h-[760px] overflow-hidden bg-[#F7F1E6] text-[#10131A]">
           <Image
             alt="Pixel character standing on a cliff looking at a city skyline"
-            className="object-cover object-center"
+            className="object-contain object-center"
             fill
             priority
             sizes="100vw"
             src="/images/arcade/hero-city.png"
           />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,#F7F1E6_0%,#F7F1E6_36%,rgba(247,241,230,0.76)_52%,rgba(247,241,230,0.12)_100%)]" />
-          <div className="relative z-10 mx-auto grid min-h-[760px] max-w-[1440px] gap-10 px-6 py-12 md:px-10 lg:grid-cols-[0.82fr_1.18fr] lg:px-16">
+          <div className="relative z-10 grid min-h-[760px] w-full gap-10 px-6 py-12 md:px-10 lg:grid-cols-[0.82fr_1.18fr] lg:px-16">
             <div className="relative z-10 flex flex-col justify-center">
               <p className="font-pixel text-sm text-[#F05267] md:text-base">
                 1UP &hearts; &hearts; &hearts;
@@ -78,8 +81,8 @@ export function NeverFoundHomePage() {
           <div className="h-8 bg-[#070B12]" />
         </section>
 
-        <section className="bg-[#070B12] px-6 py-14 md:px-10 lg:px-16">
-          <div className="mx-auto max-w-[1440px]">
+        <section className="bg-[#070B12] px-6 py-10 md:px-10 lg:px-16">
+          <div className="w-full">
             <div className="flex items-center justify-between gap-4">
               <h2 className="font-pixel text-sm uppercase text-[#FFF9EF]">
                 <span className="pixel-blink mr-3 text-[#F05267]">▣</span>
@@ -97,11 +100,11 @@ export function NeverFoundHomePage() {
           </div>
         </section>
 
-        <section className="bg-[#B8A8E8] px-6 py-16 text-[#10131A] md:px-10 lg:px-16">
-          <div className="mx-auto grid max-w-[1440px] items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+        <section className="bg-[#B8A8E8] px-6 py-12 text-[#10131A] md:px-10 lg:px-16">
+          <div className="grid w-full items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
             <div>
               <p className="text-sm font-black uppercase">{"// About"}</p>
-              <h2 className="font-pixel mt-8 max-w-2xl text-3xl font-black uppercase leading-tight md:text-5xl">
+              <h2 className="font-pixel mt-8 max-w-2xl text-2xl font-black uppercase leading-tight md:text-3xl">
                 We document
                 <br />
                 the unnoticed_
@@ -137,7 +140,7 @@ export function NeverFoundHomePage() {
 function Header() {
   return (
     <header className="bg-[#070B12] text-[#FFF9EF]">
-      <div className="mx-auto flex min-h-[108px] max-w-[1440px] items-center justify-between gap-4 px-6 md:px-10 lg:px-16">
+      <div className="flex min-h-[86px] w-full items-center justify-between gap-4 px-6 md:px-10 lg:px-16">
         <Link className="font-pixel text-2xl font-black leading-none" href="/">
           never
           <br />
@@ -168,10 +171,13 @@ function Header() {
 function ProductCard({
   product,
 }: {
-  product: { title: string; price: string; image: string };
+  product: { title: string; price: string; image: string; slug: string };
 }) {
   return (
-    <article className="group bg-[#FFF9EF] p-5 text-[#10131A] transition hover:-translate-y-1">
+    <Link
+      className="group block bg-[#FFF9EF] p-5 text-[#10131A] transition hover:-translate-y-1"
+      href={`/products/${product.slug}`}
+    >
       <div className="relative aspect-square">
         <span className="absolute left-0 top-0 z-10 bg-[#B8A8E8] px-3 py-1 text-xs font-black uppercase">
           New
@@ -190,7 +196,7 @@ function ProductCard({
         <span className="text-[#F05267]">♥♥♥</span>
         <span>→</span>
       </div>
-    </article>
+    </Link>
   );
 }
 
@@ -216,7 +222,7 @@ function Footer() {
         src="/images/arcade/pixel-planet.png"
       />
       <div className="absolute inset-0 bg-[#B8A8E8]/70" />
-      <div className="relative z-10 mx-auto flex max-w-[1440px] flex-col gap-6 md:flex-row md:items-center md:justify-between">
+      <div className="relative z-10 flex w-full flex-col gap-6 md:flex-row md:items-center md:justify-between">
         <p className="font-pixel text-xs uppercase leading-relaxed">
           ▣ © Never Found 1999
           <br />

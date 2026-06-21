@@ -13,8 +13,8 @@ export function OrderSummary({
 
   return (
     <aside className="space-y-4">
-      <div className="bg-[#070B12] p-7 text-[#FFF9EF]">
-        <h2 className="font-pixel text-2xl font-black uppercase">Order Summary</h2>
+      <div className="bg-[#070B12] p-5 text-[#FFF9EF]">
+        <h2 className="font-pixel text-base font-black uppercase">Order Summary</h2>
         <div className="mt-7 space-y-4 text-sm font-bold">
           <div className="flex justify-between gap-4">
             <span>Subtotal</span>
@@ -27,7 +27,7 @@ export function OrderSummary({
           <div className="h-px bg-[#F7F1E6]/15" />
           <div className="flex items-end justify-between gap-4">
             <span className="text-xl font-black">Total</span>
-            <span className="text-3xl font-black text-[#F05267]">
+            <span className="text-xl font-black text-[#F05267]">
               {formatLkr(total)}
             </span>
           </div>
@@ -39,7 +39,7 @@ export function OrderSummary({
           Proceed To Checkout -&gt;
         </Link>
       </div>
-      <div className="space-y-5 border border-[#10131A]/10 bg-[#FFF9EF] p-6 text-[#10131A]">
+      <div className="space-y-4 border border-[#10131A]/10 bg-[#FFF9EF] p-5 text-[#10131A]">
         {[
           ["🌐", "Worldwide Shipping", "We ship everywhere. Wear it anywhere."],
           ["☺", "No Restocks", "If it's sold out, it's never coming back."],
@@ -54,7 +54,7 @@ export function OrderSummary({
           </div>
         ))}
       </div>
-      <figure className="relative min-h-[220px] overflow-hidden bg-[#070B12]">
+      <figure className="relative min-h-[160px] overflow-hidden bg-[#070B12]">
         <Image
           alt="Vintage van culture strip"
           className="object-cover"

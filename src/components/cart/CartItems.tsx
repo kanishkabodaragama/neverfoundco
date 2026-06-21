@@ -35,10 +35,10 @@ export function CartItems() {
   }
 
   return (
-    <section className="mx-auto grid max-w-[1440px] gap-6 bg-[#F7F1E6] px-5 py-10 md:px-8 lg:grid-cols-[1fr_360px] lg:px-10 xl:px-12">
+    <section className="grid w-full gap-6 bg-[#F7F1E6] px-5 py-8 md:px-8 lg:grid-cols-[1fr_340px] xl:px-12">
       <div className="space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <h1 className="font-pixel text-3xl font-black uppercase">
+          <h1 className="font-pixel text-2xl font-black uppercase md:text-3xl">
             Your Items ({items.length})
           </h1>
           <button

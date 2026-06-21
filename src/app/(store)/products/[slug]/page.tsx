@@ -50,8 +50,8 @@ export default async function ProductPage({
     <div className="min-h-screen w-full bg-[#F7F1E6] text-[#10131A]">
       <Header />
       <main>
-        <section className="mx-auto grid max-w-[1440px] gap-10 px-5 py-12 md:grid-cols-[0.9fr_1.1fr] md:px-8 lg:px-12">
-          <div className="relative min-h-[420px] border border-[#10131A]/10 bg-[#FFF9EF] p-6">
+        <section className="grid w-full gap-8 bg-[#F7F1E6] px-5 py-8 md:grid-cols-[0.8fr_1.2fr] md:px-8 xl:px-12">
+          <div className="relative min-h-[360px] border border-[#10131A]/10 bg-[#FFF9EF] p-6">
             <Image
               alt={product.alt}
               className="object-contain p-8"
@@ -64,13 +64,13 @@ export default async function ProductPage({
             <p className="text-xs font-black uppercase tracking-[0.25em] text-[#F05267]">
               Product file / Drop 001
             </p>
-            <h1 className="font-pixel max-w-2xl text-4xl font-black uppercase leading-tight md:text-6xl">
+            <h1 className="font-pixel max-w-2xl text-2xl font-black uppercase leading-tight md:text-3xl">
               {product.name}
             </h1>
-            <p className="max-w-xl text-lg font-black leading-relaxed">
+            <p className="max-w-xl text-sm font-black leading-relaxed md:text-base">
               {product.shortDescription}
             </p>
-            <p className="max-w-2xl text-lg font-bold leading-relaxed">
+            <p className="max-w-2xl text-sm font-bold leading-relaxed">
               {product.description}
             </p>
             <div className="flex flex-wrap gap-3 text-xs font-black uppercase">
@@ -91,7 +91,7 @@ export default async function ProductPage({
             <div className="grid gap-4 border border-[#10131A]/10 bg-[#FFF9EF] p-5">
               <div className="flex items-center justify-between gap-4">
                 <span className="text-sm font-black uppercase">Price</span>
-                <strong className="text-3xl font-black uppercase text-[#F05267]">
+                <strong className="text-xl font-black uppercase text-[#F05267]">
                   {formatLkr(product.price)}
                 </strong>
               </div>
@@ -124,7 +124,7 @@ function InfoBlock({ label, value }: { label: string; value: string }) {
   return (
     <div className="bg-[#070B12] p-4 text-[#FFF9EF]">
       <p className="text-xs font-black uppercase text-[#B8A8E8]">{label}</p>
-      <p className="mt-2 text-lg font-black uppercase">{value}</p>
+      <p className="mt-2 text-sm font-black uppercase">{value}</p>
     </div>
   );
 }

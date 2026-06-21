@@ -59,13 +59,13 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
   }
 
   return (
-    <section className="grid gap-8 px-5 py-12 md:grid-cols-[1.1fr_0.9fr] md:px-8 lg:px-10 xl:px-12">
-      <form className="space-y-8" onSubmit={handleSubmit}>
+    <section className="grid w-full gap-6 bg-[#F7F1E6] px-5 py-8 md:grid-cols-[1.1fr_0.9fr] md:px-8 xl:px-12">
+      <form className="space-y-6" onSubmit={handleSubmit}>
         <div>
           <p className="text-xs font-black uppercase tracking-[0.25em] text-[#F05267]">
             Checkout
           </p>
-          <h1 className="font-pixel mt-3 text-3xl font-black uppercase md:text-5xl">
+          <h1 className="font-pixel mt-3 text-2xl font-black uppercase md:text-3xl">
             Complete order
           </h1>
         </div>
@@ -136,7 +136,7 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
                 value="payhere"
               />
               <span>
-                <span className="block text-2xl font-black uppercase">
+                <span className="block font-pixel text-base uppercase">
                   PayHere
                 </span>
                 <span className="mt-2 block text-sm font-black uppercase text-[#B8A8E8]">
@@ -166,8 +166,8 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
       </form>
 
       <aside className="space-y-5">
-        <div className="bg-[#070B12] p-6 text-[#FFF9EF]">
-          <h2 className="font-pixel text-2xl font-black uppercase">Order Summary</h2>
+        <div className="bg-[#070B12] p-5 text-[#FFF9EF]">
+          <h2 className="font-pixel text-base font-black uppercase">Order Summary</h2>
           <div className="mt-6 space-y-4">
             {items.map((item) => (
               <div
@@ -198,7 +198,7 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
         </div>
 
         <div className="bg-[#B8A8E8] p-5 text-[#10131A]">
-          <p className="font-pixel text-xl font-black uppercase">No Restocks</p>
+          <p className="font-pixel text-base font-black uppercase">No Restocks</p>
           <p className="mt-2 font-bold leading-relaxed">
             Orders stay pending until a verified PayHere callback marks payment
             as paid in the real checkout flow.
@@ -218,7 +218,7 @@ function Panel({
 }) {
   return (
     <div className="space-y-4">
-      <h2 className="font-pixel text-2xl font-black uppercase">{title}</h2>
+      <h2 className="font-pixel text-base font-black uppercase">{title}</h2>
       <div className="border border-[#10131A]/10 bg-[#FFF9EF] p-4">{children}</div>
     </div>
   );

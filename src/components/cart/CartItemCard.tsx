@@ -14,8 +14,8 @@ export function CartItemCard({
   onRemove: (id: string) => void;
 }) {
   return (
-    <article className="grid gap-0 border border-[#10131A]/10 bg-[#FFF9EF] transition hover:-translate-y-1 md:grid-cols-[190px_1fr_120px_150px_40px]">
-      <div className="relative min-h-[180px] bg-[#FFF9EF]">
+    <article className="grid gap-0 border border-[#10131A]/10 bg-[#FFF9EF] transition hover:-translate-y-1 md:grid-cols-[150px_1fr_110px_140px_40px]">
+      <div className="relative min-h-[150px] bg-[#FFF9EF]">
         <Image
           alt={item.alt}
           className="object-contain p-5"
@@ -24,7 +24,7 @@ export function CartItemCard({
         />
       </div>
       <div className="space-y-4 p-5">
-        <h3 className="text-lg font-black uppercase">{item.name}</h3>
+        <h3 className="font-pixel text-sm uppercase">{item.name}</h3>
         <div className="text-sm font-bold leading-snug">
           <p>{item.color}</p>
           <p>Size: {item.size}</p>

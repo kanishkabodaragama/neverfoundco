@@ -10,7 +10,7 @@ const navItems = [
 export function Header() {
   return (
     <header className="bg-[#070B12] text-[#FFF9EF]">
-      <div className="mx-auto flex min-h-[96px] max-w-[1440px] items-center justify-between gap-4 px-5 py-3 md:px-8 xl:px-12">
+      <div className="flex min-h-[86px] w-full items-center justify-between gap-4 px-5 py-3 md:px-8 xl:px-12">
         <Link
           aria-label="Never Found home"
           className="font-pixel text-2xl font-black leading-none"
