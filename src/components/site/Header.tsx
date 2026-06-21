@@ -8,6 +8,10 @@ const navItems = [
 ];
 
 export function Header() {
+  return <SiteHeader active="play" />;
+}
+
+export function SiteHeader({ active = "play" }: { active?: "play" | "shop" | "about" | "lookbook" }) {
   return (
     <header className="bg-[#070B12] text-[#FFF9EF]">
       <div className="flex min-h-[86px] w-full items-center justify-between gap-4 px-5 py-3 md:px-8 xl:px-12">
@@ -23,10 +27,10 @@ export function Header() {
           aria-label="Primary navigation"
           className="font-pixel hidden items-center gap-6 text-sm uppercase md:flex xl:gap-10"
         >
-          {navItems.map((item, index) => (
+          {navItems.map((item) => (
             <Link
               className={`relative py-2 transition hover:text-[#F05267] ${
-                index === 0
+                item.label.toLowerCase() === active
                   ? "text-[#F05267] after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:bg-[#F05267]"
                   : ""
               }`}

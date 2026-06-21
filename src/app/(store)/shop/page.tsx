@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Footer } from "@/components/site/Footer";
-import { Header } from "@/components/site/Header";
+import { SiteHeader } from "@/components/site/Header";
 import { shopProducts } from "@/components/site/shop-data";
 import { formatLkr } from "@/components/cart/cart-data";
 
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function ShopPage() {
   return (
     <div className="min-h-screen w-full bg-[#F7F1E6] text-[#10131A]">
-      <Header />
+      <SiteHeader active="shop" />
       <main>
         <section className="w-full bg-[#F7F1E6] px-5 py-8 md:px-8 xl:px-12">
           <div className="flex flex-wrap items-end justify-between gap-4">

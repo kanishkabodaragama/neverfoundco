@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { useCart } from "@/components/store/cart-provider";
 
@@ -27,21 +26,21 @@ export function ProductDetailActions({
   }
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row">
+    <div className="grid gap-3">
       <button
-        className="pixel-edge bg-[#F05267] px-6 py-4 text-sm font-black uppercase text-[#FFF9EF] transition hover:translate-x-0.5 disabled:cursor-not-allowed disabled:opacity-50"
+        className="pixel-edge flex w-full items-center justify-center gap-3 bg-[#F05267] px-6 py-4 text-sm font-black uppercase text-[#FFF9EF] transition hover:translate-x-0.5 disabled:cursor-not-allowed disabled:opacity-50"
         disabled={soldOut}
         onClick={handleAddToCart}
         type="button"
       >
-        {soldOut ? "Sold Out" : added ? "Added To Cart" : "Add To Cart ->"}
+        {soldOut ? "Sold Out" : added ? "Added To Cart" : "▶ Add To Cart"}
       </button>
-      <Link
-        className="border border-[#10131A]/20 px-6 py-4 text-center text-sm font-black uppercase transition hover:translate-x-0.5 hover:border-[#F05267] hover:text-[#F05267]"
-        href="/cart"
+      <button
+        className="w-full border border-[#10131A] px-6 py-4 text-sm font-black uppercase transition hover:translate-x-0.5 hover:border-[#F05267] hover:text-[#F05267]"
+        type="button"
       >
-        View Cart
-      </Link>
+        ♡ Add To Wishlist
+      </button>
     </div>
   );
 }
