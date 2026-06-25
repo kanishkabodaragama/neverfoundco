@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { adminRedirect } from "@/lib/admin-forms";
 import { requireAdminApi } from "@/lib/admin-auth";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { orderStatusSchema } from "@/lib/validation/admin";
@@ -16,15 +16,24 @@ export async function PATCH(
     ?.includes("application/json")
     ? await request.json()
     : Object.fromEntries((await request.formData()).entries());
-  const parsed = orderStatusSchema.parse(body);
-  const supabase = getSupabaseAdminClient();
-  const { error } = await supabase.from("orders").update(parsed).eq("id", id);
+  const parsed = orderStatusSchema.safeParse(body);
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+  if (!parsed.success) {
+    return adminRedirect(request, `/admin/orders/${id}`, {
+      error: parsed.error.issues[0]?.message ?? "Invalid order status.",
+    });
   }
 
-  return NextResponse.redirect(new URL(`/admin/orders/${id}`, request.url), 303);
+  const supabase = getSupabaseAdminClient();
+  const { error } = await supabase.from("orders").update(parsed.data).eq("id", id);
+
+  if (error) {
+    return adminRedirect(request, `/admin/orders/${id}`, { error: error.message });
+  }
+
+  return adminRedirect(request, `/admin/orders/${id}`, {
+    success: "Order status updated.",
+  });
 }
 
 export async function POST(
@@ -33,4 +42,3 @@ export async function POST(
 ) {
   return PATCH(request, context);
 }
-

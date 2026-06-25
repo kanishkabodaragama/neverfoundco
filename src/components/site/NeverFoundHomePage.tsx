@@ -1,32 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
+import { CartLink } from "@/components/site/CartLink";
+import { CurrencySelector } from "@/components/site/CurrencySelector";
+import { ScrollHeader } from "@/components/site/ScrollHeader";
+import { StorePrice } from "@/components/site/StorePrice";
+import { shopProducts, type ShopProduct } from "@/components/site/shop-data";
 
-const products = [
-  {
-    title: "PIXEL LOGO HOODIE",
-    price: "$89.00",
-    image: "/images/landing/tee-black.svg",
-    slug: "lost-paradise-tee",
-  },
-  {
-    title: "GLITCH TEE",
-    price: "$45.00",
-    image: "/images/landing/tee-cream.svg",
-    slug: "heat-wave-tee",
-  },
-  {
-    title: "8-BIT CAP",
-    price: "$35.00",
-    image: "/images/landing/tee-yellow.svg",
-    slug: "dream-state-tee",
-  },
-  {
-    title: "PIXEL TOTE BAG",
-    price: "$39.00",
-    image: "/images/landing/tee-sold.svg",
-    slug: "daydream-tee",
-  },
-];
+const featuredProducts = shopProducts.slice(0, 4);
 
 export function NeverFoundHomePage() {
   return (
@@ -93,8 +73,8 @@ export function NeverFoundHomePage() {
               </Link>
             </div>
             <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-              {products.map((product) => (
-                <ProductCard key={product.title} product={product} />
+              {featuredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
           </div>
@@ -139,7 +119,7 @@ export function NeverFoundHomePage() {
 
 function Header() {
   return (
-    <header className="bg-[#070B12] text-[#FFF9EF]">
+    <ScrollHeader>
       <div className="flex min-h-[86px] w-full items-center justify-between gap-4 px-6 md:px-10 lg:px-16">
         <Link className="font-pixel text-2xl font-black leading-none" href="/">
           never
@@ -147,51 +127,50 @@ function Header() {
           found
         </Link>
         <nav className="font-pixel hidden items-center gap-10 text-sm uppercase md:flex">
-          {["Play", "Shop", "About", "Lookbook"].map((item, index) => (
+          {["Home", "Shop", "About", "Contact"].map((item, index) => (
             <Link
               className={`relative py-2 transition hover:text-[#F05267] ${
                 index === 0 ? "text-[#F05267] after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:bg-[#F05267]" : ""
               }`}
-              href={item === "Play" ? "/" : item === "Lookbook" ? "/about" : `/${item.toLowerCase()}`}
+              href={item === "Home" ? "/" : `/${item.toLowerCase()}`}
               key={item}
             >
               {item}
             </Link>
           ))}
         </nav>
-        <Link className="font-pixel flex items-center gap-3 text-sm uppercase" href="/cart">
-          Cart (0)
-          <span className="pixel-blink text-[#F05267]">▣</span>
-        </Link>
+        <div className="flex items-center gap-4">
+          <CurrencySelector />
+          <Link className="font-pixel text-sm uppercase transition hover:text-[#F05267]" href="/account/login">
+            Login
+          </Link>
+          <CartLink />
+        </div>
       </div>
-    </header>
+    </ScrollHeader>
   );
 }
 
-function ProductCard({
-  product,
-}: {
-  product: { title: string; price: string; image: string; slug: string };
-}) {
+function ProductCard({ product }: { product: ShopProduct }) {
   return (
     <Link
       className="group block bg-[#FFF9EF] p-5 text-[#10131A] transition hover:-translate-y-1"
-      href={`/products/${product.slug}`}
+      href={`/products/${product.id}`}
     >
       <div className="relative aspect-square">
         <span className="absolute left-0 top-0 z-10 bg-[#B8A8E8] px-3 py-1 text-xs font-black uppercase">
-          New
+          {product.stockLabel}
         </span>
         <Image
-          alt={product.title}
+          alt={product.alt}
           className="object-contain p-8"
           fill
           sizes="(min-width: 1280px) 300px, (min-width: 640px) 44vw, 90vw"
           src={product.image}
         />
       </div>
-      <h3 className="font-pixel mt-5 text-sm uppercase">{product.title}</h3>
-      <p className="mt-3 font-black">{product.price}</p>
+      <h3 className="font-pixel mt-5 text-sm uppercase">{product.name}</h3>
+      <p className="mt-3 font-black"><StorePrice amountUsd={product.price} /></p>
       <div className="mt-5 flex items-center justify-between">
         <span className="text-[#F05267]">♥♥♥</span>
         <span>→</span>
@@ -234,8 +213,18 @@ function Footer() {
               {item}
             </Link>
           ))}
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/returns">Returns</Link>
+          <Link href="/terms">Terms</Link>
         </div>
-        <span className="pixel-blink text-2xl text-[#F05267]">▣</span>
+        <Link
+          className="font-pixel text-xs uppercase leading-relaxed transition hover:text-[#F05267]"
+          href="https://neurait.com"
+          rel="noreferrer"
+          target="_blank"
+        >
+          Developed and maintained by Neura IT
+        </Link>
       </div>
     </footer>
   );

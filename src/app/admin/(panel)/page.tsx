@@ -2,6 +2,14 @@ import Link from "next/link";
 import { requireAdmin } from "@/lib/admin-auth";
 import { getDashboardStats } from "@/lib/db/admin";
 import { formatCurrency } from "@/lib/utils";
+import { Boxes, ClipboardList, Percent, Truck, type LucideIcon } from "lucide-react";
+
+const quickActions: Array<[string, string, LucideIcon]> = [
+  ["Create product", "/admin/products/new", Boxes],
+  ["Review orders", "/admin/orders", ClipboardList],
+  ["Create coupon", "/admin/coupons", Percent],
+  ["Shipping rates", "/admin/settings/shipping", Truck],
+];
 
 export const dynamic = "force-dynamic";
 
@@ -10,37 +18,34 @@ export default async function AdminDashboardPage() {
   const stats = await getDashboardStats();
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div>
-        <p className="text-xs font-black uppercase tracking-[0.25em] text-[#B8A8E8]">
-          Control panel
+        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <p className="admin-muted mt-2">
+          Live ecommerce snapshot for orders, sales, catalog, and admin actions.
         </p>
-        <h1 className="mt-3 font-mono text-3xl font-black uppercase md:text-5xl">
-          Dashboard
-        </h1>
-        <p className="mt-2 text-sm text-[#F7F1E6]/60">Signed in as {admin.email}</p>
+        <p className="admin-muted mt-1 text-sm">Signed in as {admin.email}</p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-        <Metric label="Revenue" value={formatCurrency(stats.totalRevenue)} />
-        <Metric label="Orders" value={String(stats.orderCount)} />
-        <Metric label="Pending" value={String(stats.pendingOrders)} />
-        <Metric label="Products" value={String(stats.productCount)} />
-        <Metric label="Coupons" value={String(stats.activeCoupons)} />
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+        <Metric label="Total sales" value={formatCurrency(stats.totalSales)} helper="paid orders" />
+        <Metric label="Active orders" value={String(stats.activeOrders)} helper="not completed or cancelled" />
+        <Metric label="Total orders" value={String(stats.orderCount)} helper="all time" />
+        <Metric label="Total products" value={String(stats.productCount)} helper="catalog records" />
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-[1.3fr_0.7fr]">
-        <section className="border border-[#F7F1E6]/10 bg-[#0B111C] p-5">
+      <div className="grid gap-4 xl:grid-cols-[1.3fr_0.7fr]">
+        <section className="admin-card p-4">
           <div className="flex items-center justify-between gap-4">
-            <h2 className="font-mono text-xl font-black uppercase">Recent orders</h2>
-            <Link className="text-xs font-black uppercase text-[#F05267]" href="/admin/orders">
+            <h2 className="text-lg font-semibold">Recent orders</h2>
+            <Link className="text-sm font-semibold text-[#a7835d]" href="/admin/orders">
               View all
             </Link>
           </div>
-          <div className="mt-5 overflow-x-auto">
-            <table className="w-full min-w-[620px] text-left text-sm">
-              <thead className="text-xs uppercase text-[#F7F1E6]/50">
-                <tr className="border-b border-[#F7F1E6]/10">
+          <div className="mt-4 overflow-x-auto">
+            <table className="admin-table min-w-[620px]">
+              <thead>
+                <tr>
                   <th className="py-3">Order</th>
                   <th className="py-3">Customer</th>
                   <th className="py-3">Status</th>
@@ -49,15 +54,15 @@ export default async function AdminDashboardPage() {
               </thead>
               <tbody>
                 {stats.recentOrders.map((order) => (
-                  <tr className="border-b border-[#F7F1E6]/10" key={order.id}>
+                  <tr key={order.id}>
                     <td className="py-3">
-                      <Link className="text-[#FFF9EF]" href={`/admin/orders/${order.id}`}>
+                      <Link className="font-semibold" href={`/admin/orders/${order.id}`}>
                         {order.order_number}
                       </Link>
                     </td>
-                    <td className="py-3 text-[#F7F1E6]/70">{order.customer_name}</td>
+                    <td className="py-3">{order.customer_name}</td>
                     <td className="py-3">
-                      <span className="border border-[#B8A8E8]/40 px-2 py-1 text-xs uppercase text-[#B8A8E8]">
+                      <span className="rounded-md border border-[#ece7df] bg-[#f6f3ef] px-3 py-1 text-xs font-semibold uppercase text-[#81796f]">
                         {order.order_status}
                       </span>
                     </td>
@@ -67,40 +72,42 @@ export default async function AdminDashboardPage() {
               </tbody>
             </table>
             {stats.recentOrders.length === 0 ? (
-              <p className="py-8 text-sm text-[#F7F1E6]/55">No orders yet.</p>
+              <p className="admin-muted py-8 text-sm">No orders yet.</p>
             ) : null}
           </div>
         </section>
 
-        <section className="grid gap-3">
-          {[
-            ["Add product", "/admin/products/new"],
-            ["Create coupon", "/admin/coupons"],
-            ["Shipping rules", "/admin/settings/shipping"],
-          ].map(([label, href]) => (
+        <section className="admin-card p-4">
+          <h2 className="text-lg font-semibold">Quick actions</h2>
+          <p className="admin-muted mt-1 text-sm">Common admin tasks for the current storefront workflow.</p>
+          <div className="mt-4 grid gap-2.5">
+          {quickActions.map(([label, href, Icon]) => (
             <Link
-              className="border border-[#F7F1E6]/10 bg-[#0B111C] p-5 font-mono text-sm font-black uppercase transition hover:translate-x-0.5 hover:border-[#F05267]"
+              className="admin-secondary-action flex items-center gap-3 px-4 py-3"
               href={href}
               key={href}
             >
-              {label} -&gt;
+              <Icon className="h-5 w-5" />
+              {label}
             </Link>
           ))}
+          </div>
         </section>
       </div>
     </div>
   );
 }
 
-function Metric({ label, value }: { label: string; value: string }) {
+function Metric({ helper, label, value }: { helper: string; label: string; value: string }) {
   return (
-    <div className="border border-[#F7F1E6]/10 bg-[#0B111C] p-4">
-      <p className="text-xs font-black uppercase tracking-wide text-[#B8A8E8]">
+    <div className="admin-card p-4">
+      <p className="admin-muted text-xs font-semibold uppercase tracking-[0.35em]">
         {label}
       </p>
-      <p className="mt-3 font-mono text-2xl font-black uppercase text-[#FFF9EF]">
+      <p className="mt-4 text-3xl font-light">
         {value}
       </p>
+      <p className="admin-muted mt-3 text-sm">{helper}</p>
     </div>
   );
 }

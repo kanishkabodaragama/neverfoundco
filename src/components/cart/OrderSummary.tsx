@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { formatLkr } from "@/components/cart/cart-data";
+import { StorePrice } from "@/components/site/StorePrice";
 
 export function OrderSummary({
   subtotal,
@@ -18,17 +18,17 @@ export function OrderSummary({
         <div className="mt-7 space-y-4 text-sm font-bold">
           <div className="flex justify-between gap-4">
             <span>Subtotal</span>
-            <span>{formatLkr(subtotal)}</span>
+            <span><StorePrice amountUsd={subtotal} /></span>
           </div>
           <div className="flex justify-between gap-4">
             <span>Shipping</span>
-            <span>{formatLkr(shipping)}</span>
+            <span><StorePrice amountUsd={shipping} /></span>
           </div>
           <div className="h-px bg-[#F7F1E6]/15" />
           <div className="flex items-end justify-between gap-4">
             <span className="text-xl font-black">Total</span>
             <span className="text-xl font-black text-[#F05267]">
-              {formatLkr(total)}
+              <StorePrice amountUsd={total} />
             </span>
           </div>
         </div>

@@ -1,70 +1,127 @@
+import Image from "next/image";
 import Link from "next/link";
+import { Download, Filter, MoreHorizontal, Plus, Search } from "lucide-react";
+import { AdminAlert } from "@/components/admin/admin-alert";
 import { requireAdmin } from "@/lib/admin-auth";
 import { listAdminProducts } from "@/lib/db/products";
 import { formatCurrency } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminProductsPage() {
+export default async function AdminProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; success?: string }>;
+}) {
   await requireAdmin();
+  const flash = await searchParams;
   const products = await listAdminProducts();
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-[#B8A8E8]">
-            Catalog
-          </p>
-          <h1 className="mt-3 font-mono text-3xl font-black uppercase md:text-5xl">
-            Products
-          </h1>
-        </div>
-        <Link
-          className="bg-[#F05267] px-5 py-3 text-sm font-black uppercase text-[#FFF9EF] transition hover:translate-x-0.5"
-          href="/admin/products/new"
-        >
-          Add product
-        </Link>
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">Products</h1>
+        <p className="admin-muted mt-2 text-sm">
+          Manage catalog records, inventory, prices, and publication status.
+        </p>
       </div>
-      <div className="overflow-x-auto border border-[#F7F1E6]/10 bg-[#0B111C]">
-        <table className="w-full min-w-[820px] border-collapse text-left text-sm">
-          <thead className="text-xs uppercase text-[#F7F1E6]/50">
-            <tr className="border-b border-[#F7F1E6]/10">
-              <th className="px-4 py-4">Name</th>
-              <th className="px-4 py-4">Slug</th>
-              <th className="px-4 py-4">Price</th>
-              <th className="px-4 py-4">Stock</th>
-              <th className="px-4 py-4">Status</th>
-              <th className="px-4 py-4 text-right">Actions</th>
+      <AdminAlert error={flash.error} success={flash.success} />
+      <div className="admin-card overflow-hidden">
+        <div className="flex flex-wrap items-center gap-3 border-b border-[#ece7df] p-4">
+          <label className="relative min-w-72 flex-1">
+            <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#81796f]" />
+            <input
+              className="admin-input admin-search-input w-full"
+              placeholder="Search products by SKU, name, brand, or category"
+              type="search"
+            />
+          </label>
+          <button className="admin-secondary-action flex items-center gap-2 px-3 py-2.5" type="button">
+            <Filter className="h-4 w-4" />
+            Filters
+          </button>
+          <button className="admin-secondary-action flex items-center gap-2 px-3 py-2.5" type="button">
+            <Download className="h-4 w-4" />
+            Download
+          </button>
+          <Link
+            className="admin-action flex items-center gap-2 px-4 py-2.5"
+            href="/admin/products/new"
+          >
+            <Plus className="h-4 w-4" />
+            Create product
+          </Link>
+        </div>
+        <div className="flex border-b border-[#ece7df] px-3 py-2">
+          <span className="rounded-md bg-[#332c26] px-4 py-2 text-sm font-semibold text-white">
+            Active <span className="ml-2 opacity-65">{products.filter((product) => product.is_active).length}</span>
+          </span>
+          <span className="px-4 py-2 text-sm font-semibold text-[#9a9288]">
+            Trash 0
+          </span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="admin-table min-w-[980px]">
+            <thead>
+              <tr>
+                <th>SKU</th>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Status</th>
+                <th>Updated</th>
+                <th className="text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {products.map((product) => (
-              <tr className="border-b border-[#F7F1E6]/10" key={product.id}>
-                <td className="px-4 py-4 font-black uppercase text-[#FFF9EF]">
-                  {product.name}
+              <tr key={product.id}>
+                <td className="font-semibold text-[#4a4037]">
+                  {product.slug.slice(0, 8).toUpperCase()}
                 </td>
-                <td className="px-4 py-4 font-mono text-xs text-[#F7F1E6]/55">
-                  {product.slug}
+                <td>
+                  <div className="flex items-center gap-4">
+                    <div className="relative h-12 w-12 overflow-hidden rounded-md border border-[#ece7df] bg-[#f6f3ef]">
+                      {product.main_image_url || product.product_images?.[0]?.image_url ? (
+                        <Image
+                          alt={product.name}
+                          className="object-cover"
+                          fill
+                          sizes="48px"
+                          src={product.main_image_url ?? product.product_images[0].image_url}
+                          unoptimized
+                        />
+                      ) : null}
+                    </div>
+                    <Link className="font-semibold hover:text-[#a7835d]" href={`/admin/products/${product.id}/edit`}>
+                      {product.name}
+                    </Link>
+                  </div>
                 </td>
-                <td className="px-4 py-4">
+                <td>{product.category}</td>
+                <td>
                   {formatCurrency(Number(product.sale_price ?? product.price))}
                 </td>
-                <td className="px-4 py-4">{product.stock_quantity}</td>
-                <td className="px-4 py-4">
-                  <span className="border border-[#B8A8E8]/40 px-2 py-1 text-xs uppercase text-[#B8A8E8]">
-                    {product.is_active ? "Published" : "Unpublished"}
+                <td>{product.stock_quantity}</td>
+                <td>
+                  <span className={`rounded-md border px-3 py-1.5 text-[0.7rem] font-semibold uppercase ${
+                    product.is_active
+                      ? "border-emerald-200 bg-emerald-50 text-emerald-400"
+                      : "border-zinc-200 bg-zinc-50 text-zinc-400"
+                  }`}>
+                    {product.is_active ? "Active" : "Draft"}
                   </span>
                 </td>
-                <td className="px-4 py-4 text-right">
+                <td>{new Date(product.updated_at).toISOString().slice(0, 10)}</td>
+                <td className="text-right">
                   <details className="relative inline-block">
-                    <summary className="cursor-pointer border border-[#F7F1E6]/20 px-3 py-2 text-xs font-black uppercase marker:content-[''] hover:border-[#F05267]">
-                      Actions
+                    <summary className="admin-secondary-action flex h-9 w-9 cursor-pointer items-center justify-center marker:content-['']">
+                      <MoreHorizontal className="h-4 w-4" />
                     </summary>
-                    <div className="absolute right-0 z-20 mt-2 grid w-40 border border-[#F7F1E6]/10 bg-[#070B12] p-2 text-left shadow-xl">
+                    <div className="admin-menu absolute right-0 mt-2 grid w-40 p-2 text-left">
                       <Link
-                        className="px-3 py-2 text-xs font-black uppercase hover:bg-[#F05267] hover:text-[#FFF9EF]"
+                        className="rounded px-3 py-2 text-sm font-semibold hover:bg-[#f6f3ef]"
                         href={`/admin/products/${product.id}/edit`}
                       >
                         Edit
@@ -77,7 +134,7 @@ export default async function AdminProductsPage() {
                           value={product.is_active ? "false" : "true"}
                         />
                         <button
-                          className="w-full px-3 py-2 text-left text-xs font-black uppercase hover:bg-[#F05267] hover:text-[#FFF9EF]"
+                          className="w-full rounded px-3 py-2 text-left text-sm font-semibold hover:bg-[#f6f3ef]"
                           type="submit"
                         >
                           {product.is_active ? "Unpublish" : "Publish"}
@@ -86,7 +143,7 @@ export default async function AdminProductsPage() {
                       <form action={`/api/admin/products/${product.id}`} method="post">
                         <input name="_method" type="hidden" value="DELETE" />
                         <button
-                          className="w-full px-3 py-2 text-left text-xs font-black uppercase text-[#F05267] hover:bg-[#F05267] hover:text-[#FFF9EF]"
+                          className="w-full rounded px-3 py-2 text-left text-sm font-semibold text-red-500 hover:bg-red-50"
                           type="submit"
                         >
                           Delete
@@ -99,9 +156,10 @@ export default async function AdminProductsPage() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
       {products.length === 0 ? (
-        <p className="border border-[#F7F1E6]/10 bg-[#0B111C] p-6 text-sm text-[#F7F1E6]/55">
+        <p className="admin-card p-6 text-sm text-[#81796f]">
           No products yet.
         </p>
       ) : null}

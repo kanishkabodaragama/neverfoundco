@@ -26,7 +26,7 @@ export function CartView() {
     <div className="space-y-6">
       {cart.items.map((item) => (
         <div
-          key={item.productId}
+          key={item.variantId ?? item.productId}
           className="flex flex-wrap items-center justify-between gap-4 border-b py-4"
         >
           <div>
@@ -36,6 +36,11 @@ export function CartView() {
             <p className="text-sm text-foreground/70">
               {formatCurrency(item.unitPrice)}
             </p>
+            {[item.gender, item.size, item.color].filter(Boolean).length ? (
+              <p className="text-xs uppercase text-foreground/50">
+                {[item.gender, item.size, item.color].filter(Boolean).join(" / ")}
+              </p>
+            ) : null}
           </div>
           <input
             aria-label={`Quantity for ${item.name}`}
@@ -44,14 +49,17 @@ export function CartView() {
             type="number"
             value={item.quantity}
             onChange={(event) =>
-              cart.updateQuantity(item.productId, Number(event.target.value))
+              cart.updateQuantity(
+                item.variantId ?? item.productId,
+                Number(event.target.value),
+              )
             }
           />
           <p>{formatCurrency(item.unitPrice * item.quantity)}</p>
           <button
             type="button"
             className="underline"
-            onClick={() => cart.removeItem(item.productId)}
+            onClick={() => cart.removeItem(item.variantId ?? item.productId)}
           >
             Remove
           </button>
@@ -70,4 +78,3 @@ export function CartView() {
     </div>
   );
 }
-

@@ -17,7 +17,7 @@ export async function createPendingOrder(input: CheckoutInput) {
 
   const { data: products, error: productsError } = await supabase
     .from("products")
-    .select("id, name, price, sale_price, stock_quantity, is_active")
+    .select("id, name, price, sale_price, unit_cost, stock_quantity, is_active")
     .in("id", productIds);
 
   if (productsError) throw productsError;
@@ -35,22 +35,30 @@ export async function createPendingOrder(input: CheckoutInput) {
     }
 
     const unitPrice = Number(product.sale_price ?? product.price);
+    const unitCost = Number(product.unit_cost ?? 0);
     return {
       product_id: product.id,
       product_name: product.name,
       quantity: item.quantity,
       unit_price: toMoney(unitPrice),
+      unit_cost: toMoney(unitCost),
       total_price: toMoney(unitPrice * item.quantity),
+      profit: toMoney(Math.max(0, (unitPrice - unitCost) * item.quantity)),
     };
   });
 
   const subtotal = toMoney(
     lineItems.reduce((total, item) => total + item.total_price, 0),
   );
+  const { couponCode, discountAmount } = await getCouponDiscount(
+    input.couponCode,
+    productIds,
+    subtotal,
+  );
   const shippingFee = toMoney(
     await getShippingFeeForAddress(input.countryCode, input.district),
   );
-  const total = toMoney(subtotal + shippingFee);
+  const total = toMoney(Math.max(0, subtotal - discountAmount) + shippingFee);
   const orderNumber = createOrderNumber();
 
   const { data: order, error: orderError } = await supabase
@@ -63,9 +71,10 @@ export async function createPendingOrder(input: CheckoutInput) {
       address_line_1: input.addressLine1,
       address_line_2: input.addressLine2,
       country_code: input.countryCode,
+      coupon_code: couponCode,
       city: input.city,
       district: input.district,
-      discount_amount: 0,
+      discount_amount: discountAmount,
       postal_code: input.postalCode,
       subtotal,
       shipping_fee: shippingFee,
@@ -88,10 +97,95 @@ export async function createPendingOrder(input: CheckoutInput) {
 
   if (itemsError) throw itemsError;
 
+  if (couponCode) {
+    await incrementCouponUsage(couponCode);
+  }
+
   return {
     order,
     items: lineItems,
   };
+}
+
+async function getCouponDiscount(
+  rawCode: string | undefined,
+  productIds: string[],
+  subtotal: number,
+) {
+  const couponCode = rawCode?.trim().toUpperCase();
+  if (!couponCode) return { couponCode: null, discountAmount: 0 };
+
+  const supabase = getSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from("coupons")
+    .select("*, coupon_products(product_id)")
+    .eq("code", couponCode)
+    .eq("is_active", true)
+    .single();
+
+  if (error || !data) {
+    throw new Error("Coupon code is not valid.");
+  }
+
+  const coupon = data as {
+    code: string;
+    discount_type: "flat" | "percentage";
+    discount_value: number;
+    usage_limit: number | null;
+    used_count: number;
+    starts_at: string | null;
+    ends_at: string | null;
+    coupon_products?: { product_id: string }[];
+  };
+  const now = new Date();
+
+  if (coupon.starts_at && new Date(coupon.starts_at) > now) {
+    throw new Error("Coupon code is not active yet.");
+  }
+
+  if (coupon.ends_at && new Date(coupon.ends_at) < now) {
+    throw new Error("Coupon code has expired.");
+  }
+
+  if (coupon.usage_limit && coupon.used_count >= coupon.usage_limit) {
+    throw new Error("Coupon code has reached its usage limit.");
+  }
+
+  const restrictedProductIds =
+    coupon.coupon_products?.map((item) => item.product_id) ?? [];
+
+  if (
+    restrictedProductIds.length > 0 &&
+    !productIds.some((productId) => restrictedProductIds.includes(productId))
+  ) {
+    throw new Error("Coupon code does not apply to these products.");
+  }
+
+  const discountAmount =
+    coupon.discount_type === "percentage"
+      ? subtotal * (Number(coupon.discount_value) / 100)
+      : Number(coupon.discount_value);
+
+  return {
+    couponCode,
+    discountAmount: toMoney(Math.min(subtotal, discountAmount)),
+  };
+}
+
+async function incrementCouponUsage(couponCode: string) {
+  const supabase = getSupabaseAdminClient();
+  const { data: coupon } = await supabase
+    .from("coupons")
+    .select("id, used_count")
+    .eq("code", couponCode)
+    .single();
+
+  if (!coupon) return;
+
+  await supabase
+    .from("coupons")
+    .update({ used_count: Number(coupon.used_count ?? 0) + 1 })
+    .eq("id", coupon.id);
 }
 
 export async function getPublicOrderStatus(orderNumber: string) {
@@ -104,4 +198,48 @@ export async function getPublicOrderStatus(orderNumber: string) {
 
   if (error) return null;
   return data;
+}
+
+export async function getLatestOrderForCustomer(email: string) {
+  const supabase = getSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from("orders")
+    .select("order_number, customer_email, created_at")
+    .ilike("customer_email", email)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) return null;
+  return data as { order_number: string; customer_email: string; created_at: string } | null;
+}
+
+export async function listCustomerOrders(email: string) {
+  const supabase = getSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from("orders")
+    .select("*, order_items(*)")
+    .ilike("customer_email", email)
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  return (data ?? []) as Array<{
+    id: string;
+    order_number: string;
+    customer_email: string;
+    total: number;
+    subtotal: number;
+    shipping_fee: number;
+    discount_amount: number;
+    payment_status: string;
+    order_status: string;
+    created_at: string;
+    order_items: Array<{
+      id: string;
+      product_name: string;
+      quantity: number;
+      unit_price: number;
+      total_price: number;
+    }>;
+  }>;
 }

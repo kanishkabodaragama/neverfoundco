@@ -4,8 +4,10 @@ import type { Database } from "@/types/database";
 
 export type Product = Database["public"]["Tables"]["products"]["Row"];
 export type ProductImage = Database["public"]["Tables"]["product_images"]["Row"];
+export type ProductVariant = Database["public"]["Tables"]["product_variants"]["Row"];
 export type ProductWithImages = Product & {
   product_images: ProductImage[];
+  product_variants?: ProductVariant[];
 };
 
 export async function listActiveProducts() {
@@ -15,7 +17,7 @@ export async function listActiveProducts() {
 
   const { data, error } = await supabase
     .from("products")
-    .select("*, product_images(*)")
+    .select("*, product_images(*), product_variants(*)")
     .eq("is_active", true)
     .order("created_at", { ascending: false })
     .order("sort_order", {
@@ -34,7 +36,7 @@ export async function getActiveProductBySlug(slug: string) {
 
   const { data, error } = await supabase
     .from("products")
-    .select("*, product_images(*)")
+    .select("*, product_images(*), product_variants(*)")
     .eq("slug", slug)
     .eq("is_active", true)
     .single();
@@ -49,7 +51,7 @@ export async function listAdminProducts() {
   const supabase = getSupabaseAdminClient();
   const { data, error } = await supabase
     .from("products")
-    .select("*, product_images(*)")
+    .select("*, product_images(*), product_variants(*)")
     .order("created_at", { ascending: false });
 
   if (error) throw error;
@@ -62,7 +64,7 @@ export async function getAdminProduct(id: string) {
   const supabase = getSupabaseAdminClient();
   const { data, error } = await supabase
     .from("products")
-    .select("*, product_images(*)")
+    .select("*, product_images(*), product_variants(*)")
     .eq("id", id)
     .single();
 

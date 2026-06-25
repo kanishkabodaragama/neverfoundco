@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { ShopProductCard } from "@/components/site/ShopProductCard";
+import { useStoreCurrency } from "@/components/store/currency-provider";
 import {
   categories,
   colors,
@@ -14,11 +15,10 @@ type SortMode = "Newest" | "Price Low to High" | "Price High to Low";
 
 const colorClasses: Record<string, string> = {
   Black: "bg-[#111715]",
-  White: "bg-[#f5ead5]",
-  Beige: "bg-[#d8bf8f]",
-  Blue: "bg-[#2f8088]",
+  Cream: "bg-[#ead8bd]",
+  Sage: "bg-[#80916f]",
   Grey: "bg-[#77746c]",
-  Green: "bg-[#123f32]",
+  Navy: "bg-[#1f3148]",
 };
 
 function FilterPanel({
@@ -42,6 +42,8 @@ function FilterPanel({
   setMaxPrice: (value: number) => void;
   clearAll: () => void;
 }) {
+  const { format } = useStoreCurrency();
+
   return (
     <div className="landing-paper space-y-7 border-2 border-[#17251f] bg-[#ead8bd] p-5">
       <div className="flex items-center justify-between gap-3">
@@ -113,14 +115,14 @@ function FilterPanel({
         <input
           aria-label="Maximum price"
           className="w-full accent-[#d9532f]"
-          max="7000"
-          min="4000"
+          max="100"
+          min="0"
           onChange={(event) => setMaxPrice(Number(event.target.value))}
-          step="100"
+          step="5"
           type="range"
           value={maxPrice}
         />
-        <p className="text-sm font-black uppercase">Up to LKR {maxPrice.toLocaleString("en-LK")}</p>
+        <p className="text-sm font-black uppercase">Up to {format(maxPrice)}</p>
       </fieldset>
     </div>
   );
@@ -144,7 +146,7 @@ export function ShopCatalog() {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
-  const [maxPrice, setMaxPrice] = useState(7000);
+  const [maxPrice, setMaxPrice] = useState(100);
   const [sortMode, setSortMode] = useState<SortMode>("Newest");
   const [activePage, setActivePage] = useState(1);
 
@@ -168,7 +170,7 @@ export function ShopCatalog() {
     setSelectedCategory("All");
     setSelectedSizes([]);
     setSelectedColors([]);
-    setMaxPrice(7000);
+    setMaxPrice(100);
     setSortMode("Newest");
     setActivePage(1);
   }

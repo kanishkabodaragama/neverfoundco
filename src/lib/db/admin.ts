@@ -63,8 +63,12 @@ export async function getDashboardStats() {
   const orders = await listAdminOrders();
   const supabase = hasSupabaseServerEnv() ? getSupabaseAdminClient() : null;
 
-  const totalRevenue = orders.reduce((sum, order) => sum + Number(order.total), 0);
-  const pendingOrders = orders.filter((order) => order.order_status === "pending").length;
+  const totalSales = orders
+    .filter((order) => order.payment_status === "paid")
+    .reduce((sum, order) => sum + Number(order.total), 0);
+  const activeOrders = orders.filter(
+    (order) => !["completed", "cancelled"].includes(order.order_status),
+  ).length;
 
   const productCount = supabase
     ? (await supabase.from("products").select("id", { count: "exact", head: true }))
@@ -77,8 +81,8 @@ export async function getDashboardStats() {
 
   return {
     orderCount: orders.length,
-    pendingOrders,
-    totalRevenue,
+    activeOrders,
+    totalSales,
     productCount,
     activeCoupons,
     recentOrders: orders.slice(0, 5),
@@ -96,4 +100,18 @@ export async function listAdminCoupons() {
 
   if (error) throw error;
   return (data ?? []) as AdminCoupon[];
+}
+
+export async function getAdminCoupon(id: string) {
+  if (!hasSupabaseServerEnv()) return null;
+
+  const supabase = getSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from("coupons")
+    .select("*, coupon_products(product_id)")
+    .eq("id", id)
+    .single();
+
+  if (error) return null;
+  return data as AdminCoupon;
 }

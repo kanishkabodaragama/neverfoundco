@@ -23,9 +23,17 @@ export function Footer() {
           <Link href="/about">Youtube</Link>
           <Link href="/contact">Contact</Link>
           <Link href="/privacy">Privacy</Link>
+          <Link href="/returns">Returns</Link>
           <Link href="/terms">Terms</Link>
         </div>
-        <span className="pixel-blink text-2xl text-[#F05267]">▣</span>
+        <Link
+          className="font-pixel text-xs uppercase leading-relaxed transition hover:text-[#F05267]"
+          href="https://neurait.com"
+          rel="noreferrer"
+          target="_blank"
+        >
+          Developed and maintained by Neura IT
+        </Link>
       </div>
     </footer>
   );

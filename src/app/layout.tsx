@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { CartProvider } from "@/components/store/cart-provider";
+import { CurrencyProvider } from "@/components/store/currency-provider";
 import "./globals.css";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
@@ -25,7 +26,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("h-full antialiased", "font-sans", geist.variable)}>
       <body className="min-h-full">
-        <CartProvider>{children}</CartProvider>
+        <CurrencyProvider>
+          <CartProvider>{children}</CartProvider>
+        </CurrencyProvider>
       </body>
     </html>
   );

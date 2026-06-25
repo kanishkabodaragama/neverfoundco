@@ -2,12 +2,10 @@
 
 import { useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
-import {
-  formatLkr,
-  mockCartItems,
-} from "@/components/cart/cart-data";
 import { useCart } from "@/components/store/cart-provider";
+import { useStoreCurrency } from "@/components/store/currency-provider";
 import type { ShippingCountry } from "@/lib/db/shipping";
+import type { PayHereCheckoutPayload } from "@/types/commerce";
 
 type CheckoutItem = {
   id: string;
@@ -18,44 +16,83 @@ type CheckoutItem = {
 
 export function CheckoutExperience({ countries }: { countries: ShippingCountry[] }) {
   const cart = useCart();
+  const { format, rateSource } = useStoreCurrency();
+  const initialCountry = getInitialCountry(countries);
   const [message, setMessage] = useState("");
-  const [countryCode, setCountryCode] = useState(countries[0]?.country_code ?? "LK");
-  const [district, setDistrict] = useState("Default");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [countryCode, setCountryCode] = useState(initialCountry.country_code);
+  const [phoneCode, setPhoneCode] = useState(getCallingCode(initialCountry.country_code));
+  const [district, setDistrict] = useState(
+    initialCountry.shipping_regions?.[0]?.region_name ?? "Default",
+  );
 
   const items = useMemo<CheckoutItem[]>(() => {
-    if (cart.items.length) {
-      return cart.items.map((item) => ({
-        id: item.productId,
-        name: item.name,
-        price: item.unitPrice,
-        quantity: item.quantity,
-      }));
-    }
-
-    return mockCartItems.map((item) => ({
-      id: item.id,
+    return cart.items.map((item) => ({
+      id: item.productId,
       name: item.name,
-      price: item.price,
+      price: item.unitPrice,
       quantity: item.quantity,
     }));
   }, [cart.items]);
 
   const selectedCountry = countries.find((country) => country.country_code === countryCode);
-  const selectedOverride = selectedCountry?.shipping_area_overrides.find(
-    (override) => override.area_name === district,
-  );
-  const shippingFee = Number(selectedOverride?.fee ?? selectedCountry?.default_fee ?? 0);
+  const shippingFee = Number(selectedCountry?.default_fee ?? 0);
   const subtotal = items.reduce(
     (total, item) => total + item.price * item.quantity,
     0,
   );
   const total = subtotal + shippingFee;
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setMessage(
-      "PayHere is selected, but payment integration is not connected yet.",
-    );
+    setMessage("");
+
+    if (cart.items.length === 0) {
+      setMessage("Your cart is empty.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    const formData = new FormData(event.currentTarget);
+
+    try {
+      const response = await fetch("/api/checkout/create-order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          customerName: formData.get("customerName"),
+          customerEmail: formData.get("customerEmail"),
+          customerPhone: `${phoneCode} ${formData.get("customerPhone") ?? ""}`.trim(),
+          addressLine1: formData.get("addressLine1"),
+          addressLine2: formData.get("addressLine2"),
+          countryCode: formData.get("countryCode"),
+          city: formData.get("city"),
+          district: formData.get("district"),
+          postalCode: formData.get("postalCode"),
+          items: cart.items.map((item) => ({
+            productId: item.productId,
+            quantity: item.quantity,
+          })),
+        }),
+      });
+      const result = (await response.json()) as
+        | { payhere: PayHereCheckoutPayload }
+        | { error: string };
+
+      if (!response.ok || "error" in result) {
+        setMessage("error" in result ? result.error : "Checkout failed.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      cart.clearCart();
+      submitPayHere(result.payhere);
+    } catch {
+      setMessage("Checkout failed. Please try again.");
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -71,16 +108,37 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
         </div>
         <Panel title="Customer Details">
           <div className="grid gap-4 sm:grid-cols-2">
-            <CheckoutInput label="Full Name" name="name" />
-            <CheckoutInput label="Email Address" name="email" type="email" />
-            <CheckoutInput label="Phone Number" name="phone" />
-            <CheckoutInput label="City" name="city" />
+            <CheckoutInput label="Full Name" name="customerName" required />
+            <CheckoutInput label="Email Address" name="customerEmail" required type="email" />
+            <label className="grid gap-2 sm:col-span-2">
+              <span className="sr-only">Phone Number</span>
+              <span className="grid grid-cols-[120px_1fr] gap-3">
+                <select
+                  className="w-full border border-[#10131A]/15 bg-[#FFF9EF] px-3 py-4 text-sm font-black uppercase outline-none focus:border-[#F05267]"
+                  onChange={(event) => setPhoneCode(event.target.value)}
+                  value={phoneCode}
+                >
+                  {countries.map((country) => (
+                    <option key={`phone-${country.country_code}`} value={getCallingCode(country.country_code)}>
+                      {getCallingCode(country.country_code)} {country.country_code}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  className="w-full border border-[#10131A]/15 bg-[#FFF9EF] px-4 py-4 text-sm font-black uppercase outline-none placeholder:text-[#10131A]/45 focus:border-[#F05267]"
+                  name="customerPhone"
+                  placeholder="Phone Number"
+                  required
+                  type="tel"
+                />
+              </span>
+            </label>
           </div>
         </Panel>
 
         <Panel title="Shipping Address">
           <div className="grid gap-4">
-            <CheckoutInput label="Address Line 1" name="addressLine1" />
+            <CheckoutInput label="Address Line 1" name="addressLine1" required />
             <CheckoutInput label="Address Line 2" name="addressLine2" />
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block">
@@ -90,7 +148,13 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
                   name="countryCode"
                   onChange={(event) => {
                     setCountryCode(event.target.value);
-                    setDistrict("Default");
+                    const nextCountry = countries.find(
+                      (country) => country.country_code === event.target.value,
+                    );
+                    setPhoneCode(getCallingCode(event.target.value));
+                    setDistrict(
+                      nextCountry?.shipping_regions?.[0]?.region_name ?? "Default",
+                    );
                   }}
                   value={countryCode}
                 >
@@ -110,16 +174,16 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
                   value={district}
                 >
                   <option value="Default">Default district price</option>
-                  {selectedCountry?.shipping_area_overrides.map((override) => (
-                    <option key={override.id} value={override.area_name}>
-                      {override.area_name}
+                  {selectedCountry?.shipping_regions?.map((region) => (
+                    <option key={region.id} value={region.region_name}>
+                      {region.region_name}
                     </option>
                   ))}
                 </select>
               </label>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              <CheckoutInput label="City" name="city" />
+              <CheckoutInput label="City" name="city" required />
               <CheckoutInput label="Postal Code" name="postalCode" />
             </div>
           </div>
@@ -143,9 +207,8 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
                   Visa / MasterCard card payments
                 </span>
                 <span className="mt-3 block max-w-xl text-sm font-bold leading-relaxed">
-                  This is a placeholder payment selection for now. The real
-                  PayHere redirect and callback verification will be connected
-                  later on the server.
+                  Orders are created on the server, then redirected to PayHere
+                  with a verified checkout hash.
                 </span>
               </span>
             </span>
@@ -154,10 +217,15 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
 
         <button
           className="pixel-edge bg-[#F05267] px-8 py-4 text-sm font-black uppercase text-[#FFF9EF] transition hover:translate-x-0.5"
+          disabled={isSubmitting || cart.items.length === 0}
           type="submit"
         >
-          Continue With PayHere -&gt;
+          {isSubmitting ? "Preparing payment..." : "Continue With PayHere ->"}
         </button>
+        <p className="max-w-xl text-xs font-bold leading-relaxed text-[#10131A]/65">
+          Converted using live exchange data from {rateSource}. Actual bank
+          buying and selling rates may differ slightly.
+        </p>
         {message ? (
           <p className="text-sm font-black uppercase text-[#F05267]">
             {message}
@@ -181,18 +249,18 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
                   </p>
                 </div>
                 <p className="font-black uppercase">
-                  {formatLkr(item.price * item.quantity)}
+                  {format(item.price * item.quantity)}
                 </p>
               </div>
             ))}
           </div>
           <div className="mt-6 space-y-3 text-sm font-black uppercase">
-            <SummaryRow label="Subtotal" value={formatLkr(subtotal)} />
-            <SummaryRow label="Shipping" value={formatLkr(shippingFee)} />
+            <SummaryRow label="Subtotal" value={format(subtotal)} />
+            <SummaryRow label="Shipping" value={format(shippingFee)} />
             <SummaryRow
               highlight
               label="Total"
-              value={formatLkr(total)}
+              value={format(total)}
             />
           </div>
         </div>
@@ -207,6 +275,40 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
       </aside>
     </section>
   );
+}
+
+function getCallingCode(countryCode: string) {
+  const callingCodes: Record<string, string> = {
+    AE: "+971",
+    AU: "+61",
+    CA: "+1",
+    DE: "+49",
+    FR: "+33",
+    GB: "+44",
+    IN: "+91",
+    IT: "+39",
+    JP: "+81",
+    LK: "+94",
+    MY: "+60",
+    NL: "+31",
+    SG: "+65",
+    US: "+1",
+  };
+
+  return callingCodes[countryCode] ?? "+";
+}
+
+function getInitialCountry(countries: ShippingCountry[]) {
+  const fallback = countries[0] ?? {
+    country_code: "US",
+    currency: "USD",
+    shipping_regions: [],
+  };
+
+  if (typeof navigator === "undefined") return fallback;
+
+  const localeRegion = navigator.language.split("-")[1]?.toUpperCase();
+  return countries.find((country) => country.country_code === localeRegion) ?? fallback;
 }
 
 function Panel({
@@ -227,10 +329,14 @@ function Panel({
 function CheckoutInput({
   label,
   name,
+  onChange,
+  required = false,
   type = "text",
 }: {
   label: string;
   name: string;
+  onChange?: (value: string) => void;
+  required?: boolean;
   type?: string;
 }) {
   return (
@@ -239,11 +345,30 @@ function CheckoutInput({
       <input
         className="w-full border border-[#10131A]/15 bg-[#FFF9EF] px-4 py-4 text-sm font-black uppercase outline-none placeholder:text-[#10131A]/45 focus:border-[#F05267]"
         name={name}
+        onChange={(event) => onChange?.(event.target.value)}
         placeholder={label}
+        required={required}
         type={type}
       />
     </label>
   );
+}
+
+function submitPayHere(payload: PayHereCheckoutPayload) {
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = payload.actionUrl;
+
+  Object.entries(payload.fields).forEach(([name, value]) => {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = name;
+    input.value = value;
+    form.appendChild(input);
+  });
+
+  document.body.appendChild(form);
+  form.submit();
 }
 
 function SummaryRow({

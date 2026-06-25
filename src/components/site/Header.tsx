@@ -1,19 +1,22 @@
 import Link from "next/link";
+import { CartLink } from "@/components/site/CartLink";
+import { CurrencySelector } from "@/components/site/CurrencySelector";
+import { ScrollHeader } from "@/components/site/ScrollHeader";
 
 const navItems = [
-  { label: "Play", href: "/" },
+  { label: "Home", href: "/" },
   { label: "Shop", href: "/shop" },
   { label: "About", href: "/about" },
-  { label: "Lookbook", href: "/about" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export function Header() {
-  return <SiteHeader active="play" />;
+  return <SiteHeader active="home" />;
 }
 
-export function SiteHeader({ active = "play" }: { active?: "play" | "shop" | "about" | "lookbook" }) {
+export function SiteHeader({ active = "home" }: { active?: "home" | "shop" | "about" | "contact" }) {
   return (
-    <header className="bg-[#070B12] text-[#FFF9EF]">
+    <ScrollHeader>
       <div className="flex min-h-[86px] w-full items-center justify-between gap-4 px-5 py-3 md:px-8 xl:px-12">
         <Link
           aria-label="Never Found home"
@@ -41,14 +44,14 @@ export function SiteHeader({ active = "play" }: { active?: "play" | "shop" | "ab
             </Link>
           ))}
         </nav>
-        <Link
-          className="font-pixel flex items-center gap-3 text-sm uppercase transition hover:text-[#F05267]"
-          href="/cart"
-        >
-          Cart (0)
-          <span className="pixel-blink text-[#F05267]">▣</span>
-        </Link>
+        <div className="flex items-center gap-4">
+          <CurrencySelector />
+          <Link className="font-pixel text-sm uppercase transition hover:text-[#F05267]" href="/account/login">
+            Login
+          </Link>
+          <CartLink />
+        </div>
       </div>
-    </header>
+    </ScrollHeader>
   );
 }

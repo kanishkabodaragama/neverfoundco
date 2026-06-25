@@ -15,6 +15,7 @@ export const checkoutSchema = z.object({
   city: z.string().min(2),
   district: z.string().min(2),
   postalCode: z.string().optional(),
+  couponCode: z.string().optional(),
   items: z.array(cartItemSchema).min(1),
 });
 

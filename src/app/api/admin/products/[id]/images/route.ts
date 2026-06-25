@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { adminRedirect } from "@/lib/admin-forms";
 import { requireAdminApi } from "@/lib/admin-auth";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { productImageSchema } from "@/lib/validation/admin";
@@ -21,6 +22,12 @@ export async function POST(
     | null = null;
 
   if (file instanceof File && file.size > 0) {
+    if (file.size > 2 * 1024 * 1024) {
+      return adminRedirect(request, `/admin/products/${id}/edit`, {
+        error: "Image must be 2 MB or smaller.",
+      });
+    }
+
     const extension = file.name.split(".").pop() || "jpg";
     const storagePath = `${id}/${crypto.randomUUID()}.${extension}`;
     const supabase = getSupabaseAdminClient();
@@ -45,7 +52,7 @@ export async function POST(
     };
   }
 
-  const parsed = productImageSchema.parse({
+  const parsed = productImageSchema.safeParse({
     image_url: uploadedImage?.image_url || formData.get("image_url") || undefined,
     storage_path:
       uploadedImage?.storage_path || formData.get("storage_path") || undefined,
@@ -53,25 +60,31 @@ export async function POST(
     sort_order: formData.get("sort_order") || 0,
   });
 
-  if (!parsed.image_url) {
-    return NextResponse.json(
-      { error: "Upload an image file or provide an image URL." },
-      { status: 400 },
-    );
+  if (!parsed.success) {
+    return adminRedirect(request, `/admin/products/${id}/edit`, {
+      error: parsed.error.issues[0]?.message ?? "Invalid image details.",
+    });
+  }
+
+  if (!parsed.data.image_url) {
+    return adminRedirect(request, `/admin/products/${id}/edit`, {
+      error: "Upload an image file or provide an image URL.",
+    });
   }
 
   const supabase = getSupabaseAdminClient();
   const { error } = await supabase.from("product_images").insert({
-    ...parsed,
+    ...parsed.data,
     product_id: id,
   });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    return adminRedirect(request, `/admin/products/${id}/edit`, {
+      error: error.message,
+    });
   }
 
-  return NextResponse.redirect(
-    new URL(`/admin/products/${id}/edit`, request.url),
-    303,
-  );
+  return adminRedirect(request, `/admin/products/${id}/edit`, {
+    success: "Image added.",
+  });
 }

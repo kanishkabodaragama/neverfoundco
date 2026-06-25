@@ -3,10 +3,31 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { useCart } from "@/components/store/cart-provider";
+import { StorePrice } from "@/components/site/StorePrice";
 import type { ShopProduct } from "@/components/site/shop-data";
 
 export function ShopProductCard({ product }: { product: ShopProduct }) {
+  const cart = useCart();
   const [isAdded, setIsAdded] = useState(false);
+  const defaultVariant = product.variants.find((variant) => variant.stock > 0);
+
+  function addToCart() {
+    if (product.soldOut || !defaultVariant) return;
+
+    cart.addItem({
+      productId: product.id,
+      variantId: defaultVariant.id,
+      name: product.name,
+      slug: product.slug ?? product.id,
+      unitPrice: product.price,
+      image: defaultVariant.image ?? product.image,
+      gender: defaultVariant.gender,
+      size: defaultVariant.size,
+      color: defaultVariant.color,
+    });
+    setIsAdded(true);
+  }
 
   return (
     <article
@@ -15,7 +36,7 @@ export function ShopProductCard({ product }: { product: ShopProduct }) {
       <Link
         aria-label={`View ${product.name}`}
         className="relative block aspect-[4/4.35] overflow-hidden border-2 border-[#17251f] bg-[#ead8bd] transition group-hover:-translate-y-1 group-hover:rotate-[-0.8deg]"
-        href={`/products/${product.id}`}
+        href={`/products/${product.slug ?? product.id}`}
       >
         <Image
           alt={product.alt}
@@ -37,19 +58,19 @@ export function ShopProductCard({ product }: { product: ShopProduct }) {
       <div className="flex items-start justify-between gap-3 text-[0.82rem] font-black uppercase leading-tight">
         <div>
           <h3>
-            <Link className="hover:text-[#d9532f]" href={`/products/${product.id}`}>
+            <Link className="hover:text-[#d9532f]" href={`/products/${product.slug ?? product.id}`}>
               {product.name}
             </Link>
           </h3>
-          <p>LKR {product.price.toLocaleString("en-LK")}</p>
+          <p><StorePrice amountUsd={product.price} /></p>
         </div>
         <button
           className="border-2 border-[#17251f] px-3 py-2 text-[0.7rem] transition hover:bg-[#17251f] hover:text-[#ead8bd] disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-[#17251f]"
-          disabled={product.soldOut}
-          onClick={() => setIsAdded(true)}
+          disabled={product.soldOut || !defaultVariant}
+          onClick={addToCart}
           type="button"
         >
-          {product.soldOut ? "Gone" : isAdded ? "Added" : "Add"}
+          {product.soldOut || !defaultVariant ? "Gone" : isAdded ? "Added" : "Add"}
         </button>
       </div>
     </article>

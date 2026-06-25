@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { adminRedirect } from "@/lib/admin-forms";
 import { requireAdminApi } from "@/lib/admin-auth";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { couponSchema } from "@/lib/validation/admin";
@@ -9,7 +9,7 @@ export async function POST(request: Request) {
 
   const formData = await request.formData();
   const productIds = formData.getAll("product_ids").map(String).filter(Boolean);
-  const parsed = couponSchema.parse({
+  const parsed = couponSchema.safeParse({
     code: formData.get("code"),
     description: formData.get("description") || undefined,
     discount_type: formData.get("discount_type"),
@@ -21,38 +21,46 @@ export async function POST(request: Request) {
     product_ids: productIds,
   });
 
+  if (!parsed.success) {
+    return adminRedirect(request, "/admin/coupons", {
+      error: parsed.error.issues[0]?.message ?? "Invalid coupon details.",
+    });
+  }
+
   const supabase = getSupabaseAdminClient();
   const { data: coupon, error } = await supabase
     .from("coupons")
     .insert({
-      code: parsed.code,
-      description: parsed.description,
-      discount_type: parsed.discount_type,
-      discount_value: parsed.discount_value,
-      usage_limit: parsed.usage_limit,
-      starts_at: parsed.starts_at || null,
-      ends_at: parsed.ends_at || null,
-      is_active: parsed.is_active,
+      code: parsed.data.code,
+      description: parsed.data.description,
+      discount_type: parsed.data.discount_type,
+      discount_value: parsed.data.discount_value,
+      usage_limit: parsed.data.usage_limit,
+      starts_at: parsed.data.starts_at || null,
+      ends_at: parsed.data.ends_at || null,
+      is_active: parsed.data.is_active,
     })
     .select("id")
     .single();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    return adminRedirect(request, "/admin/coupons", { error: error.message });
   }
 
-  if (parsed.product_ids?.length) {
+  if (parsed.data.product_ids?.length) {
     const { error: productError } = await supabase.from("coupon_products").insert(
-      parsed.product_ids.map((productId) => ({
+      parsed.data.product_ids.map((productId) => ({
         coupon_id: coupon.id,
         product_id: productId,
       })),
     );
 
     if (productError) {
-      return NextResponse.json({ error: productError.message }, { status: 400 });
+      return adminRedirect(request, "/admin/coupons", {
+        error: productError.message,
+      });
     }
   }
 
-  return NextResponse.redirect(new URL("/admin/coupons", request.url), 303);
+  return adminRedirect(request, "/admin/coupons", { success: "Coupon created." });
 }

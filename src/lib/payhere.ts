@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { getServerEnv, isPayHereSandbox } from "@/lib/env";
+import { getPayHereEnv, isPayHereSandbox } from "@/lib/env";
 import type { PayHereCheckoutPayload } from "@/types/commerce";
 
 const CURRENCY = "LKR";
@@ -13,7 +13,7 @@ export function formatPayHereAmount(amount: number) {
 }
 
 export function createPayHereCheckoutHash(orderId: string, amount: number) {
-  const env = getServerEnv();
+  const env = getPayHereEnv();
   const merchantSecretHash = md5(env.PAYHERE_MERCHANT_SECRET);
 
   return md5(
@@ -31,7 +31,7 @@ export function verifyPayHereNotificationSignature(params: {
   statusCode: string;
   md5sig: string;
 }) {
-  const env = getServerEnv();
+  const env = getPayHereEnv();
   const merchantSecretHash = md5(env.PAYHERE_MERCHANT_SECRET);
   const expected = md5(
     `${params.merchantId}${params.orderId}${params.payhereAmount}${params.payhereCurrency}${params.statusCode}${merchantSecretHash}`,
@@ -55,7 +55,7 @@ export function createPayHerePayload(input: {
   city: string;
   items: string;
 }): PayHereCheckoutPayload {
-  const env = getServerEnv();
+  const env = getPayHereEnv();
   const actionUrl = isPayHereSandbox()
     ? "https://sandbox.payhere.lk/pay/checkout"
     : "https://www.payhere.lk/pay/checkout";
@@ -83,4 +83,3 @@ export function createPayHerePayload(input: {
     },
   };
 }
-

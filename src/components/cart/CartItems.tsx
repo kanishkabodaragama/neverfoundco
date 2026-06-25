@@ -1,33 +1,41 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { CartItemCard } from "@/components/cart/CartItemCard";
 import { EmptyCart } from "@/components/cart/EmptyCart";
 import { OrderSummary } from "@/components/cart/OrderSummary";
 import { PromoCode } from "@/components/cart/PromoCode";
-import {
-  mockCartItems,
-  shippingFee,
-  type CartProduct,
-} from "@/components/cart/cart-data";
+import { shippingFee, type CartProduct } from "@/components/cart/cart-data";
+import { useCart } from "@/components/store/cart-provider";
 
 export function CartItems() {
-  const [items, setItems] = useState<CartProduct[]>(mockCartItems);
+  const cart = useCart();
+  const items = useMemo<CartProduct[]>(
+    () =>
+      cart.items.map((item) => ({
+        id: item.variantId ?? item.productId,
+        name: item.name,
+        color: item.color ?? "Default",
+        size: item.size ?? "Default",
+        stockLabel: item.gender ?? "Selected",
+        price: item.unitPrice,
+        quantity: item.quantity,
+        image: item.image ?? "/images/products/black-heavyweight-tee.png",
+        alt: item.name,
+      })),
+    [cart.items],
+  );
   const subtotal = useMemo(
     () => items.reduce((total, item) => total + item.price * item.quantity, 0),
     [items],
   );
 
   function updateQuantity(id: string, quantity: number) {
-    setItems((current) =>
-      current.map((item) =>
-        item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item,
-      ),
-    );
+    cart.updateQuantity(id, quantity);
   }
 
   function removeItem(id: string) {
-    setItems((current) => current.filter((item) => item.id !== id));
+    cart.removeItem(id);
   }
 
   if (items.length === 0) {
@@ -43,7 +51,7 @@ export function CartItems() {
           </h1>
           <button
             className="text-sm font-black uppercase text-[#F05267] transition hover:text-[#10131A]"
-            onClick={() => setItems([])}
+            onClick={cart.clearCart}
             type="button"
           >
             Clear Cart

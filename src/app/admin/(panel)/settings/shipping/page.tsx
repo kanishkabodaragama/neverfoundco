@@ -1,161 +1,275 @@
+import { MoreHorizontal, Plus, Trash2 } from "lucide-react";
+import { AdminAlert } from "@/components/admin/admin-alert";
+import { AdminModal } from "@/components/admin/admin-modal";
+import { ShippingRuleForm } from "@/components/admin/shipping-rule-form";
 import { requireAdmin } from "@/lib/admin-auth";
-import { listShippingCountries } from "@/lib/db/shipping";
-import { formatCurrency } from "@/lib/utils";
+import { listShippingCountries, listShippingRules, type ShippingCountry, type ShippingRule } from "@/lib/db/shipping";
 
 export const dynamic = "force-dynamic";
 
-export default async function ShippingSettingsPage() {
+const countryChoices = [
+  ["US", "United States", "USD"],
+  ["LK", "Sri Lanka", "USD"],
+  ["GB", "United Kingdom", "GBP"],
+  ["CA", "Canada", "CAD"],
+  ["AU", "Australia", "AUD"],
+  ["IN", "India", "INR"],
+  ["AE", "United Arab Emirates", "AED"],
+  ["SG", "Singapore", "SGD"],
+  ["MY", "Malaysia", "MYR"],
+  ["DE", "Germany", "EUR"],
+  ["FR", "France", "EUR"],
+  ["IT", "Italy", "EUR"],
+  ["NL", "Netherlands", "EUR"],
+  ["JP", "Japan", "JPY"],
+] as const;
+
+export default async function ShippingSettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string; error?: string; success?: string }>;
+}) {
   await requireAdmin();
-  const countries = await listShippingCountries();
+  const params = await searchParams;
+  const activeTab = params.tab === "countries" ? "countries" : "overview";
+  const [countries, rules] = await Promise.all([listShippingCountries(), listShippingRules()]);
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-[#B8A8E8]">
-            Delivery
-          </p>
-          <h1 className="mt-3 font-mono text-3xl font-black uppercase md:text-5xl">
-            Shipping
-          </h1>
-        </div>
-        <details className="relative">
-          <summary className="cursor-pointer bg-[#F05267] px-5 py-3 text-sm font-black uppercase text-[#FFF9EF] marker:content-['']">
-            Add country
-          </summary>
-          <div className="absolute right-0 z-30 mt-3 w-[min(92vw,520px)] border border-[#F7F1E6]/10 bg-[#0B111C] p-5 shadow-2xl">
-            <CountryForm />
-          </div>
-        </details>
-      </div>
-
-      <div className="grid gap-5 xl:grid-cols-2">
-        {countries.map((country) => (
-          <section className="border border-[#F7F1E6]/10 bg-[#0B111C] p-5" key={country.id}>
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <h2 className="font-mono text-xl font-black uppercase">
-                  {country.country_name}
-                </h2>
-                <p className="mt-2 text-sm text-[#F7F1E6]/55">
-                  {country.country_code} / {country.currency} /{" "}
-                  {country.is_active ? "Active" : "Paused"}
-                </p>
-              </div>
-              <p className="font-mono text-2xl font-black text-[#B8A8E8]">
-                {formatCurrency(Number(country.default_fee))}
-              </p>
-            </div>
-
-            <form
-              action={`/api/admin/shipping-countries/${country.id}`}
-              className="mt-5 grid gap-3 md:grid-cols-2"
-              method="post"
-            >
-              <input defaultValue={country.country_name} name="country_name" type="hidden" />
-              <input defaultValue={country.country_code} name="country_code" type="hidden" />
-              <input defaultValue={country.currency} name="currency" type="hidden" />
-              <label className="grid gap-2 text-xs font-black uppercase text-[#F7F1E6]/60">
-                Default country price
-                <input
-                  className="admin-input"
-                  defaultValue={country.default_fee}
-                  name="default_fee"
-                  step="0.01"
-                  type="number"
-                />
-              </label>
-              <label className="flex items-end gap-3 pb-3 text-sm font-black uppercase">
-                <input
-                  defaultChecked={country.is_active}
-                  name="is_active"
-                  type="checkbox"
-                  value="true"
-                />
-                Active country
-              </label>
-              <button className="border border-[#F7F1E6]/20 px-4 py-3 text-sm font-black uppercase hover:border-[#F05267]" type="submit">
-                Save country
-              </button>
-            </form>
-
-            <div className="mt-6 border-t border-[#F7F1E6]/10 pt-5">
-              <h3 className="text-sm font-black uppercase text-[#B8A8E8]">
-                Area / district overrides
-              </h3>
-              <div className="mt-3 grid gap-2">
-                {country.shipping_area_overrides.map((override) => (
-                  <div
-                    className="flex items-center justify-between gap-4 border border-[#F7F1E6]/10 px-3 py-2 text-sm"
-                    key={override.id}
-                  >
-                    <span>{override.area_name}</span>
-                    <span>{formatCurrency(Number(override.fee))}</span>
-                  </div>
-                ))}
-                {country.shipping_area_overrides.length === 0 ? (
-                  <p className="text-sm text-[#F7F1E6]/50">No overrides yet.</p>
-                ) : null}
-              </div>
-              <form
-                action={`/api/admin/shipping-countries/${country.id}/areas`}
-                className="mt-4 grid gap-3 md:grid-cols-[1fr_140px_auto]"
-                method="post"
-              >
-                <input className="admin-input" name="area_name" placeholder="Colombo district" />
-                <input className="admin-input" name="fee" placeholder="350" step="0.01" type="number" />
-                <button className="bg-[#F05267] px-4 py-3 text-sm font-black uppercase text-[#FFF9EF]" type="submit">
-                  Add override
-                </button>
-              </form>
-            </div>
-          </section>
-        ))}
-      </div>
-      {countries.length === 0 ? (
-        <p className="border border-[#F7F1E6]/10 bg-[#0B111C] p-6 text-sm text-[#F7F1E6]/55">
-          Add a country to make it available during checkout.
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">Shipping</h1>
+        <p className="admin-muted mt-2 text-sm">
+          Manage countries, regions, and shipping rules used during checkout.
         </p>
-      ) : null}
+      </div>
+      <AdminAlert error={params.error} success={params.success} />
+
+      <div className="flex gap-2">
+        <a className={activeTab === "overview" ? "rounded-md bg-[#332c26] px-5 py-2.5 font-semibold text-white" : "admin-secondary-action px-5 py-2.5"} href="/admin/settings/shipping">
+          Overview
+        </a>
+        <a className={activeTab === "countries" ? "rounded-md bg-[#332c26] px-5 py-2.5 font-semibold text-white" : "admin-secondary-action px-5 py-2.5"} href="/admin/settings/shipping?tab=countries">
+          Countries
+        </a>
+      </div>
+
+      {activeTab === "overview" ? (
+        <ShippingRulesPanel countries={countries} rules={rules} />
+      ) : (
+        <CountriesPanel countries={countries} />
+      )}
     </div>
   );
 }
 
-function CountryForm() {
+function ShippingRulesPanel({
+  countries,
+  rules,
+}: {
+  countries: ShippingCountry[];
+  rules: ShippingRule[];
+}) {
+  const countryDefaultIds = new Set(
+    rules
+      .filter((rule) => rule.rule_type === "country_default" && rule.country_id)
+      .map((rule) => rule.country_id),
+  );
+  const countryDefaultCountries = countries.filter((country) => countryDefaultIds.has(country.id));
+
   return (
-    <form action="/api/admin/shipping-countries" className="grid gap-4" method="post">
-      <Field label="Country" name="country_name" placeholder="Sri Lanka" />
-      <div className="grid gap-4 md:grid-cols-3">
-        <Field label="Code" name="country_code" placeholder="LK" />
-        <Field label="Currency" name="currency" placeholder="LKR" />
-        <Field label="Default fee" name="default_fee" placeholder="400" type="number" />
+    <section className="admin-card overflow-hidden">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#ece7df] p-4">
+        <div>
+          <h2 className="font-semibold">Shipping rules</h2>
+          <p className="admin-muted mt-1 text-sm">International, country, and region-specific rates.</p>
+        </div>
+        <AdminModal
+          title="Create shipping rule"
+          trigger={<span className="admin-action flex items-center gap-2 px-4 py-2.5"><Plus className="h-4 w-4" />Create shipping rule</span>}
+          width="w-[min(94vw,560px)]"
+        >
+          <ShippingRuleForm
+            countries={countries}
+            countryDefaultCountries={countryDefaultCountries}
+            hasInternationalDefault={rules.some((rule) => rule.rule_type === "international_default" && rule.is_active)}
+          />
+        </AdminModal>
       </div>
-      <label className="flex items-center gap-3 text-sm font-black uppercase">
-        <input defaultChecked name="is_active" type="checkbox" value="true" />
-        Active on checkout
+      <div className="overflow-x-auto">
+        <table className="admin-table min-w-[900px]">
+          <thead>
+            <tr>
+              <th>Rule</th>
+              <th>Country</th>
+              <th>Regions</th>
+              <th>Fee</th>
+              <th>Status</th>
+              <th className="text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rules.map((rule) => {
+              const country = countries.find((item) => item.id === rule.country_id);
+              const regionNames = country?.shipping_regions
+                ?.filter((region) => Array.isArray(rule.region_ids) && rule.region_ids.map(String).includes(region.id))
+                .map((region) => region.region_name);
+
+              return (
+                <tr key={rule.id}>
+                  <td>{formatRuleType(rule.rule_type)}</td>
+                  <td>{rule.rule_type === "international_default" ? "All other countries" : country?.country_name ?? "-"}</td>
+                  <td>{regionNames?.length ? regionNames.join(", ") : "-"}</td>
+                  <td>{rule.currency} {Number(rule.fee).toFixed(2)}</td>
+                  <td>{rule.is_active ? "Active" : "Inactive"}</td>
+                  <td className="text-right">
+                    <details className="relative inline-block">
+                      <summary className="admin-secondary-action inline-flex h-9 w-9 cursor-pointer list-none items-center justify-center marker:content-['']">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </summary>
+                      <div className="admin-menu absolute right-0 mt-2 grid w-36 p-2 text-left">
+                        <AdminModal
+                          title="Edit shipping rule"
+                          trigger={<span className="block rounded px-3 py-2 text-sm font-semibold hover:bg-[#f6f3ef]">Edit</span>}
+                          width="w-[min(92vw,560px)]"
+                        >
+                        <ShippingRuleForm
+                          countries={countries}
+                          countryDefaultCountries={countryDefaultCountries}
+                          rule={rule}
+                        />
+                        </AdminModal>
+                        <form action={`/api/admin/shipping-rules/${rule.id}`} method="post">
+                          <button className="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-sm font-semibold text-red-500 hover:bg-red-50" name="_method" type="submit" value="DELETE">
+                            <Trash2 className="h-4 w-4" />
+                            Delete
+                          </button>
+                        </form>
+                      </div>
+                    </details>
+                  </td>
+                </tr>
+              );
+            })}
+            {rules.length === 0 ? (
+              <tr>
+                <td className="admin-muted" colSpan={6}>No shipping rules yet.</td>
+              </tr>
+            ) : null}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function CountriesPanel({ countries }: { countries: ShippingCountry[] }) {
+  return (
+    <section className="admin-card overflow-hidden">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#ece7df] p-4">
+        <div>
+          <h2 className="font-semibold">Countries</h2>
+          <p className="admin-muted mt-1 text-sm">Countries and manually entered regions available for shipping rules.</p>
+        </div>
+        <AdminModal
+          title="Create country"
+          trigger={<span className="admin-action flex items-center gap-2 px-4 py-2.5"><Plus className="h-4 w-4" />Create country</span>}
+          width="w-[min(94vw,520px)]"
+        >
+          <CountryForm />
+        </AdminModal>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="admin-table min-w-[900px]">
+          <thead>
+            <tr>
+              <th>Country</th>
+              <th>Code</th>
+              <th>Currency</th>
+              <th>Regions</th>
+              <th>Status</th>
+              <th className="text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {countries.map((country) => (
+              <tr key={country.id}>
+                <td>{country.country_name}</td>
+                <td>{country.country_code}</td>
+                <td>{country.currency}</td>
+                <td>{country.shipping_regions?.map((region) => region.region_name).join(", ") || "-"}</td>
+                <td>{country.is_active ? "Active" : "Inactive"}</td>
+                <td className="text-right">
+                  <details className="relative inline-block">
+                    <summary className="admin-secondary-action inline-flex h-9 w-9 cursor-pointer list-none items-center justify-center marker:content-['']">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </summary>
+                    <div className="admin-menu absolute right-0 mt-2 grid w-36 p-2 text-left">
+                      <AdminModal
+                        title="Edit country"
+                        trigger={<span className="block rounded px-3 py-2 text-sm font-semibold hover:bg-[#f6f3ef]">Edit</span>}
+                        width="w-[min(92vw,520px)]"
+                      >
+                        <CountryForm country={country} />
+                      </AdminModal>
+                      <form action={`/api/admin/shipping-countries/${country.id}`} method="post">
+                        <button className="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-sm font-semibold text-red-500 hover:bg-red-50" name="_method" type="submit" value="DELETE">
+                          <Trash2 className="h-4 w-4" />
+                          Delete
+                        </button>
+                      </form>
+                    </div>
+                  </details>
+                </td>
+              </tr>
+            ))}
+            {countries.length === 0 ? (
+              <tr>
+                <td className="admin-muted" colSpan={6}>No countries created yet.</td>
+              </tr>
+            ) : null}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function CountryForm({ country }: { country?: ShippingCountry }) {
+  const action = country ? `/api/admin/shipping-countries/${country.id}` : "/api/admin/shipping-countries";
+  const regions = country?.shipping_regions?.map((region) => region.region_name).join("\n") ?? "";
+
+  return (
+    <form action={action} className="grid gap-5" method="post">
+      <label className="grid gap-2 text-xs font-semibold uppercase text-[#81796f]">
+        Country
+        <select className="admin-input" defaultValue={country?.country_code ?? "US"} name="country_code">
+          {countryChoices.map(([code, name]) => (
+            <option key={code} value={code}>{name}</option>
+          ))}
+        </select>
       </label>
-      <button className="bg-[#F05267] px-5 py-3 text-sm font-black uppercase text-[#FFF9EF]" type="submit">
-        Save country
-      </button>
+      <input name="country_name" type="hidden" value={country?.country_name ?? ""} />
+      <input name="currency" type="hidden" value={country?.currency ?? "USD"} />
+      <input name="default_fee" type="hidden" value={country?.default_fee ?? 0} />
+      <label className="grid gap-2 text-xs font-semibold uppercase text-[#81796f]">
+        Regions
+        <textarea className="admin-input min-h-32" defaultValue={regions} name="regions" placeholder={"California\nNew York\nColombo"} />
+      </label>
+      <label className="flex items-center gap-3 text-sm font-semibold">
+        <input defaultChecked={country?.is_active ?? true} name="is_active" type="checkbox" value="true" />
+        Active country
+      </label>
+      <div className="flex justify-between gap-2">
+        <button className="admin-action px-4 py-2.5 text-xs" type="submit">
+          {country ? "Save country" : "Create country"}
+        </button>
+      </div>
     </form>
   );
 }
 
-function Field({
-  label,
-  name,
-  placeholder,
-  type = "text",
-}: {
-  label: string;
-  name: string;
-  placeholder?: string;
-  type?: string;
-}) {
-  return (
-    <label className="grid gap-2 text-xs font-black uppercase text-[#F7F1E6]/60">
-      {label}
-      <input className="admin-input" name={name} placeholder={placeholder} type={type} />
-    </label>
-  );
+function formatRuleType(type: ShippingRule["rule_type"]) {
+  if (type === "international_default") return "International Default";
+  if (type === "country_default") return "Country Default";
+  return "Country Region Override";
 }

@@ -1,65 +1,639 @@
+"use client";
+
+import { useMemo, useRef, useState } from "react";
+import { Bold, CalendarClock, Italic, List, Plus, Trash2 } from "lucide-react";
+import { UploadButton, UploadThumb, type UploadPreview } from "@/components/admin/upload-thumbnail";
+import type { ProductCategory } from "@/lib/db/categories";
+import type { VariantOption } from "@/lib/db/variant-options";
 import type { Database } from "@/types/database";
 
 type Product = Database["public"]["Tables"]["products"]["Row"];
+type Gender = "Male" | "Female" | "Unisex";
+type ProductStatus = "draft" | "published" | "inactive";
+type VariantBasis = "color" | "size" | "gender";
+type DraftVariant = {
+  key: string;
+  color: string;
+  size: string;
+  gender: Gender;
+  sku: string;
+  stock_quantity: number;
+  price: string;
+  sale_price: string;
+  unit_cost: string;
+};
+type FileUploadPreview = UploadPreview & { file: File };
 
-export function ProductForm({ product }: { product?: Product }) {
+const MAX_FILE_SIZE = 2 * 1024 * 1024;
+
+const fallbackCategories = ["T-Shirts", "Hoodies", "Shirts", "Pants", "Accessories"];
+const fallbackColors = ["Black", "Blue", "Blush", "Brown", "Cream", "Dark Navy Blue", "Green", "Ivory", "Mint", "Navy Blue", "Purple", "Sage Green", "Stone", "White", "Yellow"];
+const fallbackSizes = ["XS", "S", "M", "L", "XL", "XXL", "One Size"];
+const fallbackGenders: Gender[] = ["Male", "Female", "Unisex"];
+
+export function ProductForm({
+  product,
+  categories = [],
+  variantOptions = [],
+}: {
+  product?: Product;
+  categories?: ProductCategory[];
+  variantOptions?: VariantOption[];
+}) {
   const action = product ? `/api/admin/products/${product.id}` : "/api/admin/products";
+  const [status, setStatus] = useState<ProductStatus>(product?.product_status ?? "draft");
+  const [stockTracking, setStockTracking] = useState(product?.stock_tracking_enabled ?? true);
+  const [showStockCount, setShowStockCount] = useState(product?.show_stock_count ?? false);
+  const [preorderEnabled, setPreorderEnabled] = useState(product?.preorder_enabled ?? false);
+  const [totalStock, setTotalStock] = useState(product?.stock_quantity ?? 0);
+  const [shortDescription, setShortDescription] = useState(product?.short_description ?? "");
+  const [description, setDescription] = useState(product?.description ?? "");
+  const [variantOpen, setVariantOpen] = useState(false);
+  const [basis, setBasis] = useState<Record<VariantBasis, boolean>>({
+    color: true,
+    size: true,
+    gender: true,
+  });
+  const [basisConfirmed, setBasisConfirmed] = useState(false);
+  const [colors, setColors] = useState(getJsonList(product?.colors, ["Black"]));
+  const [sizes, setSizes] = useState(getJsonList(product?.sizes, ["M"]));
+  const [genders, setGenders] = useState<Gender[]>(
+    getJsonList(product?.genders, ["Unisex"]) as Gender[],
+  );
+  const [variants, setVariants] = useState<DraftVariant[]>([]);
+  const availableColors = optionNames(variantOptions, "color", fallbackColors);
+  const availableSizes = optionNames(variantOptions, "size", fallbackSizes);
+  const availableGenders = optionNames(variantOptions, "gender", fallbackGenders) as Gender[];
+  const categoryOptions = categories.length
+    ? categories.filter((category) => category.is_active).map((category) => category.name)
+    : fallbackCategories;
+  const colorSwatches = Object.fromEntries(
+    variantOptions
+      .filter((option) => option.option_type === "color")
+      .map((option) => [option.name, option.color_value]),
+  );
+
+  const assignedStock = useMemo(
+    () => variants.reduce((total, variant) => total + Number(variant.stock_quantity || 0), 0),
+    [variants],
+  );
+  const remainingStock = Math.max(0, Number(totalStock || 0) - assignedStock);
+
+  function generateVariants() {
+    const colorValues = basis.color ? colors : ["Default"];
+    const sizeValues = basis.size ? sizes : ["Default"];
+    const genderValues: Gender[] = basis.gender ? genders : ["Unisex"];
+    const generated = genderValues.flatMap((gender) =>
+      colorValues.flatMap((color) =>
+        sizeValues.map((size) => {
+          const key = `${gender}-${color}-${size}`.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+          return {
+            key,
+            color,
+            size,
+            gender,
+            sku: `SKU-${color}-${size}`.toUpperCase().replace(/[^A-Z0-9]+/g, "-"),
+            stock_quantity: 0,
+            price: "",
+            sale_price: "",
+            unit_cost: "",
+          };
+        }),
+      ),
+    );
+    setVariants(generated);
+  }
+
+  function updateVariant(key: string, stock: number) {
+    setVariants((current) =>
+      current.map((variant) =>
+        variant.key === key ? { ...variant, stock_quantity: Math.max(0, stock) } : variant,
+      ),
+    );
+  }
+
+  function updateVariantField(key: string, field: "price" | "sale_price" | "unit_cost", value: string) {
+    setVariants((current) =>
+      current.map((variant) => (variant.key === key ? { ...variant, [field]: value } : variant)),
+    );
+  }
 
   return (
-    <form
-      action={action}
-      className="grid gap-5 border border-[#F7F1E6]/10 bg-[#0B111C] p-5"
-      method="post"
-    >
+    <form action={action} className="space-y-6" encType="multipart/form-data" method="post">
       {product ? <input name="_method" type="hidden" value="PATCH" /> : null}
-      <div className="grid gap-4 md:grid-cols-2">
-        {[
-          ["name", "Name", product?.name ?? ""],
-          ["slug", "Slug", product?.slug ?? ""],
-          ["short_description", "Short description", product?.short_description ?? ""],
-          ["description", "Description", product?.description ?? ""],
-          ["price", "Price", product?.price ?? "0"],
-          ["sale_price", "Sale price", product?.sale_price ?? ""],
-          ["stock_quantity", "Stock quantity", product?.stock_quantity ?? "0"],
-          ["meta_title", "Meta title", product?.meta_title ?? ""],
-          ["meta_description", "Meta description", product?.meta_description ?? ""],
-        ].map(([name, label, defaultValue]) => (
-          <label
-            className={`grid gap-2 text-xs font-black uppercase text-[#F7F1E6]/60 ${
-              name === "description" || name === "meta_description"
-                ? "md:col-span-2"
-                : ""
-            }`}
-            key={name}
-          >
-            {label}
+      <input name="colors" type="hidden" value={colors.join(",")} />
+      <input name="sizes" type="hidden" value={sizes.join(",")} />
+      <input name="variants_json" type="hidden" value={JSON.stringify(variants)} />
+      {genders.map((gender) => (
+        <input key={gender} name="genders" type="hidden" value={gender} />
+      ))}
+
+      <section className="admin-card p-4">
+        <h2 className="font-semibold">Product details</h2>
+        <div className="mt-4 grid gap-4 lg:grid-cols-4">
+          <label className="grid gap-2 font-semibold lg:col-span-2">
+            Product name
+            <input className="admin-input" defaultValue={product?.name ?? ""} name="name" required />
+          </label>
+          <label className="grid gap-2 font-semibold">
+            Category
+            <select className="admin-input" defaultValue={product?.category ?? "T-Shirts"} name="category">
+              {categoryOptions.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="grid gap-2 font-semibold">
+            Product status
+            <select
+              className="admin-input"
+              name="product_status"
+              onChange={(event) => setStatus(event.target.value as ProductStatus)}
+              value={status}
+            >
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </label>
+          <label className="grid gap-2 font-semibold">
+            Slug
+            <input className="admin-input" defaultValue={product?.slug ?? ""} name="slug" placeholder="auto generated" />
+          </label>
+          <label className="grid gap-2 font-semibold">
+            Total stock
             <input
               className="admin-input"
-              defaultValue={String(defaultValue)}
-              name={String(name)}
+              min="0"
+              name="stock_quantity"
+              onChange={(event) => setTotalStock(Number(event.target.value))}
+              type="number"
+              value={totalStock}
             />
+          </label>
+          <label className="grid gap-2 font-semibold">
+            General price (USD)
+            <input className="admin-input" defaultValue={product?.price ?? "0"} name="price" step="0.01" type="number" />
+          </label>
+          <label className="grid gap-2 font-semibold">
+            General sale price (USD)
+            <input className="admin-input" defaultValue={product?.sale_price ?? ""} name="sale_price" step="0.01" type="number" />
+          </label>
+          <label className="grid gap-2 font-semibold">
+            Unit cost (USD)
+            <input className="admin-input" defaultValue={product?.unit_cost ?? ""} name="unit_cost" placeholder="Used for profit reports" step="0.01" type="number" />
+          </label>
+        </div>
+        <div className="mt-4 grid gap-3 rounded-md border border-[#ece7df] p-4 md:grid-cols-4">
+          <ToggleField
+            checked={stockTracking}
+            label="Stock tracking enabled"
+            name="stock_tracking_enabled"
+            onChange={setStockTracking}
+          />
+          <ToggleField
+            checked={showStockCount}
+            label="Show stock count"
+            name="show_stock_count"
+            onChange={setShowStockCount}
+          />
+          <ToggleField
+            checked={preorderEnabled}
+            label="Pre order enabled"
+            name="preorder_enabled"
+            onChange={setPreorderEnabled}
+          />
+          <p className="admin-muted flex items-center gap-2">
+            <CalendarClock className="h-4 w-4" />
+            Variant stock {assignedStock} / {totalStock}. Remaining {remainingStock}.
+          </p>
+        </div>
+        {preorderEnabled ? (
+          <div className="mt-4 grid gap-4 rounded-md border border-[#ece7df] p-4 md:grid-cols-3">
+            <label className="grid gap-2 font-semibold">
+              Start date & time
+              <input className="admin-input" defaultValue={toDateTimeLocal(product?.preorder_start_at)} name="preorder_start_at" type="datetime-local" />
+            </label>
+            <label className="grid gap-2 font-semibold">
+              End date & time
+              <input className="admin-input" defaultValue={toDateTimeLocal(product?.preorder_end_at)} name="preorder_end_at" type="datetime-local" />
+            </label>
+            <label className="grid gap-2 font-semibold">
+              Quantity limit
+              <input className="admin-input" defaultValue={product?.preorder_quantity_limit ?? ""} name="preorder_quantity_limit" placeholder="Unlimited" type="number" />
+            </label>
+          </div>
+        ) : null}
+      </section>
+
+      <section className="admin-card p-4">
+        <h2 className="font-semibold">Descriptions</h2>
+        <div className="mt-4 grid gap-4">
+          <RichTextarea
+            label="Short description"
+            name="short_description"
+            onChange={setShortDescription}
+            rows={5}
+            value={shortDescription}
+          />
+          <RichTextarea
+            label="Main description"
+            name="description"
+            onChange={setDescription}
+            rows={10}
+            value={description}
+          />
+        </div>
+      </section>
+
+      <section className="admin-card p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="font-semibold">Variants</h2>
+            <p className="admin-muted mt-1">Choose variant bases, select values, then generate all combinations.</p>
+          </div>
+          <button
+            className="admin-secondary-action flex items-center gap-2 px-3 py-2"
+            onClick={() => setVariantOpen((open) => !open)}
+            type="button"
+          >
+            <Plus className="h-4 w-4" />
+            Add variant
+          </button>
+        </div>
+
+        {variantOpen ? (
+          <div className="mt-4 space-y-4">
+            <div className="grid gap-3 rounded-md border border-[#ece7df] p-4 md:grid-cols-3">
+              {(["color", "size", "gender"] as VariantBasis[]).map((item) => (
+                <label className="flex items-center gap-3 font-semibold capitalize" key={item}>
+                  <input
+                    checked={basis[item]}
+                    onChange={(event) =>
+                      setBasis((current) => ({ ...current, [item]: event.target.checked }))
+                    }
+                    type="checkbox"
+                  />
+                  {item}
+                </label>
+              ))}
+            </div>
+            <button
+              className="admin-action px-4 py-2.5"
+              onClick={() => setBasisConfirmed(true)}
+              type="button"
+            >
+              Proceed
+            </button>
+            {basisConfirmed ? (
+              <div className="grid gap-4 md:grid-cols-3">
+                {basis.gender ? (
+                  <OptionColumn label="Gender" options={availableGenders} selected={genders} setSelected={setGenders} />
+                ) : null}
+                {basis.color ? (
+                  <OptionColumn colorSwatches={colorSwatches} label="Colors" options={availableColors} selected={colors} setSelected={setColors} />
+                ) : null}
+                {basis.size ? (
+                  <OptionColumn label="Sizes" options={availableSizes} selected={sizes} setSelected={setSizes} />
+                ) : null}
+              </div>
+            ) : null}
+            {basisConfirmed ? (
+              <button className="admin-action px-4 py-2.5" onClick={generateVariants} type="button">
+                Generate variants
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        <div className="mt-4 overflow-x-auto rounded-md border border-[#ece7df]">
+          <table className="admin-table min-w-[900px]">
+            <thead>
+              <tr>
+                <th>Gender</th>
+                <th>Color</th>
+                <th>Size</th>
+                <th>Variant SKU</th>
+                <th>Image</th>
+                <th>Stock amount</th>
+                <th>Variant price</th>
+                <th>Sale price</th>
+                <th>Unit cost</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {variants.length ? (
+                variants.map((variant) => (
+                  <tr key={variant.key}>
+                    <td>{variant.gender}</td>
+                    <td>
+                      <span className="inline-flex items-center gap-2">
+                        <span
+                          className="h-4 w-4 rounded-full border border-[#ece7df]"
+                          style={{ backgroundColor: colorSwatches[variant.color] ?? "#fff" }}
+                        />
+                        {variant.color}
+                      </span>
+                    </td>
+                    <td>{variant.size}</td>
+                    <td>{variant.sku}</td>
+                    <td>
+                      <FilePreviewInput compact name={`variant_image_${variant.key}`} />
+                    </td>
+                    <td>
+                      <input
+                        className="admin-input w-28"
+                        min="0"
+                        onChange={(event) => updateVariant(variant.key, Number(event.target.value))}
+                        type="number"
+                        value={variant.stock_quantity}
+                      />
+                    </td>
+                    <td>
+                      <input className="admin-input w-28" onChange={(event) => updateVariantField(variant.key, "price", event.target.value)} placeholder="USD" step="0.01" type="number" value={variant.price} />
+                    </td>
+                    <td>
+                      <input className="admin-input w-28" onChange={(event) => updateVariantField(variant.key, "sale_price", event.target.value)} placeholder="USD" step="0.01" type="number" value={variant.sale_price} />
+                    </td>
+                    <td>
+                      <input className="admin-input w-28" onChange={(event) => updateVariantField(variant.key, "unit_cost", event.target.value)} placeholder="USD" step="0.01" type="number" value={variant.unit_cost} />
+                    </td>
+                    <td className="text-right">
+                      <button
+                        className="admin-secondary-action inline-flex h-9 w-9 items-center justify-center text-red-500"
+                        onClick={() => setVariants((current) => current.filter((item) => item.key !== variant.key))}
+                        type="button"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td className="admin-muted" colSpan={10}>
+                    No variants generated yet.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="admin-card p-4">
+        <h2 className="font-semibold">Media</h2>
+        <p className="admin-muted mt-1">Upload one featured product image and gallery images. Each image must be below 2 MB.</p>
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <FilePreviewInput label="Featured image" name="featured_file" />
+          <FilePreviewInput label="Gallery images" multiple name="gallery_files" />
+        </div>
+      </section>
+
+      <section className="admin-card p-4">
+        <h2 className="font-semibold">SEO</h2>
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <label className="grid gap-2 font-semibold">
+            Meta title
+            <input className="admin-input" defaultValue={product?.meta_title ?? ""} name="meta_title" />
+          </label>
+          <label className="grid gap-2 font-semibold">
+            Meta description
+            <input className="admin-input" defaultValue={product?.meta_description ?? ""} name="meta_description" />
+          </label>
+        </div>
+      </section>
+
+      <div className="flex justify-end gap-3">
+        <button className="admin-secondary-action px-4 py-2.5" name="submit_status" type="submit" value="draft">
+          Save as draft
+        </button>
+        <button className="admin-action px-4 py-2.5" name="submit_status" type="submit" value="published">
+          Publish product
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function ToggleField({
+  checked,
+  label,
+  name,
+  onChange,
+}: {
+  checked: boolean;
+  label: string;
+  name: string;
+  onChange: (checked: boolean) => void;
+}) {
+  return (
+    <label className="flex items-center gap-3 font-semibold">
+      <input name={name} type="hidden" value={checked ? "true" : "false"} />
+      <input checked={checked} onChange={(event) => onChange(event.target.checked)} type="checkbox" />
+      {label}
+    </label>
+  );
+}
+
+function RichTextarea({
+  label,
+  name,
+  onChange,
+  rows,
+  value,
+}: {
+  label: string;
+  name: string;
+  onChange: (value: string) => void;
+  rows: number;
+  value: string;
+}) {
+  function wrap(before: string, after = before) {
+    onChange(`${value}${before}text${after}`);
+  }
+
+  return (
+    <label className="grid gap-2 font-semibold">
+      {label}
+      <span className="flex flex-wrap gap-2">
+        <button className="admin-secondary-action px-3 py-2" onClick={() => wrap("**")} type="button">
+          <Bold className="h-4 w-4" />
+        </button>
+        <button className="admin-secondary-action px-3 py-2" onClick={() => wrap("_")} type="button">
+          <Italic className="h-4 w-4" />
+        </button>
+        <button className="admin-secondary-action px-3 py-2" onClick={() => onChange(`${value}\n- List item`)} type="button">
+          <List className="h-4 w-4" />
+        </button>
+      </span>
+      <textarea
+        className="admin-input resize-y"
+        name={name}
+        onChange={(event) => onChange(event.target.value)}
+        rows={rows}
+        value={value}
+      />
+    </label>
+  );
+}
+
+function OptionColumn<T extends string>({
+  colorSwatches,
+  label,
+  options,
+  selected,
+  setSelected,
+}: {
+  colorSwatches?: Record<string, string | null>;
+  label: string;
+  options: T[];
+  selected: T[];
+  setSelected: (items: T[]) => void;
+}) {
+  return (
+    <div className="rounded-md border border-[#ece7df] p-4">
+      <p className="font-semibold">{label}</p>
+      <div className="mt-3 grid gap-2">
+        {options.map((option) => (
+          <label className="flex items-center gap-2" key={option}>
+            <input
+              checked={selected.includes(option)}
+              onChange={(event) =>
+                setSelected(
+                  event.target.checked
+                    ? [...selected, option]
+                    : selected.filter((item) => item !== option),
+                )
+              }
+              type="checkbox"
+            />
+            {colorSwatches ? (
+              <span
+                className="h-4 w-4 rounded-full border border-[#ece7df]"
+                style={{ backgroundColor: colorSwatches[option] ?? "#fff" }}
+              />
+            ) : null}
+            {option}
           </label>
         ))}
       </div>
-      {/*
-        Keep inputs simple because the existing API accepts form posts and storage
-        images are managed separately on the edit page.
-      */}
-      <label className="flex items-center gap-3 text-sm font-black uppercase">
-        <input
-          defaultChecked={product?.is_active ?? true}
-          name="is_active"
-          type="checkbox"
-          value="true"
-        />
-        <span>Published</span>
-      </label>
-      <button
-        className="w-fit bg-[#F05267] px-5 py-3 text-sm font-black uppercase text-[#FFF9EF]"
-        type="submit"
-      >
-        Save product
-      </button>
-    </form>
+    </div>
   );
+}
+
+function FilePreviewInput({
+  compact,
+  label,
+  multiple,
+  name,
+}: {
+  compact?: boolean;
+  label?: string;
+  multiple?: boolean;
+  name: string;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [previews, setPreviews] = useState<FileUploadPreview[]>([]);
+  const [message, setMessage] = useState("");
+
+  function animateProgress(items: FileUploadPreview[]) {
+    setPreviews(items.map((item) => ({ ...item, progress: 12, complete: false })));
+    [35, 68, 100].forEach((value, index) => {
+      window.setTimeout(() => {
+        setPreviews((current) =>
+          current.map((item) => ({
+            ...item,
+            progress: value,
+            complete: value === 100,
+          })),
+        );
+      }, 140 * (index + 1));
+    });
+  }
+
+  function removePreview(id: string) {
+    const removed = previews.find((preview) => preview.id === id);
+    const nextPreviews = previews.filter((preview) => preview.id !== id);
+
+    if (removed) URL.revokeObjectURL(removed.url);
+    setPreviews(nextPreviews);
+    setMessage("");
+
+    if (!inputRef.current) return;
+    if (!nextPreviews.length) {
+      inputRef.current.value = "";
+      return;
+    }
+
+    const transfer = new DataTransfer();
+    nextPreviews.forEach((preview) => transfer.items.add(preview.file));
+    inputRef.current.files = transfer.files;
+  }
+
+  return (
+    <label className="grid gap-2 font-semibold">
+      {label}
+      <UploadButton
+        inputRef={inputRef}
+        multiple={multiple}
+        name={name}
+        onChange={(event) => {
+          const files = Array.from(event.target.files ?? []);
+          const oversized = files.find((file) => file.size > MAX_FILE_SIZE);
+
+          if (oversized) {
+            setMessage(`${oversized.name} is larger than 2 MB.`);
+            event.target.value = "";
+            return;
+          }
+
+          const items = files.map((file) => ({
+            id: `${file.name}-${file.lastModified}`,
+            url: URL.createObjectURL(file),
+            name: file.name,
+            progress: 0,
+            complete: false,
+            file,
+          }));
+          setMessage("");
+          animateProgress(items);
+        }}
+      />
+      {message ? <span className="text-xs font-semibold text-red-500">{message}</span> : null}
+      {previews.length ? (
+        <span className={`flex flex-wrap gap-2 ${compact ? "max-w-24" : ""}`}>
+          {previews.map((preview) => (
+            <UploadThumb
+              item={preview}
+              key={preview.id}
+              onRemove={() => removePreview(preview.id)}
+              size={compact ? 54 : 72}
+            />
+          ))}
+        </span>
+      ) : null}
+    </label>
+  );
+}
+
+function getJsonList(value: unknown, fallback: string[]) {
+  return Array.isArray(value) && value.length ? value.map(String) : fallback;
+}
+
+function optionNames<T extends string>(
+  options: VariantOption[],
+  type: VariantOption["option_type"],
+  fallback: T[],
+) {
+  const names = options.filter((option) => option.option_type === type).map((option) => option.name);
+  return names.length ? (names as T[]) : fallback;
+}
+
+function toDateTimeLocal(value: string | null | undefined) {
+  if (!value) return "";
+  return new Date(value).toISOString().slice(0, 16);
 }

@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { requireAdmin } from "@/lib/admin-auth";
 import { listAdminOrders } from "@/lib/db/admin";
 import { formatCurrency } from "@/lib/utils";
+import { Download, Filter, MoreHorizontal, Search } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -21,96 +22,87 @@ export default async function AdminOrdersPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-[#B8A8E8]">
-            Fulfillment
-          </p>
-          <h1 className="mt-3 font-mono text-3xl font-black uppercase md:text-5xl">
-            Orders
-          </h1>
-        </div>
-        <p className="text-sm text-[#F7F1E6]/60">{orders.length} records</p>
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">Orders</h1>
+        <p className="admin-muted mt-2 text-sm">
+          Review order timing, payment state, customer details, and fulfillment status.
+        </p>
       </div>
 
-      <form className="grid gap-3 border border-[#F7F1E6]/10 bg-[#0B111C] p-4 md:grid-cols-[1fr_180px_180px_auto]">
-        <input
-          className="border border-[#F7F1E6]/10 bg-[#070B12] px-4 py-3 text-sm outline-none focus:border-[#F05267]"
-          defaultValue={query.q ?? ""}
-          name="q"
-          placeholder="Search order, customer, email"
-        />
-        <Select defaultValue={query.status ?? "all"} name="status">
-          <option value="all">All statuses</option>
-          {["pending", "processing", "shipped", "completed", "cancelled"].map(
-            (status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ),
-          )}
-        </Select>
-        <Select defaultValue={query.payment ?? "all"} name="payment">
-          <option value="all">All payments</option>
-          {["pending", "paid", "failed", "cancelled"].map((status) => (
-            <option key={status} value={status}>
-              {status}
-            </option>
-          ))}
-        </Select>
-        <button
-          className="bg-[#F05267] px-5 py-3 text-sm font-black uppercase text-[#FFF9EF] transition hover:translate-x-0.5"
-          type="submit"
-        >
-          Filter
-        </button>
-      </form>
-
-      <div className="overflow-x-auto border border-[#F7F1E6]/10 bg-[#0B111C]">
-        <table className="w-full min-w-[900px] border-collapse text-left text-sm">
-          <thead className="text-xs uppercase text-[#F7F1E6]/50">
-            <tr className="border-b border-[#F7F1E6]/10">
+      <div className="admin-card overflow-hidden">
+        <form className="flex flex-wrap items-center gap-3 border-b border-[#ece7df] p-4">
+          <label className="relative min-w-72 flex-1">
+            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#81796f]" />
+            <input
+              className="admin-input admin-search-input w-full"
+              defaultValue={query.q ?? ""}
+              name="q"
+              placeholder="Search orders by ID, customer, date, or status"
+            />
+          </label>
+          <Select defaultValue={query.status ?? "all"} name="status">
+            <option value="all">All statuses</option>
+            {["pending", "processing", "shipped", "completed", "cancelled"].map((status) => (
+              <option key={status} value={status}>{status}</option>
+            ))}
+          </Select>
+          <button className="admin-secondary-action flex items-center gap-2 px-3 py-2.5" type="submit">
+            <Filter className="h-4 w-4" />
+            Filters
+          </button>
+          <button className="admin-secondary-action flex items-center gap-2 px-3 py-2.5" type="button">
+            <Download className="h-4 w-4" />
+            Download
+          </button>
+        </form>
+        <div className="overflow-x-visible">
+        <table className="admin-table min-w-[980px]">
+          <thead>
+            <tr>
               <th className="px-4 py-4">Order</th>
-              <th className="px-4 py-4">Customer</th>
               <th className="px-4 py-4">Date</th>
+              <th className="px-4 py-4">Customer</th>
+              <th className="px-4 py-4">Total</th>
               <th className="px-4 py-4">Payment</th>
-              <th className="px-4 py-4">Status</th>
-              <th className="px-4 py-4 text-right">Total</th>
-              <th className="px-4 py-4 text-right">Action</th>
+              <th className="px-4 py-4">Order Status</th>
+              <th className="px-4 py-4">Details</th>
+              <th className="px-4 py-4 text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {orders.map((order) => (
-              <tr className="border-b border-[#F7F1E6]/10" key={order.id}>
-                <td className="px-4 py-4 font-mono">
-                  <Link className="text-[#FFF9EF]" href={`/admin/orders/${order.id}`}>
+              <tr key={order.id}>
+                <td className="px-4 py-4 font-semibold">
+                  <Link href={`/admin/orders/${order.id}`}>
                     {order.order_number}
                   </Link>
                 </td>
                 <td className="px-4 py-4">
-                  <span className="block text-[#FFF9EF]">{order.customer_name}</span>
-                  <span className="text-xs text-[#F7F1E6]/50">{order.customer_email}</span>
-                </td>
-                <td className="px-4 py-4 text-[#F7F1E6]/60">
                   {new Date(order.created_at).toLocaleDateString("en-LK")}
                 </td>
                 <td className="px-4 py-4">
-                  <StatusBadge value={order.payment_status} />
+                  {order.customer_name}
+                </td>
+                <td className="px-4 py-4">
+                  {formatCurrency(Number(order.total))}
+                </td>
+                <td className="px-4 py-4">
+                  {order.payment_status.toUpperCase()}
                 </td>
                 <td className="px-4 py-4">
                   <StatusBadge value={order.order_status} />
                 </td>
-                <td className="px-4 py-4 text-right">
-                  {formatCurrency(Number(order.total))}
+                <td className="px-4 py-4">
+                  {order.city || order.district}
                 </td>
                 <td className="px-4 py-4 text-right">
-                  <details className="relative inline-block">
-                    <summary className="cursor-pointer border border-[#F7F1E6]/20 px-3 py-2 text-xs font-black uppercase marker:content-[''] hover:border-[#F05267]">
-                      Actions
+                  <details className="relative z-20 inline-block">
+                    <summary className="admin-secondary-action flex h-9 w-9 cursor-pointer items-center justify-center marker:content-['']">
+                      <MoreHorizontal className="h-4 w-4" />
                     </summary>
-                    <div className="absolute right-0 z-20 mt-2 grid w-36 border border-[#F7F1E6]/10 bg-[#070B12] p-2 text-left shadow-xl">
+                    <div className="admin-menu absolute right-0 top-full z-[300] mt-2 grid w-36 p-2 text-left">
                       <Link
-                        className="px-3 py-2 text-xs font-black uppercase hover:bg-[#F05267] hover:text-[#FFF9EF]"
+                        className="rounded px-3 py-2 text-sm font-semibold hover:bg-[#f6f3ef]"
                         href={`/admin/orders/${order.id}`}
                       >
                         View order
@@ -122,9 +114,10 @@ export default async function AdminOrdersPage({
             ))}
           </tbody>
         </table>
+        </div>
       </div>
       {!orders.length ? (
-        <p className="border border-[#F7F1E6]/10 bg-[#0B111C] p-6 text-sm text-[#F7F1E6]/55">
+        <p className="admin-card p-6 text-sm text-[#81796f]">
           No orders match these filters.
         </p>
       ) : null}
@@ -143,7 +136,7 @@ function Select({
 }) {
   return (
     <select
-      className="border border-[#F7F1E6]/10 bg-[#070B12] px-4 py-3 text-sm capitalize outline-none focus:border-[#F05267]"
+      className="admin-input min-w-44 capitalize"
       defaultValue={defaultValue}
       name={name}
     >
@@ -154,7 +147,7 @@ function Select({
 
 function StatusBadge({ value }: { value: string }) {
   return (
-    <span className="border border-[#B8A8E8]/40 px-2 py-1 text-xs uppercase text-[#B8A8E8]">
+    <span className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold uppercase text-red-300">
       {value}
     </span>
   );

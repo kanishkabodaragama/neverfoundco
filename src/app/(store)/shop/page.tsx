@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 import { Footer } from "@/components/site/Footer";
 import { SiteHeader } from "@/components/site/Header";
-import { shopProducts } from "@/components/site/shop-data";
-import { formatLkr } from "@/components/cart/cart-data";
+import { ShopProductCard } from "@/components/site/ShopProductCard";
+import { mapDbProductToShopProduct, shopProducts } from "@/components/site/shop-data";
+import { listActiveProducts } from "@/lib/db/products";
 
 export const metadata: Metadata = {
   title: "Shop",
@@ -12,7 +11,10 @@ export const metadata: Metadata = {
     "Shop limited Never Found streetwear drops with no restocks and scarce stock.",
 };
 
-export default function ShopPage() {
+export default async function ShopPage() {
+  const dbProducts = await listActiveProducts();
+  const products = dbProducts.length ? dbProducts.map(mapDbProductToShopProduct) : shopProducts;
+
   return (
     <div className="min-h-screen w-full bg-[#F7F1E6] text-[#10131A]">
       <SiteHeader active="shop" />
@@ -32,32 +34,8 @@ export default function ShopPage() {
         </section>
         <section className="w-full bg-[#070B12] px-5 py-8 text-[#FFF9EF] md:px-8 xl:px-12">
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {shopProducts.map((product) => (
-              <Link
-                className="group bg-[#FFF9EF] p-4 text-[#10131A] transition hover:-translate-y-1"
-                href={`/products/${product.id}`}
-                key={product.id}
-              >
-                <div className="relative aspect-square">
-                  <span className="absolute left-0 top-0 z-10 bg-[#B8A8E8] px-3 py-1 text-xs font-black uppercase">
-                    {product.stockLabel}
-                  </span>
-                  <Image
-                    alt={product.alt}
-                    className="object-contain p-7"
-                    fill
-                    sizes="(min-width: 1024px) 24vw, (min-width: 640px) 48vw, 100vw"
-                    src={product.image}
-                  />
-                </div>
-                <div className="mt-4 flex items-end justify-between gap-3">
-                  <div>
-                    <h2 className="font-pixel text-xs uppercase">{product.name}</h2>
-                    <p className="mt-2 text-sm font-black">{formatLkr(product.price)}</p>
-                  </div>
-                  <span className="text-lg">→</span>
-                </div>
-              </Link>
+            {products.map((product) => (
+              <ShopProductCard key={product.id} product={product} />
             ))}
           </div>
         </section>

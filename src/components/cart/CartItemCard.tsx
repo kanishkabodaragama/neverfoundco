@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import type { CartProduct } from "@/components/cart/cart-data";
-import { formatLkr } from "@/components/cart/cart-data";
+import { StorePrice } from "@/components/site/StorePrice";
 
 export function CartItemCard({
   item,
@@ -34,7 +34,7 @@ export function CartItemCard({
         </span>
       </div>
       <div className="flex items-start p-5 text-sm font-black uppercase md:justify-center">
-        {formatLkr(item.price)}
+        <StorePrice amountUsd={item.price} />
       </div>
       <div className="flex items-start p-5">
         <div className="flex border border-[#10131A]/20 text-sm font-black">

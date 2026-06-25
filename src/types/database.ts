@@ -22,7 +22,20 @@ export type Database = {
           description: string | null;
           price: number;
           sale_price: number | null;
+          unit_cost: number | null;
           stock_quantity: number;
+          show_stock_count: boolean;
+          main_image_url: string | null;
+          category: string;
+          product_status: "draft" | "published" | "inactive";
+          stock_tracking_enabled: boolean;
+          preorder_enabled: boolean;
+          preorder_start_at: string | null;
+          preorder_end_at: string | null;
+          preorder_quantity_limit: number | null;
+          colors: Json;
+          sizes: Json;
+          genders: Json;
           is_active: boolean;
           meta_title: string | null;
           meta_description: string | null;
@@ -44,6 +57,25 @@ export type Database = {
         }>;
         Insert: Insert<Database["public"]["Tables"]["product_images"]["Row"]>;
         Update: Update<Database["public"]["Tables"]["product_images"]["Row"]>;
+      };
+      product_variants: {
+        Row: Row<{
+          id: string;
+          product_id: string;
+          gender: "Male" | "Female" | "Unisex";
+          size: string;
+          color: string;
+          stock_quantity: number;
+          price: number | null;
+          sale_price: number | null;
+          unit_cost: number | null;
+          image_url: string | null;
+          storage_path: string | null;
+          created_at: string;
+          updated_at: string;
+        }>;
+        Insert: Insert<Database["public"]["Tables"]["product_variants"]["Row"]>;
+        Update: Update<Database["public"]["Tables"]["product_variants"]["Row"]>;
       };
       orders: {
         Row: Row<{
@@ -82,6 +114,8 @@ export type Database = {
           product_name: string;
           quantity: number;
           unit_price: number;
+          unit_cost: number;
+          profit: number;
           total_price: number;
           created_at: string;
         }>;
@@ -96,6 +130,20 @@ export type Database = {
         }>;
         Insert: Insert<Database["public"]["Tables"]["shipping_settings"]["Row"]>;
         Update: Update<Database["public"]["Tables"]["shipping_settings"]["Row"]>;
+      };
+      payment_gateways: {
+        Row: Row<{
+          id: string;
+          gateway_key: string;
+          name: string;
+          description: string | null;
+          is_integrated: boolean;
+          is_enabled: boolean;
+          created_at: string;
+          updated_at: string;
+        }>;
+        Insert: Insert<Database["public"]["Tables"]["payment_gateways"]["Row"]>;
+        Update: Update<Database["public"]["Tables"]["payment_gateways"]["Row"]>;
       };
       coupons: {
         Row: Row<{
@@ -149,6 +197,58 @@ export type Database = {
         }>;
         Insert: Insert<Database["public"]["Tables"]["shipping_area_overrides"]["Row"]>;
         Update: Update<Database["public"]["Tables"]["shipping_area_overrides"]["Row"]>;
+      };
+      shipping_regions: {
+        Row: Row<{
+          id: string;
+          country_id: string;
+          region_name: string;
+          created_at: string;
+          updated_at: string;
+        }>;
+        Insert: Insert<Database["public"]["Tables"]["shipping_regions"]["Row"]>;
+        Update: Update<Database["public"]["Tables"]["shipping_regions"]["Row"]>;
+      };
+      shipping_rules: {
+        Row: Row<{
+          id: string;
+          rule_type: "international_default" | "country_default" | "country_region_override";
+          country_id: string | null;
+          region_ids: Json;
+          fee: number;
+          currency: string;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        }>;
+        Insert: Insert<Database["public"]["Tables"]["shipping_rules"]["Row"]>;
+        Update: Update<Database["public"]["Tables"]["shipping_rules"]["Row"]>;
+      };
+      variant_options: {
+        Row: Row<{
+          id: string;
+          option_type: "color" | "size" | "gender";
+          name: string;
+          color_value: string | null;
+          created_at: string;
+          updated_at: string;
+        }>;
+        Insert: Insert<Database["public"]["Tables"]["variant_options"]["Row"]>;
+        Update: Update<Database["public"]["Tables"]["variant_options"]["Row"]>;
+      };
+      product_categories: {
+        Row: Row<{
+          id: string;
+          name: string;
+          slug: string;
+          description: string | null;
+          display_order: number;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        }>;
+        Insert: Insert<Database["public"]["Tables"]["product_categories"]["Row"]>;
+        Update: Update<Database["public"]["Tables"]["product_categories"]["Row"]>;
       };
       admin_users: {
         Row: Row<{

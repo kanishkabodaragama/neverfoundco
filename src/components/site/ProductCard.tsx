@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { StorePrice } from "@/components/site/StorePrice";
 import type { DropProduct } from "@/components/site/landing-data";
 
 export function ProductCard({ product }: { product: DropProduct }) {
@@ -37,7 +38,7 @@ export function ProductCard({ product }: { product: DropProduct }) {
             {product.name}
           </Link>
         </h3>
-        <p>{product.price}</p>
+        <p><StorePrice amountUsd={product.price} /></p>
       </div>
     </article>
   );

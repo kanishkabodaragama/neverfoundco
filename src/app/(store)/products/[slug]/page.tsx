@@ -2,16 +2,17 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { formatLkr } from "@/components/cart/cart-data";
 import { Footer } from "@/components/site/Footer";
-import { ProductDetailActions } from "@/components/site/ProductDetailActions";
+import { ProductDetailClient } from "@/components/site/ProductDetailClient";
+import { StorePrice } from "@/components/site/StorePrice";
 import {
-  getMockProductBySlug,
+  getProductDetailBySlug,
   mockProductDetails,
   type MockProductDetail,
 } from "@/components/site/product-detail-data";
-import { shopProducts } from "@/components/site/shop-data";
+import { mapDbProductToShopProduct, shopProducts, type ShopProduct } from "@/components/site/shop-data";
 import { SiteHeader } from "@/components/site/Header";
+import { listActiveProducts } from "@/lib/db/products";
 
 const detailBullets = [
   "100% Cotton Fleece",
@@ -41,7 +42,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = getMockProductBySlug(slug);
+  const product = await getProductDetailBySlug(slug);
 
   if (!product) return {};
 
@@ -62,23 +63,25 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = getMockProductBySlug(slug);
+  const product = await getProductDetailBySlug(slug);
 
   if (!product) notFound();
 
-  return <NeverFoundProductPage product={product} />;
+  const dbProducts = await listActiveProducts();
+  const relatedProducts = dbProducts.length ? dbProducts.map(mapDbProductToShopProduct) : shopProducts;
+
+  return <NeverFoundProductPage product={product} relatedProducts={relatedProducts} />;
 }
 
-function NeverFoundProductPage({ product }: { product: MockProductDetail }) {
-  const gallery = [
-    product.image,
-    "/images/landing/tee-black.svg",
-    "/images/landing/tee-cream.svg",
-    "/images/landing/tee-yellow.svg",
-  ];
-  const selectedSize = product.sizes.includes("M") ? "M" : product.sizes[0];
-  const relatedProducts = shopProducts
-    .filter((related) => related.id !== product.slug)
+function NeverFoundProductPage({
+  product,
+  relatedProducts,
+}: {
+  product: MockProductDetail;
+  relatedProducts: ShopProduct[];
+}) {
+  const related = relatedProducts
+    .filter((item) => (item.slug ?? item.id) !== product.slug)
     .slice(0, 4);
 
   return (
@@ -99,110 +102,7 @@ function NeverFoundProductPage({ product }: { product: MockProductDetail }) {
             <span>{product.name}</span>
           </nav>
 
-          <div className="mt-8 grid w-full gap-8 lg:grid-cols-[55fr_45fr] xl:gap-12">
-            <div className="grid gap-5 md:grid-cols-[96px_1fr]">
-              <div className="order-2 flex gap-4 overflow-x-auto md:order-1 md:flex-col md:overflow-visible">
-                {gallery.map((image, index) => (
-                  <button
-                    aria-label={`View product image ${index + 1}`}
-                    className={`relative h-24 w-24 shrink-0 bg-[#FFF9EF] ${
-                      index === 0 ? "border-2 border-[#F05267]" : "border border-[#10131A]/15"
-                    }`}
-                    key={`${image}-${index}`}
-                    type="button"
-                  >
-                    <Image
-                      alt={`${product.name} thumbnail ${index + 1}`}
-                      className="object-contain p-3"
-                      fill
-                      sizes="96px"
-                      src={image}
-                    />
-                  </button>
-                ))}
-              </div>
-
-              <div className="relative order-1 min-h-[430px] bg-[#FFF9EF] md:order-2 lg:min-h-[610px]">
-                <Image
-                  alt={product.alt}
-                  className="object-contain p-8 md:p-12"
-                  fill
-                  priority
-                  sizes="(min-width: 1024px) 50vw, 100vw"
-                  src={product.image}
-                />
-                <span className="font-pixel absolute bottom-5 right-5 text-2xl">
-                  ⛶
-                </span>
-              </div>
-            </div>
-
-            <div className="flex flex-col justify-center">
-              <span className="w-fit bg-[#B8A8E8] px-3 py-1 text-xs font-black uppercase">
-                New Drop
-              </span>
-              <h1 className="font-pixel mt-6 max-w-xl text-3xl font-black uppercase leading-tight md:text-4xl">
-                {product.name}
-              </h1>
-              <p className="font-pixel mt-5 text-2xl uppercase text-[#F05267]">
-                {formatLkr(product.price)}
-              </p>
-              <p className="mt-5 text-3xl leading-none text-[#F05267]">♥♥♥</p>
-              <p className="mt-6 max-w-md text-sm font-bold leading-relaxed">
-                {product.shortDescription}
-                <br />
-                Lost since 1999.
-              </p>
-
-              <div className="my-7 h-px w-full bg-[#B8A8E8]" />
-
-              <div className="space-y-6">
-                <div>
-                  <p className="font-pixel text-xs uppercase">
-                    Color: {product.color}
-                  </p>
-                  <div className="mt-4 flex gap-4">
-                    <ColorSwatch className="bg-[#070B12]" selected />
-                    <ColorSwatch className="bg-[#8C8D8F]" />
-                    <ColorSwatch className="bg-[#B8A8E8]" />
-                  </div>
-                </div>
-
-                <div>
-                  <p className="font-pixel text-xs uppercase">Size: Select Size</p>
-                  <div className="mt-4 flex flex-wrap gap-3">
-                    {["S", "M", "L", "XL", "XXL"].map((size) => (
-                      <button
-                        className={`min-w-16 border px-5 py-3 text-xs font-black uppercase transition hover:border-[#F05267] hover:text-[#F05267] ${
-                          size === selectedSize
-                            ? "border-[#F05267] text-[#F05267]"
-                            : "border-[#10131A]"
-                        }`}
-                        key={size}
-                        type="button"
-                      >
-                        {size}
-                      </button>
-                    ))}
-                  </div>
-                  <Link
-                    className="mt-4 inline-flex text-xs font-black uppercase text-[#F05267] transition hover:translate-x-0.5"
-                    href="#size-chart"
-                  >
-                    Size guide ›
-                  </Link>
-                </div>
-
-                <ProductDetailActions
-                  name={product.name}
-                  productId={product.slug}
-                  slug={product.slug}
-                  soldOut={product.soldOut}
-                  unitPrice={product.price}
-                />
-              </div>
-            </div>
-          </div>
+          <ProductDetailClient product={product} />
         </section>
 
         <section className="grid w-full gap-8 border-t border-[#B8A8E8] bg-[#F7F1E6] px-5 py-9 md:px-8 lg:grid-cols-[1fr_0.8fr_1fr] xl:px-12">
@@ -266,8 +166,8 @@ function NeverFoundProductPage({ product }: { product: MockProductDetail }) {
             </Link>
           </div>
           <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-            {relatedProducts.map((related) => (
-              <RelatedProductCard key={related.id} product={related} />
+            {related.map((item) => (
+              <RelatedProductCard key={item.id} product={item} />
             ))}
           </div>
         </section>
@@ -301,33 +201,15 @@ function NeverFoundProductPage({ product }: { product: MockProductDetail }) {
   );
 }
 
-function ColorSwatch({
-  className,
-  selected,
-}: {
-  className: string;
-  selected?: boolean;
-}) {
-  return (
-    <button
-      aria-label="Product color option"
-      className={`h-10 w-10 border ${
-        selected ? "border-2 border-[#F05267]" : "border-[#10131A]/20"
-      } ${className}`}
-      type="button"
-    />
-  );
-}
-
 function RelatedProductCard({
   product,
 }: {
-  product: (typeof shopProducts)[number];
+  product: ShopProduct;
 }) {
   return (
     <Link
       className="group block bg-[#FFF9EF] p-5 text-[#10131A] transition hover:-translate-y-1"
-      href={`/products/${product.id}`}
+      href={`/products/${product.slug ?? product.id}`}
     >
       <div className="relative aspect-square">
         <span className="absolute left-0 top-0 z-10 bg-[#B8A8E8] px-3 py-1 text-xs font-black uppercase">
@@ -342,7 +224,7 @@ function RelatedProductCard({
         />
       </div>
       <h3 className="font-pixel mt-5 text-sm uppercase">{product.name}</h3>
-      <p className="mt-3 font-black">{formatLkr(product.price)}</p>
+      <p className="mt-3 font-black"><StorePrice amountUsd={product.price} /></p>
       <div className="mt-5 flex items-center justify-between">
         <span className="text-[#F05267]">♥♥♥</span>
         <span>→</span>

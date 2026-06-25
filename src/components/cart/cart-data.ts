@@ -17,7 +17,7 @@ export const mockCartItems: CartProduct[] = [
     color: "Black",
     size: "L",
     stockLabel: "12 LEFT",
-    price: 5490,
+    price: 100,
     quantity: 1,
     image: "/images/landing/tee-black.svg",
     alt: "Black Lost Paradise graphic t-shirt",
@@ -28,7 +28,7 @@ export const mockCartItems: CartProduct[] = [
     color: "Sand",
     size: "M",
     stockLabel: "10 LEFT",
-    price: 5490,
+    price: 100,
     quantity: 1,
     image: "/images/landing/tee-yellow.svg",
     alt: "Sand Heat Wave graphic t-shirt",
@@ -39,14 +39,14 @@ export const mockCartItems: CartProduct[] = [
     color: "Blue",
     size: "XL",
     stockLabel: "2 LEFT",
-    price: 5490,
+    price: 100,
     quantity: 1,
     image: "/images/landing/tee-cream.svg",
     alt: "Blue Ocean Drive graphic t-shirt",
   },
 ];
 
-export const shippingFee = 750;
+export const shippingFee = 8;
 
 export const cartCultureItems = [
   {
@@ -70,8 +70,3 @@ export const cartCultureItems = [
     text: "Original designs. Premium quality. Built different.",
   },
 ];
-
-export function formatLkr(amount: number) {
-  return `LKR ${amount.toLocaleString("en-LK")}`;
-}
-
