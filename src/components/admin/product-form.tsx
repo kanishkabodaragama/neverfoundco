@@ -1,18 +1,19 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useRef, useState } from "react";
 import { Bold, CalendarClock, Italic, List, Plus, Trash2 } from "lucide-react";
 import { cropImageFilesToSquare, setInputFiles } from "@/components/admin/image-cropper";
 import { UploadButton, UploadThumb, type UploadPreview } from "@/components/admin/upload-thumbnail";
 import type { ProductCategory } from "@/lib/db/categories";
+import type { ProductWithImages } from "@/lib/db/products";
 import type { VariantOption } from "@/lib/db/variant-options";
-import type { Database } from "@/types/database";
 
-type Product = Database["public"]["Tables"]["products"]["Row"];
 type Gender = "Male" | "Female" | "Unisex";
 type ProductStatus = "draft" | "published" | "inactive";
 type VariantBasis = "color" | "size" | "gender";
 type DraftVariant = {
+  id?: string;
   key: string;
   color: string;
   size: string;
@@ -22,6 +23,7 @@ type DraftVariant = {
   price: string;
   sale_price: string;
   unit_cost: string;
+  image_url?: string | null;
 };
 type FileUploadPreview = UploadPreview & { file: File };
 
@@ -37,7 +39,7 @@ export function ProductForm({
   categories = [],
   variantOptions = [],
 }: {
-  product?: Product;
+  product?: ProductWithImages;
   categories?: ProductCategory[];
   variantOptions?: VariantOption[];
 }) {
@@ -49,19 +51,33 @@ export function ProductForm({
   const [totalStock, setTotalStock] = useState(product?.stock_quantity ?? 0);
   const [shortDescription, setShortDescription] = useState(product?.short_description ?? "");
   const [description, setDescription] = useState(product?.description ?? "");
-  const [variantOpen, setVariantOpen] = useState(false);
+  const [variantOpen, setVariantOpen] = useState(Boolean(product?.product_variants?.length));
   const [basis, setBasis] = useState<Record<VariantBasis, boolean>>({
     color: true,
     size: true,
     gender: true,
   });
-  const [basisConfirmed, setBasisConfirmed] = useState(false);
+  const [basisConfirmed, setBasisConfirmed] = useState(Boolean(product?.product_variants?.length));
   const [colors, setColors] = useState(getJsonList(product?.colors, ["Black"]));
   const [sizes, setSizes] = useState(getJsonList(product?.sizes, ["M"]));
   const [genders, setGenders] = useState<Gender[]>(
     getJsonList(product?.genders, ["Unisex"]) as Gender[],
   );
-  const [variants, setVariants] = useState<DraftVariant[]>([]);
+  const [variants, setVariants] = useState<DraftVariant[]>(() =>
+    (product?.product_variants ?? []).map((variant) => ({
+      id: variant.id,
+      key: variant.id,
+      color: variant.color,
+      size: variant.size,
+      gender: variant.gender,
+      sku: `SKU-${variant.color}-${variant.size}`.toUpperCase().replace(/[^A-Z0-9]+/g, "-"),
+      stock_quantity: variant.stock_quantity,
+      price: variant.price === null ? "" : String(variant.price),
+      sale_price: variant.sale_price === null ? "" : String(variant.sale_price),
+      unit_cost: variant.unit_cost === null ? "" : String(variant.unit_cost),
+      image_url: variant.image_url,
+    })),
+  );
   const availableColors = optionNames(variantOptions, "color", fallbackColors);
   const availableSizes = optionNames(variantOptions, "size", fallbackSizes);
   const availableGenders = optionNames(variantOptions, "gender", fallbackGenders) as Gender[];
@@ -122,6 +138,7 @@ export function ProductForm({
   return (
     <form action={action} className="space-y-6" encType="multipart/form-data" method="post">
       {product ? <input name="_method" type="hidden" value="PATCH" /> : null}
+      {product ? <input name="redirect_to" type="hidden" value={`/admin/products/${product.id}/edit`} /> : null}
       <input name="colors" type="hidden" value={colors.join(",")} />
       <input name="sizes" type="hidden" value={sizes.join(",")} />
       <input name="variants_json" type="hidden" value={JSON.stringify(variants)} />
@@ -342,6 +359,11 @@ export function ProductForm({
                     <td>{variant.size}</td>
                     <td>{variant.sku}</td>
                     <td>
+                      {variant.image_url ? (
+                        <div className="mb-2">
+                          <ExistingImagePreview compact name={variant.sku} url={variant.image_url} />
+                        </div>
+                      ) : null}
                       <FilePreviewInput compact name={`variant_image_${variant.key}`} />
                     </td>
                     <td>
@@ -388,6 +410,29 @@ export function ProductForm({
       <section className="admin-card p-4">
         <h2 className="font-semibold">Media</h2>
         <p className="admin-muted mt-1">Upload one featured product image and gallery images. Each image must be below 2 MB.</p>
+        {product?.main_image_url || product?.product_images?.length ? (
+          <div className="mt-4 grid gap-4 md:grid-cols-[180px_1fr]">
+            <ExistingImagePreview
+              label="Current featured image"
+              name={product.name}
+              url={product.main_image_url ?? product.product_images?.[0]?.image_url}
+            />
+            <div>
+              <p className="text-xs font-semibold uppercase text-[#81796f]">Current gallery</p>
+              <div className="mt-2 flex flex-wrap gap-3">
+                {product.product_images?.map((image) => (
+                  <span key={image.id}>
+                    <ExistingImagePreview
+                      compact
+                      name={image.alt_text ?? product.name}
+                      url={image.image_url}
+                    />
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : null}
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <FilePreviewInput label="Featured image" name="featured_file" />
           <FilePreviewInput label="Gallery images" multiple name="gallery_files" />
@@ -624,6 +669,53 @@ function FilePreviewInput({
         </span>
       ) : null}
     </label>
+  );
+}
+
+function ExistingImagePreview({
+  compact,
+  label,
+  name,
+  url,
+}: {
+  compact?: boolean;
+  label?: string;
+  name: string;
+  url?: string | null;
+}) {
+  if (!url) {
+    return (
+      <div>
+        {label ? <p className="text-xs font-semibold uppercase text-[#81796f]">{label}</p> : null}
+        <div className="admin-muted mt-2 grid h-24 w-24 place-items-center rounded-md border border-[#ece7df] text-center text-[0.65rem] font-semibold uppercase">
+          No image
+        </div>
+      </div>
+    );
+  }
+
+  const size = compact ? 72 : 128;
+
+  return (
+    <div>
+      {label ? <p className="text-xs font-semibold uppercase text-[#81796f]">{label}</p> : null}
+      <a
+        className="relative mt-2 block overflow-hidden rounded-md border border-[#ece7df] bg-[#f7f3ed]"
+        href={url}
+        rel="noreferrer"
+        style={{ height: size, width: size }}
+        target="_blank"
+      >
+        <Image
+          alt={name}
+          className="object-cover"
+          fill
+          sizes={`${size}px`}
+          src={url}
+          unoptimized
+        />
+      </a>
+    </div>
   );
 }
 
