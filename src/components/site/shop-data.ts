@@ -27,6 +27,7 @@ export type ProductVariant = {
   size: string;
   color: ProductColor;
   stock: number;
+  price?: number;
   image?: string;
 };
 
@@ -204,6 +205,10 @@ export function mapDbProductToShopProduct(product: ProductWithImages): ShopProdu
         size: variant.size,
         color: variant.color,
         stock: variant.stock_quantity,
+        price:
+          variant.sale_price !== null || variant.price !== null
+            ? Number(variant.sale_price ?? variant.price)
+            : undefined,
         image: variant.image_url ?? colorImageMap[variant.color] ?? mainImage,
       }))
     : genders.flatMap((gender) =>

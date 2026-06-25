@@ -95,17 +95,23 @@ export function ProductForm({
     [variants],
   );
   const remainingStock = Math.max(0, Number(totalStock || 0) - assignedStock);
+  const serializedVariants = useMemo(
+    () => JSON.stringify(dedupeVariants(variants)),
+    [variants],
+  );
 
   function generateVariants() {
     const colorValues = basis.color ? colors : ["Default"];
     const sizeValues = basis.size ? sizes : ["Default"];
     const genderValues: Gender[] = basis.gender ? genders : ["Unisex"];
+    const dedupedVariants = dedupeVariants(variants);
+    const existingCombinations = new Set(dedupedVariants.map(getVariantCombinationKey));
     const generated = genderValues.flatMap((gender) =>
       colorValues.flatMap((color) =>
-        sizeValues.map((size) => {
-          const key = `${gender}-${color}-${size}`.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-          return {
-            key,
+        sizeValues
+          .filter((size) => !existingCombinations.has(getVariantCombinationKey({ gender, color, size })))
+          .map((size) => ({
+            key: `${gender}-${color}-${size}-${Date.now()}`.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
             color,
             size,
             gender,
@@ -114,11 +120,11 @@ export function ProductForm({
             price: "",
             sale_price: "",
             unit_cost: "",
-          };
-        }),
+          })),
       ),
     );
-    setVariants(generated);
+
+    setVariants([...dedupedVariants, ...generated]);
   }
 
   function updateVariant(key: string, stock: number) {
@@ -141,7 +147,7 @@ export function ProductForm({
       {product ? <input name="redirect_to" type="hidden" value={`/admin/products/${product.id}/edit`} /> : null}
       <input name="colors" type="hidden" value={colors.join(",")} />
       <input name="sizes" type="hidden" value={sizes.join(",")} />
-      <input name="variants_json" type="hidden" value={JSON.stringify(variants)} />
+      <input name="variants_json" type="hidden" value={serializedVariants} />
       {genders.map((gender) => (
         <input key={gender} name="genders" type="hidden" value={gender} />
       ))}
@@ -320,91 +326,91 @@ export function ProductForm({
             ) : null}
             {basisConfirmed ? (
               <button className="admin-action px-4 py-2.5" onClick={generateVariants} type="button">
-                Generate variants
+                Generate missing variants
               </button>
             ) : null}
+
+            <div className="overflow-x-auto rounded-md border border-[#ece7df]">
+              <table className="admin-table min-w-[900px]">
+                <thead>
+                  <tr>
+                    <th>Gender</th>
+                    <th>Color</th>
+                    <th>Size</th>
+                    <th>Variant SKU</th>
+                    <th>Image</th>
+                    <th>Stock amount</th>
+                    <th>Variant price</th>
+                    <th>Sale price</th>
+                    <th>Unit cost</th>
+                    <th />
+                  </tr>
+                </thead>
+                <tbody>
+                  {variants.length ? (
+                    variants.map((variant) => (
+                      <tr key={variant.key}>
+                        <td>{variant.gender}</td>
+                        <td>
+                          <span className="inline-flex items-center gap-2">
+                            <span
+                              className="h-4 w-4 rounded-full border border-[#ece7df]"
+                              style={{ backgroundColor: colorSwatches[variant.color] ?? "#fff" }}
+                            />
+                            {variant.color}
+                          </span>
+                        </td>
+                        <td>{variant.size}</td>
+                        <td>{variant.sku}</td>
+                        <td>
+                          {variant.image_url ? (
+                            <div className="mb-2">
+                              <ExistingImagePreview compact name={variant.sku} url={variant.image_url} />
+                            </div>
+                          ) : null}
+                          <FilePreviewInput compact name={`variant_image_${variant.key}`} />
+                        </td>
+                        <td>
+                          <input
+                            className="admin-input w-28"
+                            min="0"
+                            onChange={(event) => updateVariant(variant.key, Number(event.target.value))}
+                            type="number"
+                            value={variant.stock_quantity}
+                          />
+                        </td>
+                        <td>
+                          <input className="admin-input w-28" onChange={(event) => updateVariantField(variant.key, "price", event.target.value)} placeholder="USD" step="0.01" type="number" value={variant.price} />
+                        </td>
+                        <td>
+                          <input className="admin-input w-28" onChange={(event) => updateVariantField(variant.key, "sale_price", event.target.value)} placeholder="USD" step="0.01" type="number" value={variant.sale_price} />
+                        </td>
+                        <td>
+                          <input className="admin-input w-28" onChange={(event) => updateVariantField(variant.key, "unit_cost", event.target.value)} placeholder="USD" step="0.01" type="number" value={variant.unit_cost} />
+                        </td>
+                        <td className="text-right">
+                          <button
+                            className="admin-secondary-action inline-flex h-9 w-9 items-center justify-center text-red-500"
+                            onClick={() => setVariants((current) => current.filter((item) => item.key !== variant.key))}
+                            type="button"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td className="admin-muted" colSpan={10}>
+                        No variants generated yet.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         ) : null}
-
-        <div className="mt-4 overflow-x-auto rounded-md border border-[#ece7df]">
-          <table className="admin-table min-w-[900px]">
-            <thead>
-              <tr>
-                <th>Gender</th>
-                <th>Color</th>
-                <th>Size</th>
-                <th>Variant SKU</th>
-                <th>Image</th>
-                <th>Stock amount</th>
-                <th>Variant price</th>
-                <th>Sale price</th>
-                <th>Unit cost</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {variants.length ? (
-                variants.map((variant) => (
-                  <tr key={variant.key}>
-                    <td>{variant.gender}</td>
-                    <td>
-                      <span className="inline-flex items-center gap-2">
-                        <span
-                          className="h-4 w-4 rounded-full border border-[#ece7df]"
-                          style={{ backgroundColor: colorSwatches[variant.color] ?? "#fff" }}
-                        />
-                        {variant.color}
-                      </span>
-                    </td>
-                    <td>{variant.size}</td>
-                    <td>{variant.sku}</td>
-                    <td>
-                      {variant.image_url ? (
-                        <div className="mb-2">
-                          <ExistingImagePreview compact name={variant.sku} url={variant.image_url} />
-                        </div>
-                      ) : null}
-                      <FilePreviewInput compact name={`variant_image_${variant.key}`} />
-                    </td>
-                    <td>
-                      <input
-                        className="admin-input w-28"
-                        min="0"
-                        onChange={(event) => updateVariant(variant.key, Number(event.target.value))}
-                        type="number"
-                        value={variant.stock_quantity}
-                      />
-                    </td>
-                    <td>
-                      <input className="admin-input w-28" onChange={(event) => updateVariantField(variant.key, "price", event.target.value)} placeholder="USD" step="0.01" type="number" value={variant.price} />
-                    </td>
-                    <td>
-                      <input className="admin-input w-28" onChange={(event) => updateVariantField(variant.key, "sale_price", event.target.value)} placeholder="USD" step="0.01" type="number" value={variant.sale_price} />
-                    </td>
-                    <td>
-                      <input className="admin-input w-28" onChange={(event) => updateVariantField(variant.key, "unit_cost", event.target.value)} placeholder="USD" step="0.01" type="number" value={variant.unit_cost} />
-                    </td>
-                    <td className="text-right">
-                      <button
-                        className="admin-secondary-action inline-flex h-9 w-9 items-center justify-center text-red-500"
-                        onClick={() => setVariants((current) => current.filter((item) => item.key !== variant.key))}
-                        type="button"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td className="admin-muted" colSpan={10}>
-                    No variants generated yet.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
       </section>
 
       <section className="admin-card p-4">
@@ -717,6 +723,29 @@ function ExistingImagePreview({
       </a>
     </div>
   );
+}
+
+function dedupeVariants(variants: DraftVariant[]) {
+  const seen = new Set<string>();
+
+  return variants.filter((variant) => {
+    const key = getVariantCombinationKey(variant);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function getVariantCombinationKey({
+  color,
+  gender,
+  size,
+}: {
+  color: string;
+  gender: string;
+  size: string;
+}) {
+  return `${gender}::${color}::${size}`.toLowerCase();
 }
 
 function getJsonList(value: unknown, fallback: string[]) {

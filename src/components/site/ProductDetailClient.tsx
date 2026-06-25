@@ -26,6 +26,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
     [product.variants, selectedColor, selectedGender, selectedSize],
   );
   const displayImage = selectedVariant?.image ?? selectedImage;
+  const displayPrice = selectedVariant?.price ?? product.price;
   const isAvailable = Boolean(selectedVariant && selectedVariant.stock > 0 && !product.soldOut);
 
   function addSelectedVariant() {
@@ -36,7 +37,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
       variantId: selectedVariant.id,
       name: product.name,
       slug: product.slug,
-      unitPrice: product.price,
+      unitPrice: displayPrice,
       image: displayImage,
       gender: selectedGender,
       size: selectedSize,
@@ -92,7 +93,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
           {product.name}
         </h1>
         <p className="font-pixel mt-5 text-2xl uppercase text-[#F05267]">
-          <StorePrice amountUsd={product.price} />
+          <StorePrice amountUsd={displayPrice} />
         </p>
         <p className="mt-6 max-w-md whitespace-pre-line text-sm font-bold leading-relaxed">
           {product.shortDescription}

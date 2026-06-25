@@ -134,8 +134,6 @@ async function updateProduct(request: Request, id: string) {
     await syncProductVariants({
       formData,
       productId: id,
-      productName: parsed.data.name,
-      request,
     });
   } catch (variantError) {
     return adminRedirect(request, `/admin/products/${id}/edit`, {
@@ -157,23 +155,35 @@ async function syncProductVariants({
 }: {
   formData: FormData;
   productId: string;
-  productName: string;
-  request: Request;
 }) {
   const supabase = getSupabaseAdminClient();
   const variants = parseVariants(formData);
-  const submittedIds = variants
-    .map((variant) => variant.id)
-    .filter((id): id is string => Boolean(id));
+  const { data: existingVariants, error: existingError } = await supabase
+    .from("product_variants")
+    .select("id, storage_path")
+    .eq("product_id", productId);
 
-  if (submittedIds.length) {
-    await supabase
+  if (existingError) throw existingError;
+
+  const existingVariantMap = new Map(
+    (existingVariants ?? []).map((variant) => [variant.id, variant]),
+  );
+  const submittedIds = new Set(
+    variants
+      .map((variant) => variant.id)
+      .filter((id): id is string => Boolean(id)),
+  );
+  const removedVariantIds = (existingVariants ?? [])
+    .map((variant) => variant.id)
+    .filter((id) => !submittedIds.has(id));
+
+  if (removedVariantIds.length) {
+    const { error: deleteError } = await supabase
       .from("product_variants")
       .delete()
-      .eq("product_id", productId)
-      .not("id", "in", `(${submittedIds.join(",")})`);
-  } else {
-    await supabase.from("product_variants").delete().eq("product_id", productId);
+      .in("id", removedVariantIds);
+
+    if (deleteError) throw deleteError;
   }
 
   for (const variant of variants) {
@@ -203,11 +213,21 @@ async function syncProductVariants({
     };
 
     if (variant.id) {
+      const existingVariant = existingVariantMap.get(variant.id);
       const { error } = await supabase
         .from("product_variants")
         .update(payload)
         .eq("id", variant.id);
       if (error) throw error;
+
+      if (uploaded && existingVariant?.storage_path) {
+        const { error: removeError } = await supabase.storage
+          .from("product-images")
+          .remove([existingVariant.storage_path]);
+
+        if (removeError) throw removeError;
+      }
+
       continue;
     }
 
@@ -306,10 +326,23 @@ function parseVariants(formData: FormData) {
       unit_cost?: string;
     }>;
 
-    return variants.filter(
+    return dedupeVariants(variants).filter(
       (variant) => variant.gender && variant.size && variant.color,
     );
   } catch {
     return [];
   }
+}
+
+function dedupeVariants<T extends { color: string; gender: string; size: string }>(
+  variants: T[],
+) {
+  const seen = new Set<string>();
+
+  return variants.filter((variant) => {
+    const key = `${variant.gender}::${variant.color}::${variant.size}`.toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }

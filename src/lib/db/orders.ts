@@ -15,6 +15,9 @@ function createOrderNumber() {
 export async function createPendingOrder(input: CheckoutInput) {
   const supabase = getSupabaseAdminClient();
   const productIds = input.items.map((item) => item.productId);
+  const variantIds = input.items
+    .map((item) => item.variantId)
+    .filter((id): id is string => Boolean(id));
 
   const { data: products, error: productsError } = await supabase
     .from("products")
@@ -23,23 +26,43 @@ export async function createPendingOrder(input: CheckoutInput) {
 
   if (productsError) throw productsError;
 
+  const { data: variants, error: variantsError } = variantIds.length
+    ? await supabase
+        .from("product_variants")
+        .select("id, product_id, price, sale_price, unit_cost, stock_quantity, gender, color, size")
+        .in("id", variantIds)
+    : { data: [], error: null };
+
+  if (variantsError) throw variantsError;
+
   const productMap = new Map((products ?? []).map((product) => [product.id, product]));
+  const variantMap = new Map((variants ?? []).map((variant) => [variant.id, variant]));
   const lineItems = input.items.map((item) => {
     const product = productMap.get(item.productId);
+    const variant = item.variantId ? variantMap.get(item.variantId) : null;
 
     if (!product || !product.is_active) {
       throw new Error("One or more products are unavailable.");
     }
 
-    if (product.stock_quantity < item.quantity) {
+    if (item.variantId && (!variant || variant.product_id !== product.id)) {
+      throw new Error(`${product.name} variant is unavailable.`);
+    }
+
+    const availableStock = variant?.stock_quantity ?? product.stock_quantity;
+    if (availableStock < item.quantity) {
       throw new Error(`${product.name} does not have enough stock.`);
     }
 
-    const unitPrice = Number(product.sale_price ?? product.price);
-    const unitCost = Number(product.unit_cost ?? 0);
+    const unitPrice = Number(variant?.sale_price ?? variant?.price ?? product.sale_price ?? product.price);
+    const unitCost = Number(variant?.unit_cost ?? product.unit_cost ?? 0);
+    const variantLabel = variant
+      ? ` (${[variant.gender, variant.color, variant.size].filter(Boolean).join(" / ")})`
+      : "";
+
     return {
       product_id: product.id,
-      product_name: product.name,
+      product_name: `${product.name}${variantLabel}`,
       quantity: item.quantity,
       unit_price: toMoney(unitPrice),
       unit_cost: toMoney(unitCost),

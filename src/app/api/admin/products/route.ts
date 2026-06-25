@@ -126,11 +126,11 @@ export async function POST(request: Request) {
             : null;
 
           return {
-          product_id: product.id,
-          gender: variant.gender,
-          size: variant.size,
-          color: variant.color,
-          stock_quantity: variant.stock_quantity,
+            product_id: product.id,
+            gender: variant.gender,
+            size: variant.size,
+            color: variant.color,
+            stock_quantity: variant.stock_quantity,
             price: variant.price || null,
             sale_price: variant.sale_price || null,
             unit_cost: variant.unit_cost || null,
@@ -185,10 +185,23 @@ function parseVariants(formData: FormData) {
       unit_cost?: string;
     }>;
 
-    return variants.filter(
+    return dedupeVariants(variants).filter(
       (variant) => variant.gender && variant.size && variant.color,
     );
   } catch {
     return [];
   }
+}
+
+function dedupeVariants<T extends { color: string; gender: string; size: string }>(
+  variants: T[],
+) {
+  const seen = new Set<string>();
+
+  return variants.filter((variant) => {
+    const key = `${variant.gender}::${variant.color}::${variant.size}`.toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }

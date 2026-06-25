@@ -53,6 +53,7 @@ export function CheckoutForm() {
         postalCode: formData.get("postalCode"),
         items: cart.items.map((item) => ({
           productId: item.productId,
+          variantId: item.variantId,
           quantity: item.quantity,
         })),
       }),
@@ -113,4 +114,3 @@ export function CheckoutForm() {
     </form>
   );
 }
-

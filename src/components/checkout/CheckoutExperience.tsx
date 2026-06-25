@@ -207,6 +207,7 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
           couponCode: cart.couponCode || undefined,
           items: cart.items.map((item) => ({
             productId: item.productId,
+            variantId: item.variantId,
             quantity: item.quantity,
           })),
         }),

@@ -84,6 +84,7 @@ async function mapDbProductToDetail(product: Awaited<ReturnType<typeof getActive
     colors.map((color, index) => [color, images[index]?.image_url ?? mainImage]),
   );
   const soldOut = product.stock_quantity <= 0 && !product.preorder_enabled;
+  const productPrice = Number(product.sale_price ?? product.price);
   const stockLabel = soldOut
     ? "SOLD OUT"
     : product.preorder_enabled
@@ -96,7 +97,7 @@ async function mapDbProductToDetail(product: Awaited<ReturnType<typeof getActive
     slug: product.slug,
     id: product.id,
     name: product.name,
-    price: Number(product.sale_price ?? product.price),
+    price: productPrice,
     stockLabel,
     image: mainImage,
     gallery: [mainImage, ...images.map((image) => image.image_url)].filter(
@@ -115,6 +116,10 @@ async function mapDbProductToDetail(product: Awaited<ReturnType<typeof getActive
           size: variant.size,
           color: variant.color as ProductColor,
           stock: variant.stock_quantity,
+          price:
+            variant.sale_price !== null || variant.price !== null
+              ? Number(variant.sale_price ?? variant.price)
+              : productPrice,
           image: variant.image_url ?? colorImageMap[variant.color] ?? mainImage,
         }))
       : genders.flatMap((gender) =>
@@ -125,6 +130,7 @@ async function mapDbProductToDetail(product: Awaited<ReturnType<typeof getActive
               size,
               color,
               stock: product.stock_quantity,
+              price: productPrice,
               image: mainImage,
             })),
           ),
