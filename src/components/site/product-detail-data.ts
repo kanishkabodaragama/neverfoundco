@@ -70,14 +70,23 @@ async function mapDbProductToDetail(product: Awaited<ReturnType<typeof getActive
     (a, b) => a.sort_order - b.sort_order,
   );
   const variants = product.product_variants ?? [];
-  const colors = getJsonList<ProductColor>(product.colors, ["Black"]);
+  const variantColors = uniqueList<ProductColor>(
+    variants.map((variant) => variant.color as ProductColor),
+  );
+  const colors = variants.length
+    ? variantColors
+    : getJsonList<ProductColor>(product.colors, ["Black"]);
   const colorSwatches = Object.fromEntries(
     variantOptions
       .filter((option) => option.option_type === "color")
       .map((option) => [option.name, option.color_value ?? option.name]),
   );
-  const sizes = getJsonList<string>(product.sizes, ["S", "M", "L"]);
-  const genders = getJsonList<ProductGender>(product.genders, ["Unisex"]);
+  const sizes = variants.length
+    ? uniqueList(variants.map((variant) => variant.size))
+    : getJsonList<string>(product.sizes, ["S", "M", "L"]);
+  const genders = variants.length
+    ? uniqueList<ProductGender>(variants.map((variant) => variant.gender))
+    : getJsonList<ProductGender>(product.genders, ["Unisex"]);
   const mainImage =
     product.main_image_url || images[0]?.image_url || "/images/products/black-heavyweight-tee.png";
   const colorImageMap = Object.fromEntries(
@@ -92,6 +101,9 @@ async function mapDbProductToDetail(product: Awaited<ReturnType<typeof getActive
       : product.show_stock_count
         ? `${product.stock_quantity} LEFT`
         : "IN STOCK";
+  const variantImageUrls = variants
+    .map((variant) => variant.image_url)
+    .filter((imageUrl): imageUrl is string => Boolean(imageUrl));
 
   return {
     slug: product.slug,
@@ -100,7 +112,7 @@ async function mapDbProductToDetail(product: Awaited<ReturnType<typeof getActive
     price: productPrice,
     stockLabel,
     image: mainImage,
-    gallery: [mainImage, ...images.map((image) => image.image_url)].filter(
+    gallery: [mainImage, ...images.map((image) => image.image_url), ...variantImageUrls].filter(
       (value, index, list) => list.indexOf(value) === index,
     ),
     alt: product.name,
@@ -147,4 +159,8 @@ async function mapDbProductToDetail(product: Awaited<ReturnType<typeof getActive
 
 function getJsonList<T extends string>(value: unknown, fallback: T[]) {
   return Array.isArray(value) && value.length ? (value.map(String) as T[]) : fallback;
+}
+
+function uniqueList<T extends string>(items: T[]) {
+  return items.filter((item, index, list) => list.indexOf(item) === index);
 }

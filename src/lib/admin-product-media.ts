@@ -42,3 +42,15 @@ export function getImageFiles(formData: FormData, name: string) {
     .getAll(name)
     .filter((value): value is File => value instanceof File && value.size > 0);
 }
+
+export function getProductImageStoragePathFromUrl(url: string | null | undefined) {
+  if (!url) return null;
+
+  const marker = "/storage/v1/object/public/product-images/";
+  const markerIndex = url.indexOf(marker);
+  if (markerIndex === -1) return null;
+
+  return decodeURIComponent(
+    url.slice(markerIndex + marker.length).split("?")[0] ?? "",
+  );
+}

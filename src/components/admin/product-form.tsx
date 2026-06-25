@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useMemo, useRef, useState } from "react";
-import { Bold, CalendarClock, Italic, List, Plus, Trash2 } from "lucide-react";
+import { Bold, CalendarClock, Italic, List, Plus, Trash2, X } from "lucide-react";
 import { cropImageFilesToSquare, setInputFiles } from "@/components/admin/image-cropper";
 import { UploadButton, UploadThumb, type UploadPreview } from "@/components/admin/upload-thumbnail";
 import type { ProductCategory } from "@/lib/db/categories";
@@ -58,6 +58,9 @@ export function ProductForm({
     gender: true,
   });
   const [basisConfirmed, setBasisConfirmed] = useState(Boolean(product?.product_variants?.length));
+  const [featuredRemoved, setFeaturedRemoved] = useState(false);
+  const [removedGalleryImageIds, setRemovedGalleryImageIds] = useState<string[]>([]);
+  const [removedVariantImageIds, setRemovedVariantImageIds] = useState<string[]>([]);
   const [colors, setColors] = useState(getJsonList(product?.colors, ["Black"]));
   const [sizes, setSizes] = useState(getJsonList(product?.sizes, ["M"]));
   const [genders, setGenders] = useState<Gender[]>(
@@ -99,6 +102,7 @@ export function ProductForm({
     () => JSON.stringify(dedupeVariants(variants)),
     [variants],
   );
+  const featuredImageUrl = product?.main_image_url ?? product?.product_images?.[0]?.image_url ?? null;
 
   function generateVariants() {
     const colorValues = basis.color ? colors : ["Default"];
@@ -148,6 +152,13 @@ export function ProductForm({
       <input name="colors" type="hidden" value={colors.join(",")} />
       <input name="sizes" type="hidden" value={sizes.join(",")} />
       <input name="variants_json" type="hidden" value={serializedVariants} />
+      {featuredRemoved ? <input name="remove_featured_image" type="hidden" value="true" /> : null}
+      {removedGalleryImageIds.map((id) => (
+        <input key={id} name="remove_gallery_image_ids" type="hidden" value={id} />
+      ))}
+      {removedVariantImageIds.map((id) => (
+        <input key={id} name="remove_variant_image_ids" type="hidden" value={id} />
+      ))}
       {genders.map((gender) => (
         <input key={gender} name="genders" type="hidden" value={gender} />
       ))}
@@ -363,12 +374,27 @@ export function ProductForm({
                         <td>{variant.size}</td>
                         <td>{variant.sku}</td>
                         <td>
-                          {variant.image_url ? (
+                          {variant.image_url && !removedVariantImageIds.includes(variant.id ?? "") ? (
                             <div className="mb-2">
-                              <ExistingImagePreview compact name={variant.sku} url={variant.image_url} />
+                              <ExistingImagePreview
+                                compact
+                                name={variant.sku}
+                                onRemove={
+                                  variant.id
+                                    ? () => setRemovedVariantImageIds((current) => addUnique(current, variant.id!))
+                                    : undefined
+                                }
+                                url={variant.image_url}
+                              />
                             </div>
                           ) : null}
-                          <FilePreviewInput compact name={`variant_image_${variant.key}`} />
+                          {!variant.image_url || removedVariantImageIds.includes(variant.id ?? "") ? (
+                            <FilePreviewInput compact name={`variant_image_${variant.key}`} />
+                          ) : (
+                            <p className="admin-muted max-w-28 text-[0.65rem]">
+                              Remove image first to replace.
+                            </p>
+                          )}
                         </td>
                         <td>
                           <input
@@ -416,23 +442,38 @@ export function ProductForm({
       <section className="admin-card p-4">
         <h2 className="font-semibold">Media</h2>
         <p className="admin-muted mt-1">Upload one featured product image and gallery images. Each image must be below 2 MB.</p>
-        {product?.main_image_url || product?.product_images?.length ? (
+        {featuredImageUrl || product?.product_images?.length ? (
           <div className="mt-4 grid gap-4 md:grid-cols-[180px_1fr]">
-            <ExistingImagePreview
-              label="Current featured image"
-              name={product.name}
-              url={product.main_image_url ?? product.product_images?.[0]?.image_url}
-            />
+            <div>
+              {featuredImageUrl && !featuredRemoved ? (
+                <ExistingImagePreview
+                  label="Current featured image"
+                  name={product?.name ?? "Product image"}
+                  onRemove={() => setFeaturedRemoved(true)}
+                  url={featuredImageUrl}
+                />
+              ) : (
+                <FilePreviewInput label="Featured image replacement" name="featured_file" />
+              )}
+              {featuredImageUrl && !featuredRemoved ? (
+                <p className="admin-muted mt-2 text-xs">Remove current featured image before replacing it.</p>
+              ) : null}
+            </div>
             <div>
               <p className="text-xs font-semibold uppercase text-[#81796f]">Current gallery</p>
               <div className="mt-2 flex flex-wrap gap-3">
-                {product.product_images?.map((image) => (
-                  <span key={image.id}>
-                    <ExistingImagePreview
-                      compact
-                      name={image.alt_text ?? product.name}
-                      url={image.image_url}
-                    />
+                {product?.product_images?.map((image) => (
+                  <span className="grid gap-2" key={image.id}>
+                    {removedGalleryImageIds.includes(image.id) ? (
+                      <FilePreviewInput compact name={`replace_gallery_image_${image.id}`} />
+                    ) : (
+                      <ExistingImagePreview
+                        compact
+                        name={image.alt_text ?? product?.name ?? "Gallery image"}
+                        onRemove={() => setRemovedGalleryImageIds((current) => addUnique(current, image.id))}
+                        url={image.image_url}
+                      />
+                    )}
                   </span>
                 ))}
               </div>
@@ -440,7 +481,7 @@ export function ProductForm({
           </div>
         ) : null}
         <div className="mt-4 grid gap-4 md:grid-cols-2">
-          <FilePreviewInput label="Featured image" name="featured_file" />
+          {!featuredImageUrl ? <FilePreviewInput label="Featured image" name="featured_file" /> : null}
           <FilePreviewInput label="Gallery images" multiple name="gallery_files" />
         </div>
       </section>
@@ -682,11 +723,13 @@ function ExistingImagePreview({
   compact,
   label,
   name,
+  onRemove,
   url,
 }: {
   compact?: boolean;
   label?: string;
   name: string;
+  onRemove?: () => void;
   url?: string | null;
 }) {
   if (!url) {
@@ -703,7 +746,7 @@ function ExistingImagePreview({
   const size = compact ? 72 : 128;
 
   return (
-    <div>
+    <div className="relative w-fit">
       {label ? <p className="text-xs font-semibold uppercase text-[#81796f]">{label}</p> : null}
       <a
         className="relative mt-2 block overflow-hidden rounded-md border border-[#ece7df] bg-[#f7f3ed]"
@@ -721,6 +764,16 @@ function ExistingImagePreview({
           unoptimized
         />
       </a>
+      {onRemove ? (
+        <button
+          aria-label={`Remove ${name}`}
+          className="absolute -right-2 -top-2 grid h-7 w-7 place-items-center rounded-md border border-[#ece7df] bg-white text-[#332c26] shadow-sm hover:text-red-500"
+          onClick={onRemove}
+          type="button"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      ) : null}
     </div>
   );
 }
@@ -746,6 +799,10 @@ function getVariantCombinationKey({
   size: string;
 }) {
   return `${gender}::${color}::${size}`.toLowerCase();
+}
+
+function addUnique(items: string[], value: string) {
+  return items.includes(value) ? items : [...items, value];
 }
 
 function getJsonList(value: unknown, fallback: string[]) {
