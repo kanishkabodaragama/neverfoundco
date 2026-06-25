@@ -89,6 +89,11 @@ async function updateProduct(request: Request, id: string) {
         .from("product_images")
         .select("*", { count: "exact", head: true })
         .eq("product_id", id);
+      const { data: existingProduct } = await supabase
+        .from("products")
+        .select("main_image_url")
+        .eq("id", id)
+        .maybeSingle();
       const rows = await Promise.all(
         galleryFiles.map(async (file, index) => {
           const uploaded = await uploadProductImageFile({
@@ -108,6 +113,13 @@ async function updateProduct(request: Request, id: string) {
       );
 
       await supabase.from("product_images").insert(rows);
+
+      if (!existingProduct?.main_image_url && (count ?? 0) === 0 && rows[0]?.image_url) {
+        await supabase
+          .from("products")
+          .update({ main_image_url: rows[0].image_url })
+          .eq("id", id);
+      }
     }
   } catch (uploadError) {
     return adminRedirect(request, `/admin/products/${id}/edit`, {

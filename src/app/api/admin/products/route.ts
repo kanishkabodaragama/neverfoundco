@@ -68,12 +68,14 @@ export async function POST(request: Request) {
 
   try {
     const featuredFile = getImageFiles(formData, "featured_file")[0];
+    let uploadedFeaturedImageUrl: string | null = null;
     if (featuredFile) {
       const uploaded = await uploadProductImageFile({
         file: featuredFile,
         productId: product.id,
         prefix: "featured",
       });
+      uploadedFeaturedImageUrl = uploaded.imageUrl;
 
       await supabase
         .from("products")
@@ -102,6 +104,13 @@ export async function POST(request: Request) {
       );
 
       await supabase.from("product_images").insert(rows);
+
+      if (!uploadedFeaturedImageUrl && rows[0]?.image_url) {
+        await supabase
+          .from("products")
+          .update({ main_image_url: rows[0].image_url })
+          .eq("id", product.id);
+      }
     }
 
     if (variantRows.length) {

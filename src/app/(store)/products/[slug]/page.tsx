@@ -108,14 +108,20 @@ function NeverFoundProductPage({
             <h2 className="font-pixel text-xs uppercase text-[#8F7BD5]">
               {"// Product Details"}
             </h2>
-            <ul className="mt-6 space-y-3 text-sm font-bold">
-              {detailBullets.map((detail) => (
-                <li className="flex gap-4" key={detail}>
-                  <span className="text-[#8F7BD5]">✣</span>
-                  {detail}
-                </li>
-              ))}
-            </ul>
+            {product.description ? (
+              <div className="mt-6 whitespace-pre-line text-sm font-bold leading-relaxed">
+                {product.description}
+              </div>
+            ) : (
+              <ul className="mt-6 space-y-3 text-sm font-bold">
+                {detailBullets.map((detail) => (
+                  <li className="flex gap-4" key={detail}>
+                    <span className="text-[#8F7BD5]">✣</span>
+                    {detail}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           <div className="flex flex-col items-center justify-center py-8 text-[#8F7BD5]">
@@ -219,6 +225,7 @@ function RelatedProductCard({
           fill
           sizes="(min-width: 1280px) 300px, (min-width: 640px) 44vw, 90vw"
           src={product.image}
+          unoptimized
         />
       </div>
       <h3 className="font-pixel mt-5 text-sm uppercase">{product.name}</h3>

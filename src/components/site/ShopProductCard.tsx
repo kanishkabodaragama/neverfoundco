@@ -44,6 +44,7 @@ export function ShopProductCard({ product }: { product: ShopProduct }) {
           fill
           sizes="(min-width: 1280px) 22vw, (min-width: 768px) 31vw, 90vw"
           src={product.image}
+          unoptimized
         />
         <span
           className={`absolute right-3 top-3 flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#17251f] text-center text-[0.58rem] font-black uppercase leading-none ${

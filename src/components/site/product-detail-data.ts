@@ -5,6 +5,7 @@ import {
   type ProductVariant,
 } from "@/components/site/shop-data";
 import { getActiveProductBySlug } from "@/lib/db/products";
+import { listVariantOptions } from "@/lib/db/variant-options";
 
 export type MockProductDetail = {
   id: string;
@@ -17,6 +18,7 @@ export type MockProductDetail = {
   alt: string;
   color: ProductColor;
   colors: ProductColor[];
+  colorSwatches: Record<string, string>;
   sizes: string[];
   genders: ProductGender[];
   variants: ProductVariant[];
@@ -37,6 +39,7 @@ const shopProductDetails: MockProductDetail[] = shopProducts.map((product) => ({
   alt: product.alt,
   color: product.color,
   colors: product.colors,
+  colorSwatches: Object.fromEntries(product.colors.map((color) => [color, color])),
   sizes: product.sizes,
   genders: product.genders,
   variants: product.variants,
@@ -59,18 +62,27 @@ export async function getProductDetailBySlug(slug: string) {
   return getMockProductBySlug(slug);
 }
 
-function mapDbProductToDetail(product: Awaited<ReturnType<typeof getActiveProductBySlug>>) {
+async function mapDbProductToDetail(product: Awaited<ReturnType<typeof getActiveProductBySlug>>) {
   if (!product) return null;
 
+  const variantOptions = await listVariantOptions();
   const images = [...(product.product_images ?? [])].sort(
     (a, b) => a.sort_order - b.sort_order,
   );
   const variants = product.product_variants ?? [];
   const colors = getJsonList<ProductColor>(product.colors, ["Black"]);
+  const colorSwatches = Object.fromEntries(
+    variantOptions
+      .filter((option) => option.option_type === "color")
+      .map((option) => [option.name, option.color_value ?? option.name]),
+  );
   const sizes = getJsonList<string>(product.sizes, ["S", "M", "L"]);
   const genders = getJsonList<ProductGender>(product.genders, ["Unisex"]);
   const mainImage =
     product.main_image_url || images[0]?.image_url || "/images/products/black-heavyweight-tee.png";
+  const colorImageMap = Object.fromEntries(
+    colors.map((color, index) => [color, images[index]?.image_url ?? mainImage]),
+  );
   const soldOut = product.stock_quantity <= 0 && !product.preorder_enabled;
   const stockLabel = soldOut
     ? "SOLD OUT"
@@ -93,6 +105,7 @@ function mapDbProductToDetail(product: Awaited<ReturnType<typeof getActiveProduc
     alt: product.name,
     color: colors[0],
     colors,
+    colorSwatches,
     sizes,
     genders,
     variants: variants.length
@@ -102,7 +115,7 @@ function mapDbProductToDetail(product: Awaited<ReturnType<typeof getActiveProduc
           size: variant.size,
           color: variant.color as ProductColor,
           stock: variant.stock_quantity,
-          image: variant.image_url ?? undefined,
+          image: variant.image_url ?? colorImageMap[variant.color] ?? mainImage,
         }))
       : genders.flatMap((gender) =>
           sizes.flatMap((size) =>

@@ -7,14 +7,6 @@ import { useCart } from "@/components/store/cart-provider";
 import { StorePrice } from "@/components/site/StorePrice";
 import type { MockProductDetail } from "@/components/site/product-detail-data";
 
-const colorClasses: Record<string, string> = {
-  Black: "bg-[#070B12]",
-  Cream: "bg-[#ead8bd]",
-  Sage: "bg-[#80916f]",
-  Grey: "bg-[#8C8D8F]",
-  Navy: "bg-[#1f3148]",
-};
-
 export function ProductDetailClient({ product }: { product: MockProductDetail }) {
   const cart = useCart();
   const [selectedGender, setSelectedGender] = useState(product.genders[0]);
@@ -73,6 +65,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
                 fill
                 sizes="96px"
                 src={image}
+                unoptimized
               />
             </button>
           ))}
@@ -86,6 +79,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
             priority
             sizes="(min-width: 1024px) 50vw, 100vw"
             src={displayImage}
+            unoptimized
           />
         </div>
       </div>
@@ -100,10 +94,8 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
         <p className="font-pixel mt-5 text-2xl uppercase text-[#F05267]">
           <StorePrice amountUsd={product.price} />
         </p>
-        <p className="mt-6 max-w-md text-sm font-bold leading-relaxed">
+        <p className="mt-6 max-w-md whitespace-pre-line text-sm font-bold leading-relaxed">
           {product.shortDescription}
-          <br />
-          Lost since 1999.
         </p>
 
         <div className="my-7 h-px w-full bg-[#B8A8E8]" />
@@ -129,7 +121,8 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
                   selectedColor === color
                     ? "border-2 border-[#F05267]"
                     : "border-[#10131A]/20"
-                } ${colorClasses[color]}`}
+                }`}
+                style={{ backgroundColor: getColorValue(color, product.colorSwatches) }}
                 key={color}
                 onClick={() => setSelectedColor(color)}
                 type="button"
@@ -173,6 +166,10 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
       </div>
     </div>
   );
+}
+
+function getColorValue(color: string, swatches: Record<string, string>) {
+  return swatches[color] ?? color;
 }
 
 function OptionGroup({

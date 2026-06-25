@@ -192,6 +192,9 @@ export function mapDbProductToShopProduct(product: ProductWithImages): ShopProdu
   const mainImage =
     product.main_image_url || images[0]?.image_url || "/images/products/black-heavyweight-tee.png";
   const colors = getJsonList<ProductColor>(product.colors, ["Black"]);
+  const colorImageMap = Object.fromEntries(
+    colors.map((color, index) => [color, images[index]?.image_url ?? mainImage]),
+  );
   const sizes = getJsonList<string>(product.sizes, ["S", "M", "L"]);
   const genders = getJsonList<ProductGender>(product.genders, ["Unisex"]);
   const variants = product.product_variants?.length
@@ -201,7 +204,7 @@ export function mapDbProductToShopProduct(product: ProductWithImages): ShopProdu
         size: variant.size,
         color: variant.color,
         stock: variant.stock_quantity,
-        image: variant.image_url ?? mainImage,
+        image: variant.image_url ?? colorImageMap[variant.color] ?? mainImage,
       }))
     : genders.flatMap((gender) =>
         sizes.flatMap((size) =>
