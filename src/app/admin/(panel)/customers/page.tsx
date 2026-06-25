@@ -1,3 +1,4 @@
+import { CsvDownloadButton } from "@/components/admin/csv-download-button";
 import { requireAdmin } from "@/lib/admin-auth";
 import { listAdminOrders } from "@/lib/db/admin";
 import { formatCurrency } from "@/lib/utils";
@@ -24,6 +25,14 @@ export default async function AdminCustomersPage() {
       return map;
     }, new Map<string, { name: string; email: string; phone: string; orders: number; spent: number; lastOrderAt: string }>()),
   ).map(([, customer]) => customer).sort((a, b) => +new Date(b.lastOrderAt) - +new Date(a.lastOrderAt));
+  const customerRows = customers.map((customer) => ({
+    name: customer.name,
+    email: customer.email,
+    phone: customer.phone,
+    orders: customer.orders,
+    spent: customer.spent.toFixed(2),
+    latest_order: new Date(customer.lastOrderAt).toLocaleString("en-US"),
+  }));
 
   return (
     <div className="space-y-6">
@@ -31,8 +40,24 @@ export default async function AdminCustomersPage() {
         <h1 className="text-2xl font-bold tracking-tight">Customers</h1>
         <p className="admin-muted mt-2 text-sm">Customers are created automatically from checkout orders.</p>
       </div>
-      <section className="admin-card overflow-x-auto">
-        <table className="admin-table min-w-[860px]">
+      <section className="admin-card overflow-hidden">
+        <div className="flex justify-end border-b border-[#ece7df] p-4">
+          <CsvDownloadButton
+            columns={[
+              { key: "name", label: "Customer" },
+              { key: "email", label: "Email" },
+              { key: "phone", label: "Phone" },
+              { key: "orders", label: "Orders" },
+              { key: "spent", label: "Total Spent" },
+              { key: "latest_order", label: "Latest Order" },
+            ]}
+            filename="neverfoundco-customers"
+            rows={customerRows}
+            title="Never Found Co Customers"
+          />
+        </div>
+        <div className="overflow-x-auto">
+          <table className="admin-table min-w-[860px]">
           <thead>
             <tr>
               <th>Customer</th>
@@ -58,7 +83,8 @@ export default async function AdminCustomersPage() {
               <tr><td className="admin-muted" colSpan={6}>No customers yet.</td></tr>
             ) : null}
           </tbody>
-        </table>
+          </table>
+        </div>
       </section>
     </div>
   );

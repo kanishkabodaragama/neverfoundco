@@ -1,5 +1,6 @@
 import { MoreHorizontal, Plus, Trash2 } from "lucide-react";
 import { AdminAlert } from "@/components/admin/admin-alert";
+import { CsvDownloadButton } from "@/components/admin/csv-download-button";
 import { AdminModal } from "@/components/admin/admin-modal";
 import { ShippingRuleForm } from "@/components/admin/shipping-rule-form";
 import { requireAdmin } from "@/lib/admin-auth";
@@ -75,6 +76,21 @@ function ShippingRulesPanel({
       .map((rule) => rule.country_id),
   );
   const countryDefaultCountries = countries.filter((country) => countryDefaultIds.has(country.id));
+  const ruleRows = rules.map((rule) => {
+    const country = countries.find((item) => item.id === rule.country_id);
+    const regionNames = country?.shipping_regions
+      ?.filter((region) => Array.isArray(rule.region_ids) && rule.region_ids.map(String).includes(region.id))
+      .map((region) => region.region_name);
+
+    return {
+      rule: formatRuleType(rule.rule_type),
+      country: rule.rule_type === "international_default" ? "All other countries" : country?.country_name ?? "",
+      regions: regionNames?.join(", ") ?? "",
+      fee: Number(rule.fee).toFixed(2),
+      currency: rule.currency,
+      status: rule.is_active ? "Active" : "Inactive",
+    };
+  });
 
   return (
     <section className="admin-card overflow-hidden">
@@ -83,17 +99,32 @@ function ShippingRulesPanel({
           <h2 className="font-semibold">Shipping rules</h2>
           <p className="admin-muted mt-1 text-sm">International, country, and region-specific rates.</p>
         </div>
-        <AdminModal
-          title="Create shipping rule"
-          trigger={<span className="admin-action flex items-center gap-2 px-4 py-2.5"><Plus className="h-4 w-4" />Create shipping rule</span>}
-          width="w-[min(94vw,560px)]"
-        >
-          <ShippingRuleForm
-            countries={countries}
-            countryDefaultCountries={countryDefaultCountries}
-            hasInternationalDefault={rules.some((rule) => rule.rule_type === "international_default" && rule.is_active)}
+        <div className="flex flex-wrap gap-2">
+          <CsvDownloadButton
+            columns={[
+              { key: "rule", label: "Rule" },
+              { key: "country", label: "Country" },
+              { key: "regions", label: "Regions" },
+              { key: "fee", label: "Fee" },
+              { key: "currency", label: "Currency" },
+              { key: "status", label: "Status" },
+            ]}
+            filename="neverfoundco-shipping-rules"
+            rows={ruleRows}
+            title="Never Found Co Shipping Rules"
           />
-        </AdminModal>
+          <AdminModal
+            title="Create shipping rule"
+            trigger={<span className="admin-action flex items-center gap-2 px-4 py-2.5"><Plus className="h-4 w-4" />Create shipping rule</span>}
+            width="w-[min(94vw,560px)]"
+          >
+            <ShippingRuleForm
+              countries={countries}
+              countryDefaultCountries={countryDefaultCountries}
+              hasInternationalDefault={rules.some((rule) => rule.rule_type === "international_default" && rule.is_active)}
+            />
+          </AdminModal>
+        </div>
       </div>
       <div className="overflow-x-visible">
         <table className="admin-table min-w-[900px]">
@@ -163,6 +194,14 @@ function ShippingRulesPanel({
 }
 
 function CountriesPanel({ countries }: { countries: ShippingCountry[] }) {
+  const countryRows = countries.map((country) => ({
+    country: country.country_name,
+    code: country.country_code,
+    currency: country.currency,
+    regions: country.shipping_regions?.map((region) => region.region_name).join(", ") ?? "",
+    status: country.is_active ? "Active" : "Inactive",
+  }));
+
   return (
     <section className="admin-card overflow-hidden">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#ece7df] p-4">
@@ -170,13 +209,27 @@ function CountriesPanel({ countries }: { countries: ShippingCountry[] }) {
           <h2 className="font-semibold">Countries</h2>
           <p className="admin-muted mt-1 text-sm">Countries and manually entered regions available for shipping rules.</p>
         </div>
-        <AdminModal
-          title="Create country"
-          trigger={<span className="admin-action flex items-center gap-2 px-4 py-2.5"><Plus className="h-4 w-4" />Create country</span>}
-          width="w-[min(94vw,520px)]"
-        >
-          <CountryForm />
-        </AdminModal>
+        <div className="flex flex-wrap gap-2">
+          <CsvDownloadButton
+            columns={[
+              { key: "country", label: "Country" },
+              { key: "code", label: "Code" },
+              { key: "currency", label: "Currency" },
+              { key: "regions", label: "Regions" },
+              { key: "status", label: "Status" },
+            ]}
+            filename="neverfoundco-shipping-countries"
+            rows={countryRows}
+            title="Never Found Co Shipping Countries"
+          />
+          <AdminModal
+            title="Create country"
+            trigger={<span className="admin-action flex items-center gap-2 px-4 py-2.5"><Plus className="h-4 w-4" />Create country</span>}
+            width="w-[min(94vw,520px)]"
+          >
+            <CountryForm />
+          </AdminModal>
+        </div>
       </div>
       <div className="overflow-x-visible">
         <table className="admin-table min-w-[900px]">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CartItemCard } from "@/components/cart/CartItemCard";
 import { EmptyCart } from "@/components/cart/EmptyCart";
 import { OrderSummary } from "@/components/cart/OrderSummary";
@@ -10,6 +10,9 @@ import { useCart } from "@/components/store/cart-provider";
 
 export function CartItems() {
   const cart = useCart();
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [couponMessage, setCouponMessage] = useState("");
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   const items = useMemo<CartProduct[]>(
     () =>
       cart.items.map((item) => ({
@@ -29,6 +32,110 @@ export function CartItems() {
     () => items.reduce((total, item) => total + item.price * item.quantity, 0),
     [items],
   );
+  const appliedDiscount = cart.couponCode ? couponDiscount : 0;
+  const couponItems = useMemo(
+    () =>
+      cart.items.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+      })),
+    [cart.items],
+  );
+  const couponItemsKey = useMemo(() => JSON.stringify(couponItems), [couponItems]);
+
+  useEffect(() => {
+    if (!cart.couponCode || cart.items.length === 0) {
+      return;
+    }
+
+    const controller = new AbortController();
+
+    fetch("/api/cart/coupon", {
+      body: JSON.stringify({
+        couponCode: cart.couponCode,
+        items: couponItems,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      signal: controller.signal,
+    })
+      .then((response) => response.json().then((result) => ({ response, result })))
+      .then(({ response, result }) => {
+        if (!response.ok || "error" in result) {
+          setCouponDiscount(0);
+          setCouponMessage(result.error ?? "Coupon could not be applied.");
+          return;
+        }
+
+        setCouponDiscount(Number(result.discountAmount ?? 0));
+        setCouponMessage(`${result.couponCode} applied.`);
+      })
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+
+        setCouponDiscount(0);
+        setCouponMessage("Coupon could not be applied.");
+      });
+
+    return () => controller.abort();
+  }, [cart.couponCode, cart.items.length, couponItems, couponItemsKey]);
+
+  async function applyCoupon(code: string) {
+    const couponCode = code.trim().toUpperCase();
+
+    if (!couponCode) {
+      setCouponMessage("Enter a coupon code.");
+      return;
+    }
+
+    setIsApplyingCoupon(true);
+    setCouponMessage("");
+
+    try {
+      const response = await fetch("/api/cart/coupon", {
+        body: JSON.stringify({
+          couponCode,
+          items: couponItems,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+      });
+      const result = (await response.json()) as
+        | {
+            couponCode: string;
+            discountAmount: number;
+          }
+        | { error: string };
+
+      if (!response.ok || "error" in result) {
+        cart.clearCouponCode();
+        setCouponDiscount(0);
+        setCouponMessage("error" in result ? result.error : "Coupon could not be applied.");
+        return;
+      }
+
+      cart.setCouponCode(result.couponCode);
+      setCouponDiscount(Number(result.discountAmount ?? 0));
+      setCouponMessage(`${result.couponCode} applied.`);
+    } catch {
+      setCouponDiscount(0);
+      setCouponMessage("Coupon could not be applied.");
+    } finally {
+      setIsApplyingCoupon(false);
+    }
+  }
+
+  function removeCoupon() {
+    cart.clearCouponCode();
+    setCouponDiscount(0);
+    setCouponMessage("");
+  }
 
   function updateQuantity(id: string, quantity: number) {
     cart.updateQuantity(id, quantity);
@@ -67,9 +174,21 @@ export function CartItems() {
             />
           ))}
         </div>
-        <PromoCode />
+        <PromoCode
+          appliedCode={cart.couponCode}
+          disabled={cart.items.length === 0}
+          isApplying={isApplyingCoupon}
+          message={couponMessage}
+          onApply={applyCoupon}
+          onRemove={removeCoupon}
+        />
       </div>
-      <OrderSummary shipping={shippingFee} subtotal={subtotal} />
+      <OrderSummary
+        couponCode={cart.couponCode}
+        discount={appliedDiscount}
+        shipping={shippingFee}
+        subtotal={subtotal}
+      />
     </section>
   );
 }

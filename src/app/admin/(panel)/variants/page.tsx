@@ -1,5 +1,6 @@
 import { MoreHorizontal, Plus, Search, Trash2 } from "lucide-react";
 import { AdminAlert } from "@/components/admin/admin-alert";
+import { CsvDownloadButton } from "@/components/admin/csv-download-button";
 import { AdminModal } from "@/components/admin/admin-modal";
 import { requireAdmin } from "@/lib/admin-auth";
 import { listVariantOptions } from "@/lib/db/variant-options";
@@ -26,6 +27,14 @@ export default async function AdminVariantsPage({
     : "color";
   const options = await listVariantOptions();
   const activeOptions = options.filter((option) => option.option_type === activeTab);
+  const optionRows = activeOptions.map((option) => ({
+    type: option.option_type,
+    value: option.name,
+    color: option.color_value ?? "",
+    created: option.created_at
+      ? new Date(option.created_at).toISOString().slice(0, 10)
+      : "",
+  }));
 
   return (
     <div className="space-y-6">
@@ -59,6 +68,17 @@ export default async function AdminVariantsPage({
             <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#81796f]" />
             <input className="admin-input admin-search-input w-full" placeholder={`Search ${activeTab} options`} />
           </label>
+          <CsvDownloadButton
+            columns={[
+              { key: "type", label: "Type" },
+              { key: "value", label: "Value" },
+              { key: "color", label: "Color" },
+              { key: "created", label: "Created" },
+            ]}
+            filename={`neverfoundco-${activeTab}-variants`}
+            rows={optionRows}
+            title={`Never Found Co ${activeTab} variants`}
+          />
           <AdminModal
             title={`Create ${activeTab}`}
             trigger={<span className="admin-action flex items-center gap-2 px-4 py-2.5"><Plus className="h-4 w-4" />Create {activeTab}</span>}

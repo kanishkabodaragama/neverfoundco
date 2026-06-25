@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import { Bold, CalendarClock, Italic, List, Plus, Trash2 } from "lucide-react";
+import { cropImageFilesToSquare, setInputFiles } from "@/components/admin/image-cropper";
 import { UploadButton, UploadThumb, type UploadPreview } from "@/components/admin/upload-thumbnail";
 import type { ProductCategory } from "@/lib/db/categories";
 import type { VariantOption } from "@/lib/db/variant-options";
@@ -578,18 +579,22 @@ function FilePreviewInput({
     <label className="grid gap-2 font-semibold">
       {label}
       <UploadButton
+        disabled={!multiple && previews.length > 0}
         inputRef={inputRef}
         multiple={multiple}
         name={name}
-        onChange={(event) => {
-          const files = Array.from(event.target.files ?? []);
+        onChange={async (event) => {
+          const selectedFiles = Array.from(event.target.files ?? []);
+          const files = await cropImageFilesToSquare(selectedFiles);
           const oversized = files.find((file) => file.size > MAX_FILE_SIZE);
 
           if (oversized) {
-            setMessage(`${oversized.name} is larger than 2 MB.`);
+            setMessage(`${oversized.name} is larger than 2 MB after cropping.`);
             event.target.value = "";
             return;
           }
+
+          setInputFiles(event.target, files);
 
           const items = files.map((file) => ({
             id: `${file.name}-${file.lastModified}`,
@@ -602,7 +607,9 @@ function FilePreviewInput({
           setMessage("");
           animateProgress(items);
         }}
-      />
+      >
+        {!multiple && previews.length ? "Image selected" : "Upload"}
+      </UploadButton>
       {message ? <span className="text-xs font-semibold text-red-500">{message}</span> : null}
       {previews.length ? (
         <span className={`flex flex-wrap gap-2 ${compact ? "max-w-24" : ""}`}>

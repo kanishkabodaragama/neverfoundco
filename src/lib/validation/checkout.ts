@@ -13,7 +13,7 @@ export const checkoutSchema = z.object({
   addressLine2: z.string().optional(),
   countryCode: z.string().min(2).max(3),
   city: z.string().min(2),
-  district: z.string().min(2),
+  district: z.string().min(1),
   postalCode: z.string().optional(),
   couponCode: z.string().optional(),
   items: z.array(cartItemSchema).min(1),

@@ -3,13 +3,17 @@ import Image from "next/image";
 import { StorePrice } from "@/components/site/StorePrice";
 
 export function OrderSummary({
+  discount = 0,
+  couponCode,
   subtotal,
   shipping,
 }: {
+  discount?: number;
+  couponCode?: string;
   subtotal: number;
   shipping: number;
 }) {
-  const total = subtotal + shipping;
+  const total = Math.max(0, subtotal - discount) + shipping;
 
   return (
     <aside className="space-y-4">
@@ -20,6 +24,12 @@ export function OrderSummary({
             <span>Subtotal</span>
             <span><StorePrice amountUsd={subtotal} /></span>
           </div>
+          {discount > 0 ? (
+            <div className="flex justify-between gap-4 text-[#B8A8E8]">
+              <span>Discount {couponCode ? `(${couponCode})` : ""}</span>
+              <span>-<StorePrice amountUsd={discount} /></span>
+            </div>
+          ) : null}
           <div className="flex justify-between gap-4">
             <span>Shipping</span>
             <span><StorePrice amountUsd={shipping} /></span>

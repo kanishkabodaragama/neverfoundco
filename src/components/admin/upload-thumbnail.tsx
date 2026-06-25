@@ -78,7 +78,11 @@ export function UploadButton({
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
-    <label className="admin-secondary-action inline-flex w-fit cursor-pointer items-center gap-2 px-3 py-2">
+    <label
+      className={`admin-secondary-action inline-flex w-fit items-center gap-2 px-3 py-2 ${
+        disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+      }`}
+    >
       <ImageUp className="h-4 w-4" />
       {children}
       <input

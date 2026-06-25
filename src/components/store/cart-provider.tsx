@@ -24,23 +24,30 @@ type CartItem = {
 
 type CartContextValue = {
   items: CartItem[];
+  couponCode: string;
   addItem: (item: Omit<CartItem, "quantity">) => void;
   updateQuantity: (itemKey: string, quantity: number) => void;
   removeItem: (itemKey: string) => void;
   clearCart: () => void;
+  setCouponCode: (code: string) => void;
+  clearCouponCode: () => void;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
 const STORAGE_KEY = "neverfoundco-cart";
+const COUPON_STORAGE_KEY = "neverfoundco-coupon";
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [couponCode, setStoredCouponCode] = useState("");
   const [hasLoadedStoredCart, setHasLoadedStoredCart] = useState(false);
 
   useEffect(() => {
     window.setTimeout(() => {
       const stored = window.localStorage.getItem(STORAGE_KEY);
+      const storedCoupon = window.localStorage.getItem(COUPON_STORAGE_KEY);
       if (stored) setItems(normalizeStoredCartItems(JSON.parse(stored) as CartItem[]));
+      if (storedCoupon) setStoredCouponCode(storedCoupon);
       setHasLoadedStoredCart(true);
     }, 0);
   }, []);
@@ -50,9 +57,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [hasLoadedStoredCart, items]);
 
+  useEffect(() => {
+    if (!hasLoadedStoredCart) return;
+
+    if (couponCode) {
+      window.localStorage.setItem(COUPON_STORAGE_KEY, couponCode);
+      return;
+    }
+
+    window.localStorage.removeItem(COUPON_STORAGE_KEY);
+  }, [couponCode, hasLoadedStoredCart]);
+
   const value = useMemo<CartContextValue>(
     () => ({
       items,
+      couponCode,
       addItem(item) {
         setItems((current) => {
           const itemKey = getCartItemKey(item);
@@ -87,9 +106,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
       },
       clearCart() {
         setItems([]);
+        setStoredCouponCode("");
+      },
+      setCouponCode(code) {
+        setStoredCouponCode(code.trim().toUpperCase());
+      },
+      clearCouponCode() {
+        setStoredCouponCode("");
       },
     }),
-    [items],
+    [couponCode, items],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

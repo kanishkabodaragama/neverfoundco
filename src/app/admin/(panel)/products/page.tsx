@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Download, Filter, MoreHorizontal, Plus, Search } from "lucide-react";
+import { Filter, MoreHorizontal, Plus, Search } from "lucide-react";
 import { AdminAlert } from "@/components/admin/admin-alert";
+import { CsvDownloadButton } from "@/components/admin/csv-download-button";
 import { requireAdmin } from "@/lib/admin-auth";
 import { listAdminProducts } from "@/lib/db/products";
 import { formatCurrency } from "@/lib/utils";
@@ -16,6 +17,16 @@ export default async function AdminProductsPage({
   await requireAdmin();
   const flash = await searchParams;
   const products = await listAdminProducts();
+  const productRows = products.map((product) => ({
+    sku: product.slug.slice(0, 8).toUpperCase(),
+    name: product.name,
+    category: product.category,
+    price: Number(product.price).toFixed(2),
+    sale_price: product.sale_price ? Number(product.sale_price).toFixed(2) : "",
+    stock: product.stock_quantity,
+    status: product.is_active ? "Active" : "Draft",
+    updated: new Date(product.updated_at).toISOString().slice(0, 10),
+  }));
 
   return (
     <div className="space-y-6">
@@ -40,10 +51,21 @@ export default async function AdminProductsPage({
             <Filter className="h-4 w-4" />
             Filters
           </button>
-          <button className="admin-secondary-action flex items-center gap-2 px-3 py-2.5" type="button">
-            <Download className="h-4 w-4" />
-            Download
-          </button>
+          <CsvDownloadButton
+            columns={[
+              { key: "sku", label: "SKU" },
+              { key: "name", label: "Product" },
+              { key: "category", label: "Category" },
+              { key: "price", label: "Price" },
+              { key: "sale_price", label: "Sale Price" },
+              { key: "stock", label: "Stock" },
+              { key: "status", label: "Status" },
+              { key: "updated", label: "Updated" },
+            ]}
+            filename="neverfoundco-products"
+            rows={productRows}
+            title="Never Found Co Products"
+          />
           <Link
             className="admin-action flex items-center gap-2 px-4 py-2.5"
             href="/admin/products/new"

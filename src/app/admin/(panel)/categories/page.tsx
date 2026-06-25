@@ -1,5 +1,6 @@
 import { MoreHorizontal, Plus, Tags, Trash2 } from "lucide-react";
 import { AdminAlert } from "@/components/admin/admin-alert";
+import { CsvDownloadButton } from "@/components/admin/csv-download-button";
 import { AdminModal } from "@/components/admin/admin-modal";
 import { requireAdmin } from "@/lib/admin-auth";
 import { listProductCategories, type ProductCategory } from "@/lib/db/categories";
@@ -13,6 +14,12 @@ export default async function AdminCategoriesPage({
 }) {
   await requireAdmin();
   const [flash, categories] = await Promise.all([searchParams, listProductCategories()]);
+  const categoryRows = categories.map((category) => ({
+    name: category.name,
+    slug: category.slug,
+    description: category.description ?? "",
+    status: category.is_active ? "Active" : "Inactive",
+  }));
 
   return (
     <div className="space-y-6">
@@ -39,6 +46,19 @@ export default async function AdminCategoriesPage({
       <AdminAlert error={flash.error} success={flash.success} />
 
       <section className="admin-card">
+        <div className="flex justify-end border-b border-[#ece7df] p-4">
+          <CsvDownloadButton
+            columns={[
+              { key: "name", label: "Category" },
+              { key: "slug", label: "Slug" },
+              { key: "description", label: "Description" },
+              { key: "status", label: "Status" },
+            ]}
+            filename="neverfoundco-categories"
+            rows={categoryRows}
+            title="Never Found Co Categories"
+          />
+        </div>
         <div className="overflow-x-visible">
           <table className="admin-table min-w-[820px]">
             <thead>

@@ -20,10 +20,14 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
   const initialCountry = getInitialCountry(countries);
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [countryCode, setCountryCode] = useState(initialCountry.country_code);
+  const [billingCountryCode, setBillingCountryCode] = useState(initialCountry.country_code);
+  const [billingRegion, setBillingRegion] = useState("");
+  const [deliverySameAsBilling, setDeliverySameAsBilling] = useState(true);
+  const [deliveryCountryCode, setDeliveryCountryCode] = useState(initialCountry.country_code);
+  const [deliveryRegion, setDeliveryRegion] = useState("");
   const [phoneCode, setPhoneCode] = useState(getCallingCode(initialCountry.country_code));
-  const [district, setDistrict] = useState(initialCountry.shipping_regions?.[0]?.region_name ?? "");
-  const [shippingFee, setShippingFee] = useState(Number(initialCountry.default_fee ?? 0));
+  const [shippingFee, setShippingFee] = useState<number | null>(null);
+  const [discountAmount, setDiscountAmount] = useState(0);
 
   const items = useMemo<CheckoutItem[]>(() => {
     return cart.items.map((item) => ({
@@ -34,21 +38,33 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
     }));
   }, [cart.items]);
 
-  const selectedCountry = countries.find((country) => country.country_code === countryCode);
-  const selectedRegions = selectedCountry?.shipping_regions ?? [];
+  const billingCountry = countries.find((country) => country.country_code === billingCountryCode);
+  const deliveryCountry = countries.find((country) => country.country_code === deliveryCountryCode);
+  const billingRegions = billingCountry?.shipping_regions ?? [];
+  const deliveryRegions = deliveryCountry?.shipping_regions ?? [];
+  const shippingCountryCode = deliverySameAsBilling
+    ? billingCountryCode
+    : deliveryCountryCode;
+  const shippingRegion = deliverySameAsBilling ? billingRegion : deliveryRegion;
+  const visibleShippingFee = shippingRegion ? shippingFee : null;
+  const shippingForTotal = visibleShippingFee ?? 0;
   const subtotal = items.reduce(
     (total, item) => total + item.price * item.quantity,
     0,
   );
-  const total = subtotal + shippingFee;
+  const appliedDiscount = cart.couponCode ? discountAmount : 0;
+  const total = Math.max(0, subtotal - appliedDiscount) + shippingForTotal;
 
   useEffect(() => {
-    const controller = new AbortController();
-    const params = new URLSearchParams({ countryCode });
-
-    if (district) {
-      params.set("district", district);
+    if (!shippingRegion) {
+      return;
     }
+
+    const controller = new AbortController();
+    const params = new URLSearchParams({
+      countryCode: shippingCountryCode,
+      district: shippingRegion,
+    });
 
     fetch(`/api/shipping/quote?${params.toString()}`, {
       signal: controller.signal,
@@ -64,11 +80,47 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
           return;
         }
 
-        setShippingFee(Number(selectedCountry?.default_fee ?? 0));
+        setShippingFee(null);
       });
 
     return () => controller.abort();
-  }, [countryCode, district, selectedCountry?.default_fee]);
+  }, [shippingCountryCode, shippingRegion]);
+
+  useEffect(() => {
+    if (!cart.couponCode || cart.items.length === 0) {
+      return;
+    }
+
+    const controller = new AbortController();
+
+    fetch("/api/cart/coupon", {
+      body: JSON.stringify({
+        couponCode: cart.couponCode,
+        items: cart.items.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+        })),
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      signal: controller.signal,
+    })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((result: { discountAmount?: number } | null) => {
+        setDiscountAmount(Number(result?.discountAmount ?? 0));
+      })
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+
+        setDiscountAmount(0);
+      });
+
+    return () => controller.abort();
+  }, [cart.couponCode, cart.items]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -81,6 +133,60 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
 
     setIsSubmitting(true);
     const formData = new FormData(event.currentTarget);
+    const firstName = getFormValue(formData, "firstName");
+    const lastName = getFormValue(formData, "lastName");
+    const customerEmail = getFormValue(formData, "customerEmail");
+    const customerPhone = getFormValue(formData, "customerPhone");
+    const billingAddressLine1 = getFormValue(formData, "billingAddressLine1");
+    const billingAddressLine2 = getFormValue(formData, "billingAddressLine2");
+    const billingCity = getFormValue(formData, "billingCity");
+    const billingPostalCode = getFormValue(formData, "billingPostalCode");
+    const deliveryAddressLine1 = getFormValue(formData, "deliveryAddressLine1");
+    const deliveryAddressLine2 = getFormValue(formData, "deliveryAddressLine2");
+    const deliveryCity = getFormValue(formData, "deliveryCity");
+    const deliveryPostalCode = getFormValue(formData, "deliveryPostalCode");
+    const addressLine1 = deliverySameAsBilling
+      ? billingAddressLine1
+      : deliveryAddressLine1;
+    const addressLine2 = deliverySameAsBilling
+      ? billingAddressLine2
+      : deliveryAddressLine2;
+    const city = deliverySameAsBilling ? billingCity : deliveryCity;
+    const postalCode = deliverySameAsBilling
+      ? billingPostalCode
+      : deliveryPostalCode;
+    const missingFields = [
+      [firstName, "First name"],
+      [lastName, "Last name"],
+      [customerEmail, "Email"],
+      [customerPhone, "Phone"],
+      [billingCountryCode, "Billing country"],
+      [billingRegion, "Billing region"],
+      [billingAddressLine1, "Billing address"],
+      [billingCity, "Billing city"],
+      ...(!deliverySameAsBilling
+        ? [
+            [deliveryCountryCode, "Delivery country"],
+            [deliveryRegion, "Delivery region"],
+            [deliveryAddressLine1, "Delivery address"],
+            [deliveryCity, "Delivery city"],
+          ]
+        : []),
+    ].filter(([value]) => !value);
+
+    if (missingFields.length > 0) {
+      setMessage(
+        `Please complete: ${missingFields
+          .map(([, label]) => label)
+          .join(", ")}.`,
+      );
+      return;
+    }
+
+    if (!shippingRegion || shippingFee === null) {
+      setMessage("Please wait until the shipping fee is calculated.");
+      return;
+    }
 
     try {
       const response = await fetch("/api/checkout/create-order", {
@@ -89,15 +195,16 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          customerName: formData.get("customerName"),
-          customerEmail: formData.get("customerEmail"),
-          customerPhone: `${phoneCode} ${formData.get("customerPhone") ?? ""}`.trim(),
-          addressLine1: formData.get("addressLine1"),
-          addressLine2: formData.get("addressLine2"),
-          countryCode: formData.get("countryCode"),
-          city: formData.get("city"),
-          district: formData.get("district"),
-          postalCode: formData.get("postalCode"),
+          customerName: `${firstName} ${lastName}`,
+          customerEmail,
+          customerPhone: `${phoneCode} ${customerPhone}`.trim(),
+          addressLine1,
+          addressLine2,
+          countryCode: shippingCountryCode,
+          city,
+          district: shippingRegion,
+          postalCode,
+          couponCode: cart.couponCode || undefined,
           items: cart.items.map((item) => ({
             productId: item.productId,
             quantity: item.quantity,
@@ -135,8 +242,9 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
         </div>
         <Panel title="Customer Details">
           <div className="grid gap-4 sm:grid-cols-2">
-            <CheckoutInput label="Full Name" name="customerName" required />
-            <CheckoutInput label="Email Address" name="customerEmail" required type="email" />
+            <CheckoutInput label="First Name" name="firstName" />
+            <CheckoutInput label="Last Name" name="lastName" />
+            <CheckoutInput label="Email Address" name="customerEmail" type="email" />
             <label className="grid gap-2 sm:col-span-2">
               <span className="sr-only">Phone Number</span>
               <span className="grid grid-cols-[120px_1fr] gap-3">
@@ -155,7 +263,6 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
                   className="w-full border border-[#10131A]/15 bg-[#FFF9EF] px-4 py-4 text-sm font-black uppercase outline-none placeholder:text-[#10131A]/45 focus:border-[#F05267]"
                   name="customerPhone"
                   placeholder="Phone Number"
-                  required
                   type="tel"
                 />
               </span>
@@ -163,27 +270,22 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
           </div>
         </Panel>
 
-        <Panel title="Shipping Address">
+        <Panel title="Billing Address">
           <div className="grid gap-4">
-            <CheckoutInput label="Address Line 1" name="addressLine1" required />
-            <CheckoutInput label="Address Line 2" name="addressLine2" />
+            <CheckoutInput label="Billing Address Line 1" name="billingAddressLine1" />
+            <CheckoutInput label="Billing Address Line 2" name="billingAddressLine2" />
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block">
-                <span className="sr-only">Country</span>
+                <span className="sr-only">Billing Country</span>
                 <select
                   className="w-full border border-[#10131A]/15 bg-[#FFF9EF] px-4 py-4 text-sm font-black uppercase outline-none focus:border-[#F05267]"
-                  name="countryCode"
                   onChange={(event) => {
-                    setCountryCode(event.target.value);
-                    const nextCountry = countries.find(
-                      (country) => country.country_code === event.target.value,
-                    );
+                    setBillingCountryCode(event.target.value);
                     setPhoneCode(getCallingCode(event.target.value));
-                    setDistrict(
-                      nextCountry?.shipping_regions?.[0]?.region_name ?? "",
-                    );
+                    setBillingRegion("");
+                    setShippingFee(null);
                   }}
-                  value={countryCode}
+                  value={billingCountryCode}
                 >
                   {countries.map((country) => (
                     <option key={country.id} value={country.country_code}>
@@ -193,33 +295,105 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
                 </select>
               </label>
               <label className="block">
-                <span className="sr-only">District</span>
+                <span className="sr-only">Billing Region</span>
                 <select
                   className="w-full border border-[#10131A]/15 bg-[#FFF9EF] px-4 py-4 text-sm font-black uppercase outline-none focus:border-[#F05267]"
-                  name="district"
-                  onChange={(event) => setDistrict(event.target.value)}
-                  value={district}
+                  onChange={(event) => {
+                    setBillingRegion(event.target.value);
+                    setShippingFee(null);
+                  }}
+                  value={billingRegion}
                 >
-                  <option value="">Use country default shipping</option>
-                  {selectedRegions.map((region) => (
+                  <option value="">Select region</option>
+                  {billingRegions.map((region) => (
                     <option key={region.id} value={region.region_name}>
                       {region.region_name}
                     </option>
                   ))}
                 </select>
-                {selectedRegions.length === 0 ? (
+                {billingRegions.length === 0 ? (
                   <p className="mt-2 text-xs font-bold uppercase text-[#10131A]/55">
-                    No regions are configured for this country. Country default shipping will apply.
+                    No regions are configured for this country yet.
                   </p>
                 ) : null}
               </label>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              <CheckoutInput label="City" name="city" required />
-              <CheckoutInput label="Postal Code" name="postalCode" />
+              <CheckoutInput label="Billing City" name="billingCity" />
+              <CheckoutInput label="Billing Postal Code" name="billingPostalCode" />
             </div>
+            <label className="flex cursor-pointer items-start gap-3 border border-[#10131A]/10 bg-[#F7F1E6] p-4 text-sm font-black uppercase">
+              <input
+                checked={deliverySameAsBilling}
+                className="mt-1 h-5 w-5 accent-[#F05267]"
+                onChange={(event) => {
+                  setDeliverySameAsBilling(event.target.checked);
+                  setDeliveryCountryCode(billingCountryCode);
+                  setDeliveryRegion("");
+                  setShippingFee(null);
+                }}
+                type="checkbox"
+              />
+              <span>Billing address and delivery address are the same</span>
+            </label>
           </div>
         </Panel>
+
+        {!deliverySameAsBilling ? (
+          <Panel title="Delivery Address">
+            <div className="grid gap-4">
+              <CheckoutInput label="Delivery Address Line 1" name="deliveryAddressLine1" />
+              <CheckoutInput label="Delivery Address Line 2" name="deliveryAddressLine2" />
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="block">
+                  <span className="sr-only">Delivery Country</span>
+                  <select
+                    className="w-full border border-[#10131A]/15 bg-[#FFF9EF] px-4 py-4 text-sm font-black uppercase outline-none focus:border-[#F05267]"
+                    onChange={(event) => {
+                      setDeliveryCountryCode(event.target.value);
+                      setDeliveryRegion("");
+                      setShippingFee(null);
+                    }}
+                    value={deliveryCountryCode}
+                  >
+                    {countries.map((country) => (
+                      <option key={country.id} value={country.country_code}>
+                        {country.country_name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block">
+                  <span className="sr-only">Delivery Region</span>
+                  <select
+                    className="w-full border border-[#10131A]/15 bg-[#FFF9EF] px-4 py-4 text-sm font-black uppercase outline-none focus:border-[#F05267]"
+                    onChange={(event) => {
+                      setDeliveryRegion(event.target.value);
+                      setShippingFee(null);
+                    }}
+                    value={deliveryRegion}
+                  >
+                    <option value="">Select region</option>
+                    {deliveryRegions.map((region) => (
+                      <option key={region.id} value={region.region_name}>
+                        {region.region_name}
+                      </option>
+                    ))}
+                  </select>
+                  {deliveryRegions.length === 0 ? (
+                    <p className="mt-2 text-xs font-bold uppercase text-[#10131A]/55">
+                      No regions are configured for this country yet.
+                    </p>
+                  ) : null}
+                </label>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <CheckoutInput label="Delivery City" name="deliveryCity" />
+                <CheckoutInput label="Delivery Postal Code" name="deliveryPostalCode" />
+              </div>
+            </div>
+          </Panel>
+        ) : null}
 
         <Panel title="Payment Option">
           <label className="block cursor-pointer bg-[#070B12] p-5 text-[#FFF9EF] transition hover:translate-x-0.5">
@@ -261,7 +435,7 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
         ) : null}
       </form>
 
-      <aside className="space-y-5">
+      <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
         <div className="bg-[#070B12] p-5 text-[#FFF9EF]">
           <h2 className="font-pixel text-base font-black uppercase">Order Summary</h2>
           <div className="mt-6 space-y-4">
@@ -284,7 +458,22 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
           </div>
           <div className="mt-6 space-y-3 text-sm font-black uppercase">
             <SummaryRow label="Subtotal" value={format(subtotal)} />
-            <SummaryRow label="Shipping" value={format(shippingFee)} />
+            {appliedDiscount > 0 ? (
+              <SummaryRow
+                label={`Discount ${cart.couponCode ? `(${cart.couponCode})` : ""}`}
+                value={`-${format(appliedDiscount)}`}
+              />
+            ) : null}
+            <SummaryRow
+              label="Shipping"
+              value={
+                !shippingRegion
+                  ? "Select region"
+                  : visibleShippingFee === null
+                    ? "Calculating..."
+                    : format(visibleShippingFee)
+              }
+            />
             <SummaryRow
               highlight
               label="Total"
@@ -294,14 +483,6 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
           <p className="mt-4 border-t border-[#FFF9EF]/15 pt-4 text-xs font-bold leading-relaxed text-[#FFF9EF]/65">
             Converted using live exchange data from {rateSource}. Actual bank
             buying and selling rates may differ slightly.
-          </p>
-        </div>
-
-        <div className="bg-[#B8A8E8] p-5 text-[#10131A]">
-          <p className="font-pixel text-base font-black uppercase">No Restocks</p>
-          <p className="mt-2 font-bold leading-relaxed">
-            Orders stay pending until a verified PayHere callback marks payment
-            as paid in the real checkout flow.
           </p>
         </div>
       </aside>
@@ -343,6 +524,10 @@ function getInitialCountry(countries: ShippingCountry[]) {
   return countries.find((country) => country.country_code === localeRegion) ?? fallback;
 }
 
+function getFormValue(formData: FormData, name: string) {
+  return String(formData.get(name) ?? "").trim();
+}
+
 function Panel({
   title,
   children,
@@ -362,13 +547,11 @@ function CheckoutInput({
   label,
   name,
   onChange,
-  required = false,
   type = "text",
 }: {
   label: string;
   name: string;
   onChange?: (value: string) => void;
-  required?: boolean;
   type?: string;
 }) {
   return (
@@ -379,7 +562,6 @@ function CheckoutInput({
         name={name}
         onChange={(event) => onChange?.(event.target.value)}
         placeholder={label}
-        required={required}
         type={type}
       />
     </label>

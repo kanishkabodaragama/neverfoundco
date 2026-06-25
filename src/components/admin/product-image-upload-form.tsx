@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { cropImageFileToSquare, setInputFiles } from "@/components/admin/image-cropper";
 import { UploadButton, UploadThumb, type UploadPreview } from "@/components/admin/upload-thumbnail";
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024;
@@ -16,6 +17,28 @@ export function ProductImageUploadForm({
   const [message, setMessage] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [preview, setPreview] = useState<UploadPreview | null>(null);
+
+  async function prepareFile(file: File) {
+    const croppedFile = await cropImageFileToSquare(file);
+
+    if (croppedFile.size > MAX_FILE_SIZE) {
+      setMessage("Cropped image must be 2 MB or smaller.");
+      if (inputRef.current) inputRef.current.value = "";
+      return null;
+    }
+
+    if (inputRef.current) setInputFiles(inputRef.current, [croppedFile]);
+    setMessage("");
+    setPreview({
+      id: `${croppedFile.name}-${croppedFile.lastModified}`,
+      name: croppedFile.name,
+      url: URL.createObjectURL(croppedFile),
+      progress: 100,
+      complete: true,
+    });
+
+    return croppedFile;
+  }
 
   function upload(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -86,9 +109,10 @@ export function ProductImageUploadForm({
       <label className="grid gap-2 text-xs font-semibold uppercase text-[#81796f]">
         Upload image
         <UploadButton
+          disabled={Boolean(preview) || isUploading}
           inputRef={inputRef}
           name="file"
-          onChange={(event) => {
+          onChange={async (event) => {
             const file = event.target.files?.[0];
             if (!file) return;
             if (file.size > MAX_FILE_SIZE) {
@@ -96,17 +120,10 @@ export function ProductImageUploadForm({
               event.target.value = "";
               return;
             }
-            setMessage("");
-            setPreview({
-              id: `${file.name}-${file.lastModified}`,
-              name: file.name,
-              url: URL.createObjectURL(file),
-              progress: 0,
-              complete: false,
-            });
+            await prepareFile(file);
           }}
         >
-          Choose image
+          {preview ? "Image selected" : "Choose image"}
         </UploadButton>
         <span className="text-[0.65rem] text-[#9a9288]">Max 2 MB</span>
       </label>

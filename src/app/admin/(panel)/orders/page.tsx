@@ -1,9 +1,10 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { CsvDownloadButton } from "@/components/admin/csv-download-button";
 import { requireAdmin } from "@/lib/admin-auth";
 import { listAdminOrders } from "@/lib/db/admin";
 import { formatCurrency } from "@/lib/utils";
-import { Download, Filter, MoreHorizontal, Search } from "lucide-react";
+import { Filter, MoreHorizontal, Search } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,17 @@ export default async function AdminOrdersPage({
     payment: query.payment ?? "all",
     search: query.q,
   });
+  const orderRows = orders.map((order) => ({
+    order: order.order_number,
+    date: new Date(order.created_at).toLocaleString("en-LK"),
+    customer: order.customer_name,
+    email: order.customer_email,
+    total: Number(order.total).toFixed(2),
+    payment: order.payment_status,
+    status: order.order_status,
+    city: order.city,
+    region: order.district,
+  }));
 
   return (
     <div className="space-y-6">
@@ -50,10 +62,22 @@ export default async function AdminOrdersPage({
             <Filter className="h-4 w-4" />
             Filters
           </button>
-          <button className="admin-secondary-action flex items-center gap-2 px-3 py-2.5" type="button">
-            <Download className="h-4 w-4" />
-            Download
-          </button>
+          <CsvDownloadButton
+            columns={[
+              { key: "order", label: "Order" },
+              { key: "date", label: "Date" },
+              { key: "customer", label: "Customer" },
+              { key: "email", label: "Email" },
+              { key: "total", label: "Total" },
+              { key: "payment", label: "Payment" },
+              { key: "status", label: "Order Status" },
+              { key: "city", label: "City" },
+              { key: "region", label: "Region" },
+            ]}
+            filename="neverfoundco-orders"
+            rows={orderRows}
+            title="Never Found Co Orders"
+          />
         </form>
         <div className="overflow-x-visible">
         <table className="admin-table min-w-[980px]">

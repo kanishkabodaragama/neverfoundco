@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { MoreHorizontal, Percent, Plus, Search, Trash2 } from "lucide-react";
 import { AdminAlert } from "@/components/admin/admin-alert";
+import { CsvDownloadButton } from "@/components/admin/csv-download-button";
 import { AdminModal } from "@/components/admin/admin-modal";
 import { CouponForm } from "@/components/admin/coupon-form";
 import { requireAdmin } from "@/lib/admin-auth";
@@ -21,6 +22,21 @@ export default async function AdminCouponsPage({
     listAdminCoupons(),
     listAdminProducts(),
   ]);
+  const couponRows = coupons.map((coupon) => ({
+    code: coupon.code,
+    discount:
+      coupon.discount_type === "flat"
+        ? Number(coupon.discount_value).toFixed(2)
+        : `${coupon.discount_value}%`,
+    usage: coupon.used_count,
+    limit: coupon.usage_limit ?? "Unlimited",
+    starts: formatDate(coupon.starts_at),
+    ends: formatDate(coupon.ends_at),
+    products: coupon.coupon_products.length
+      ? `${coupon.coupon_products.length} selected`
+      : "All products",
+    status: coupon.is_active ? "Active" : "Paused",
+  }));
 
   return (
     <div className="space-y-6">
@@ -47,6 +63,21 @@ export default async function AdminCouponsPage({
             <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#81796f]" />
             <input className="admin-input admin-search-input w-full" placeholder="Search coupons by code or status" />
           </label>
+          <CsvDownloadButton
+            columns={[
+              { key: "code", label: "Code" },
+              { key: "discount", label: "Discount" },
+              { key: "usage", label: "Total Usage" },
+              { key: "limit", label: "Limit" },
+              { key: "starts", label: "Starts" },
+              { key: "ends", label: "Ends" },
+              { key: "products", label: "Products" },
+              { key: "status", label: "Status" },
+            ]}
+            filename="neverfoundco-coupons"
+            rows={couponRows}
+            title="Never Found Co Coupons"
+          />
         </div>
         <div className="overflow-x-visible">
           <table className="admin-table min-w-[980px]">
