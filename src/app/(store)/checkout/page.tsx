@@ -10,6 +10,9 @@ export const metadata: Metadata = {
     "Complete your Never Found order with secure PayHere checkout.",
 };
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function CheckoutPage() {
   const countries = await listCheckoutCountries();
 

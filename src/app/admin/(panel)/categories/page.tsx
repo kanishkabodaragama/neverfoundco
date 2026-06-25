@@ -39,7 +39,7 @@ export default async function AdminCategoriesPage({
       <AdminAlert error={flash.error} success={flash.success} />
 
       <section className="admin-card">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-visible">
           <table className="admin-table min-w-[820px]">
             <thead>
               <tr>
@@ -63,11 +63,11 @@ export default async function AdminCategoriesPage({
                   <td>{category.description || "-"}</td>
                   <td>{category.is_active ? "Active" : "Inactive"}</td>
                   <td className="text-right">
-                    <details className="relative inline-block">
+                    <details className="relative z-20 inline-block">
                       <summary className="admin-secondary-action inline-flex h-9 w-9 cursor-pointer list-none items-center justify-center marker:content-['']">
                         <MoreHorizontal className="h-4 w-4" />
                       </summary>
-                      <div className="admin-menu absolute right-0 mt-2 grid w-36 p-2 text-left">
+                      <div className="admin-menu absolute right-0 top-full z-[300] mt-2 grid w-36 p-2 text-left">
                         <AdminModal
                           title="Edit category"
                           trigger={<span className="block rounded px-3 py-2 text-sm font-semibold hover:bg-[#f6f3ef]">Edit</span>}

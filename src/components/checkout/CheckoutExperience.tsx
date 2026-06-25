@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { useCart } from "@/components/store/cart-provider";
 import { useStoreCurrency } from "@/components/store/currency-provider";
@@ -22,9 +22,8 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [countryCode, setCountryCode] = useState(initialCountry.country_code);
   const [phoneCode, setPhoneCode] = useState(getCallingCode(initialCountry.country_code));
-  const [district, setDistrict] = useState(
-    initialCountry.shipping_regions?.[0]?.region_name ?? "Default",
-  );
+  const [district, setDistrict] = useState(initialCountry.shipping_regions?.[0]?.region_name ?? "");
+  const [shippingFee, setShippingFee] = useState(Number(initialCountry.default_fee ?? 0));
 
   const items = useMemo<CheckoutItem[]>(() => {
     return cart.items.map((item) => ({
@@ -36,12 +35,40 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
   }, [cart.items]);
 
   const selectedCountry = countries.find((country) => country.country_code === countryCode);
-  const shippingFee = Number(selectedCountry?.default_fee ?? 0);
+  const selectedRegions = selectedCountry?.shipping_regions ?? [];
   const subtotal = items.reduce(
     (total, item) => total + item.price * item.quantity,
     0,
   );
   const total = subtotal + shippingFee;
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const params = new URLSearchParams({ countryCode });
+
+    if (district) {
+      params.set("district", district);
+    }
+
+    fetch(`/api/shipping/quote?${params.toString()}`, {
+      signal: controller.signal,
+    })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((result: { shippingFee?: number } | null) => {
+        if (typeof result?.shippingFee === "number") {
+          setShippingFee(result.shippingFee);
+        }
+      })
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+
+        setShippingFee(Number(selectedCountry?.default_fee ?? 0));
+      });
+
+    return () => controller.abort();
+  }, [countryCode, district, selectedCountry?.default_fee]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -153,7 +180,7 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
                     );
                     setPhoneCode(getCallingCode(event.target.value));
                     setDistrict(
-                      nextCountry?.shipping_regions?.[0]?.region_name ?? "Default",
+                      nextCountry?.shipping_regions?.[0]?.region_name ?? "",
                     );
                   }}
                   value={countryCode}
@@ -173,13 +200,18 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
                   onChange={(event) => setDistrict(event.target.value)}
                   value={district}
                 >
-                  <option value="Default">Default district price</option>
-                  {selectedCountry?.shipping_regions?.map((region) => (
+                  <option value="">Use country default shipping</option>
+                  {selectedRegions.map((region) => (
                     <option key={region.id} value={region.region_name}>
                       {region.region_name}
                     </option>
                   ))}
                 </select>
+                {selectedRegions.length === 0 ? (
+                  <p className="mt-2 text-xs font-bold uppercase text-[#10131A]/55">
+                    No regions are configured for this country. Country default shipping will apply.
+                  </p>
+                ) : null}
               </label>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -222,10 +254,6 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
         >
           {isSubmitting ? "Preparing payment..." : "Continue With PayHere ->"}
         </button>
-        <p className="max-w-xl text-xs font-bold leading-relaxed text-[#10131A]/65">
-          Converted using live exchange data from {rateSource}. Actual bank
-          buying and selling rates may differ slightly.
-        </p>
         {message ? (
           <p className="text-sm font-black uppercase text-[#F05267]">
             {message}
@@ -263,6 +291,10 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
               value={format(total)}
             />
           </div>
+          <p className="mt-4 border-t border-[#FFF9EF]/15 pt-4 text-xs font-bold leading-relaxed text-[#FFF9EF]/65">
+            Converted using live exchange data from {rateSource}. Actual bank
+            buying and selling rates may differ slightly.
+          </p>
         </div>
 
         <div className="bg-[#B8A8E8] p-5 text-[#10131A]">

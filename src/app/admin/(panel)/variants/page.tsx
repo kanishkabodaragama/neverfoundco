@@ -67,7 +67,7 @@ export default async function AdminVariantsPage({
             <VariantOptionForm optionType={activeTab} />
           </AdminModal>
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-visible">
           <table className="admin-table min-w-[760px]">
             <thead>
               <tr>
@@ -96,11 +96,11 @@ export default async function AdminVariantsPage({
                   ) : null}
                   <td>{option.created_at ? new Date(option.created_at).toISOString().slice(0, 10) : "-"}</td>
                   <td className="text-right">
-                    <details className="relative inline-block">
+                    <details className="relative z-20 inline-block">
                       <summary className="admin-secondary-action inline-flex h-9 w-9 cursor-pointer list-none items-center justify-center marker:content-['']">
                         <MoreHorizontal className="h-4 w-4" />
                       </summary>
-                      <div className="admin-menu absolute right-0 mt-2 grid w-36 p-2 text-left">
+                      <div className="admin-menu absolute right-0 top-full z-[300] mt-2 grid w-36 p-2 text-left">
                         <AdminModal
                           title={`Edit ${activeTab}`}
                           trigger={<span className="block rounded px-3 py-2 text-sm font-semibold hover:bg-[#f6f3ef]">Edit</span>}

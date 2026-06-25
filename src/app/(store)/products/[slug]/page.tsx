@@ -7,7 +7,6 @@ import { ProductDetailClient } from "@/components/site/ProductDetailClient";
 import { StorePrice } from "@/components/site/StorePrice";
 import {
   getProductDetailBySlug,
-  mockProductDetails,
   type MockProductDetail,
 } from "@/components/site/product-detail-data";
 import { mapDbProductToShopProduct, shopProducts, type ShopProduct } from "@/components/site/shop-data";
@@ -32,9 +31,8 @@ const sizeRows = [
   ["XXL", "66", "76", "61"],
 ];
 
-export function generateStaticParams() {
-  return mockProductDetails.map((product) => ({ slug: product.slug }));
-}
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function generateMetadata({
   params,

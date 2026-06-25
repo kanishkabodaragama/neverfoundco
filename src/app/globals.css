@@ -144,7 +144,7 @@ body {
   }
 
   .admin-menu {
-    z-index: 150;
+    z-index: 300;
     border: 1px solid #ece7df;
     border-radius: 0.45rem;
     background: #fff;

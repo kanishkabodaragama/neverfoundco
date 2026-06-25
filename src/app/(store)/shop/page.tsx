@@ -11,6 +11,9 @@ export const metadata: Metadata = {
     "Shop limited Never Found streetwear drops with no restocks and scarce stock.",
 };
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function ShopPage() {
   const dbProducts = await listActiveProducts();
   const products = dbProducts.length ? dbProducts.map(mapDbProductToShopProduct) : shopProducts;
