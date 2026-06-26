@@ -2,7 +2,17 @@
 
 import Image from "next/image";
 import { useMemo, useRef, useState } from "react";
-import { Bold, CalendarClock, Italic, List, Plus, Trash2, X } from "lucide-react";
+import {
+  Bold,
+  CalendarClock,
+  ImageUp,
+  Italic,
+  List,
+  LoaderCircle,
+  Plus,
+  Trash2,
+  X,
+} from "lucide-react";
 import { cropImageFilesToSquare, setInputFiles } from "@/components/admin/image-cropper";
 import { UploadButton, UploadThumb, type UploadPreview } from "@/components/admin/upload-thumbnail";
 import type { ProductCategory } from "@/lib/db/categories";
@@ -446,7 +456,23 @@ export function ProductForm({
                             </div>
                           ) : null}
                           {!variant.image_url || removedVariantImageIds.includes(variant.id ?? "") ? (
-                            <FilePreviewInput compact name={`variant_image_${variant.key}`} />
+                            variant.id ? (
+                              <DirectVariantImageUpload
+                                variantId={variant.id}
+                                onUploaded={(imageUrl) => {
+                                  setVariants((current) =>
+                                    current.map((item) =>
+                                      item.key === variant.key ? { ...item, image_url: imageUrl } : item,
+                                    ),
+                                  );
+                                  setRemovedVariantImageIds((current) =>
+                                    current.filter((id) => id !== variant.id),
+                                  );
+                                }}
+                              />
+                            ) : (
+                              <FilePreviewInput compact name={`variant_image_${variant.key}`} />
+                            )
                           ) : (
                             <p className="admin-muted max-w-28 text-[0.65rem]">
                               Remove image first to replace.
@@ -775,6 +801,73 @@ function FilePreviewInput({
           ))}
         </span>
       ) : null}
+    </label>
+  );
+}
+
+function DirectVariantImageUpload({
+  onUploaded,
+  variantId,
+}: {
+  onUploaded: (imageUrl: string) => void;
+  variantId: string;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+
+  async function upload(file: File) {
+    try {
+      setError("");
+      setIsUploading(true);
+      const [croppedFile] = await cropImageFilesToSquare([file]);
+
+      if (!croppedFile || croppedFile.size > MAX_FILE_SIZE) {
+        throw new Error("Image must be 2 MB or smaller after cropping.");
+      }
+
+      const formData = new FormData();
+      formData.set("file", croppedFile);
+      const response = await fetch(`/api/admin/product-variants/${variantId}/image`, {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: formData,
+      });
+      const result = (await response.json()) as { error?: string; imageUrl?: string };
+
+      if (!response.ok || !result.imageUrl) {
+        throw new Error(result.error ?? "Variant image upload failed.");
+      }
+
+      onUploaded(result.imageUrl);
+    } catch (uploadError) {
+      setError(
+        uploadError instanceof Error ? uploadError.message : "Variant image upload failed.",
+      );
+    } finally {
+      setIsUploading(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  }
+
+  return (
+    <label className="grid max-w-32 gap-2">
+      <span className="admin-secondary-action inline-flex w-fit items-center gap-2 px-3 py-2 text-xs">
+        {isUploading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <ImageUp className="h-4 w-4" />}
+        {isUploading ? "Uploading" : "Upload image"}
+      </span>
+      <input
+        accept="image/*"
+        className="sr-only"
+        disabled={isUploading}
+        onChange={(event) => {
+          const file = event.target.files?.[0];
+          if (file) void upload(file);
+        }}
+        ref={inputRef}
+        type="file"
+      />
+      {error ? <span className="text-xs font-semibold text-red-600">{error}</span> : null}
     </label>
   );
 }

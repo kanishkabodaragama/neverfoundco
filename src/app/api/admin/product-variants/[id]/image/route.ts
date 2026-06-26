@@ -20,15 +20,22 @@ export async function POST(
       requestUrl.searchParams.get("redirect_to") ??
       "/admin/products",
   );
+  const wantsJson = request.headers.get("accept")?.includes("application/json");
   const file = formData.get("file");
 
   if (!(file instanceof File) || file.size === 0) {
+    if (wantsJson) {
+      return NextResponse.json({ error: "Choose an image to upload." }, { status: 400 });
+    }
     return adminRedirect(request, redirectTo, {
       error: "Choose an image to upload.",
     });
   }
 
   if (file.size > MAX_FILE_SIZE) {
+    if (wantsJson) {
+      return NextResponse.json({ error: "Image must be 2 MB or smaller." }, { status: 400 });
+    }
     return adminRedirect(request, redirectTo, {
       error: "Image must be 2 MB or smaller.",
     });
@@ -52,14 +59,17 @@ export async function POST(
     data: { publicUrl },
   } = supabase.storage.from("product-images").getPublicUrl(storagePath);
 
-  const { data: variant } = await supabase
+  const { data: variant, error: variantError } = await supabase
     .from("product_variants")
     .select("storage_path")
     .eq("id", id)
     .single();
 
-  if (variant?.storage_path) {
-    await supabase.storage.from("product-images").remove([variant.storage_path]);
+  if (variantError || !variant) {
+    await supabase.storage.from("product-images").remove([storagePath]);
+    const message = variantError?.message ?? "Variant not found.";
+    if (wantsJson) return NextResponse.json({ error: message }, { status: 404 });
+    return adminRedirect(request, redirectTo, { error: message });
   }
 
   const { error } = await supabase
@@ -71,7 +81,17 @@ export async function POST(
     .eq("id", id);
 
   if (error) {
+    await supabase.storage.from("product-images").remove([storagePath]);
+    if (wantsJson) return NextResponse.json({ error: error.message }, { status: 400 });
     return adminRedirect(request, redirectTo, { error: error.message });
+  }
+
+  if (variant.storage_path) {
+    await supabase.storage.from("product-images").remove([variant.storage_path]);
+  }
+
+  if (wantsJson) {
+    return NextResponse.json({ imageUrl: publicUrl, storagePath });
   }
 
   return adminRedirect(request, redirectTo, {
