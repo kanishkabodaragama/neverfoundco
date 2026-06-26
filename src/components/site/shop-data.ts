@@ -1,4 +1,8 @@
 import type { ProductWithImages } from "@/lib/db/products";
+import {
+  normalizeVariantCombination,
+  uniqueVariantValues,
+} from "@/lib/product-variants";
 
 export type ShopProduct = {
   id: string;
@@ -192,14 +196,21 @@ export function mapDbProductToShopProduct(product: ProductWithImages): ShopProdu
   );
   const mainImage =
     product.main_image_url || images[0]?.image_url || "/images/products/black-heavyweight-tee.png";
-  const colors = getJsonList<ProductColor>(product.colors, ["Black"]);
+  const savedVariants = (product.product_variants ?? []).map(normalizeVariantCombination);
+  const colors = savedVariants.length
+    ? uniqueVariantValues(savedVariants.map((variant) => variant.color))
+    : getJsonList<ProductColor>(product.colors, ["Black"]);
   const colorImageMap = Object.fromEntries(
     colors.map((color, index) => [color, images[index]?.image_url ?? mainImage]),
   );
-  const sizes = getJsonList<string>(product.sizes, ["S", "M", "L"]);
-  const genders = getJsonList<ProductGender>(product.genders, ["Unisex"]);
-  const variants = product.product_variants?.length
-    ? product.product_variants.map((variant) => ({
+  const sizes = savedVariants.length
+    ? uniqueVariantValues(savedVariants.map((variant) => variant.size))
+    : getJsonList<string>(product.sizes, ["S", "M", "L"]);
+  const genders = savedVariants.length
+    ? uniqueVariantValues<ProductGender>(savedVariants.map((variant) => variant.gender))
+    : getJsonList<ProductGender>(product.genders, ["Unisex"]);
+  const variants = savedVariants.length
+    ? savedVariants.map((variant) => ({
         id: variant.id,
         gender: variant.gender,
         size: variant.size,
@@ -224,13 +235,16 @@ export function mapDbProductToShopProduct(product: ProductWithImages): ShopProdu
         ),
       );
 
-  const soldOut = product.stock_quantity <= 0 && !product.preorder_enabled;
+  const availableStock = savedVariants.length
+    ? savedVariants.reduce((total, variant) => total + variant.stock_quantity, 0)
+    : product.stock_quantity;
+  const soldOut = product.stock_tracking_enabled && availableStock <= 0 && !product.preorder_enabled;
   const stockLabel = soldOut
     ? "SOLD OUT"
     : product.preorder_enabled
       ? "PRE ORDER"
       : product.show_stock_count
-        ? `${product.stock_quantity} LEFT`
+        ? `${availableStock} LEFT`
         : "IN STOCK";
 
   return {

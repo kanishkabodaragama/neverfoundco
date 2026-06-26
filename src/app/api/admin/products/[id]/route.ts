@@ -8,6 +8,10 @@ import {
 import { requireAdminApi } from "@/lib/admin-auth";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { productFormSchema } from "@/lib/validation/admin";
+import {
+  findDuplicateVariantKey,
+  normalizeVariantCombination,
+} from "@/lib/product-variants";
 import { slugify } from "@/lib/utils";
 
 async function updateProduct(request: Request, id: string) {
@@ -22,6 +26,13 @@ async function updateProduct(request: Request, id: string) {
 
   if (formData.get("_method") === "TOGGLE_ACTIVE") {
     return toggleProduct(request, id, formData.get("is_active") === "true");
+  }
+
+  const submittedVariants = parseVariants(formData);
+  if (findDuplicateVariantKey(submittedVariants)) {
+    return adminRedirect(request, `/admin/products/${id}/edit`, {
+      error: "Each variant must use a unique gender, color, and size combination.",
+    });
   }
 
   const parsed = productFormSchema.safeParse({
@@ -53,6 +64,16 @@ async function updateProduct(request: Request, id: string) {
   if (!parsed.success) {
     return adminRedirect(request, `/admin/products/${id}/edit`, {
       error: formatValidationError(parsed.error),
+    });
+  }
+
+  if (
+    parsed.data.stock_tracking_enabled &&
+    submittedVariants.reduce((total, variant) => total + variant.stock_quantity, 0) >
+      parsed.data.stock_quantity
+  ) {
+    return adminRedirect(request, `/admin/products/${id}/edit`, {
+      error: "Variant stock cannot be greater than total product stock.",
     });
   }
 
@@ -183,6 +204,7 @@ async function updateProduct(request: Request, id: string) {
     await syncProductVariants({
       formData,
       productId: id,
+      variants: submittedVariants,
     });
   } catch (variantError) {
     return adminRedirect(request, `/admin/products/${id}/edit`, {
@@ -275,12 +297,13 @@ async function syncReplacedGalleryImages({
 async function syncProductVariants({
   formData,
   productId,
+  variants,
 }: {
   formData: FormData;
   productId: string;
+  variants: ReturnType<typeof parseVariants>;
 }) {
   const supabase = getSupabaseAdminClient();
-  const variants = parseVariants(formData);
   const removedVariantImageIds = new Set(
     formData.getAll("remove_variant_image_ids").map(String).filter(Boolean),
   );
@@ -469,23 +492,10 @@ function parseVariants(formData: FormData) {
       unit_cost?: string;
     }>;
 
-    return dedupeVariants(variants).filter(
-      (variant) => variant.gender && variant.size && variant.color,
-    );
+    return variants
+      .map(normalizeVariantCombination)
+      .filter((variant) => variant.gender && variant.size && variant.color);
   } catch {
     return [];
   }
-}
-
-function dedupeVariants<T extends { color: string; gender: string; size: string }>(
-  variants: T[],
-) {
-  const seen = new Set<string>();
-
-  return variants.filter((variant) => {
-    const key = `${variant.gender}::${variant.color}::${variant.size}`.toLowerCase();
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
 }

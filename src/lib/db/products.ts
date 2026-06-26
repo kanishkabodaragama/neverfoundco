@@ -1,5 +1,6 @@
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { hasSupabaseServerEnv } from "@/lib/env";
+import { connection } from "next/server";
 import type { Database } from "@/types/database";
 
 export type Product = Database["public"]["Tables"]["products"]["Row"];
@@ -11,6 +12,7 @@ export type ProductWithImages = Product & {
 };
 
 export async function listActiveProducts() {
+  await connection();
   if (!hasSupabaseServerEnv()) return [];
 
   const supabase = getSupabaseAdminClient();
@@ -30,6 +32,7 @@ export async function listActiveProducts() {
 }
 
 export async function getActiveProductBySlug(slug: string) {
+  await connection();
   if (!hasSupabaseServerEnv()) return null;
 
   const supabase = getSupabaseAdminClient();

@@ -4,6 +4,10 @@ import { getImageFiles, uploadProductImageFile } from "@/lib/admin-product-media
 import { requireAdminApi } from "@/lib/admin-auth";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { productFormSchema } from "@/lib/validation/admin";
+import {
+  findDuplicateVariantKey,
+  normalizeVariantCombination,
+} from "@/lib/product-variants";
 import { slugify } from "@/lib/utils";
 
 export async function POST(request: Request) {
@@ -45,6 +49,12 @@ export async function POST(request: Request) {
 
   const supabase = getSupabaseAdminClient();
   const variantRows = parseVariants(formData);
+
+  if (findDuplicateVariantKey(variantRows)) {
+    return adminRedirect(request, "/admin/products/new", {
+      error: "Each variant must use a unique gender, color, and size combination.",
+    });
+  }
 
   if (
     parsed.data.stock_tracking_enabled &&
@@ -185,23 +195,10 @@ function parseVariants(formData: FormData) {
       unit_cost?: string;
     }>;
 
-    return dedupeVariants(variants).filter(
-      (variant) => variant.gender && variant.size && variant.color,
-    );
+    return variants
+      .map(normalizeVariantCombination)
+      .filter((variant) => variant.gender && variant.size && variant.color);
   } catch {
     return [];
   }
-}
-
-function dedupeVariants<T extends { color: string; gender: string; size: string }>(
-  variants: T[],
-) {
-  const seen = new Set<string>();
-
-  return variants.filter((variant) => {
-    const key = `${variant.gender}::${variant.color}::${variant.size}`.toLowerCase();
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
 }

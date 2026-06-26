@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 import { useCart } from "@/components/store/cart-provider";
 import { StorePrice } from "@/components/site/StorePrice";
 import type { MockProductDetail } from "@/components/site/product-detail-data";
+import { getVariantCombinationKey, uniqueVariantValues } from "@/lib/product-variants";
 
 export function ProductDetailClient({ product }: { product: MockProductDetail }) {
   const cart = useCart();
@@ -17,7 +18,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
   const [galleryStart, setGalleryStart] = useState(0);
   const [added, setAdded] = useState(false);
   const availableGenders = useMemo(
-    () => uniqueList(product.variants.map((variant) => variant.gender)),
+    () => uniqueVariantValues(product.variants.map((variant) => variant.gender)),
     [product.variants],
   );
   const selectedGender = availableGenders.includes(requestedGender)
@@ -25,7 +26,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
     : availableGenders[0] ?? requestedGender;
   const availableColors = useMemo(
     () =>
-      uniqueList(
+      uniqueVariantValues(
         product.variants
           .filter((variant) => variant.gender === selectedGender)
           .map((variant) => variant.color),
@@ -37,7 +38,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
     : availableColors[0] ?? requestedColor;
   const availableSizes = useMemo(
     () =>
-      uniqueList(
+      uniqueVariantValues(
         product.variants
           .filter(
             (variant) =>
@@ -55,15 +56,21 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
     () =>
       product.variants.find(
         (variant) =>
-          variant.gender === selectedGender &&
-          variant.color === selectedColor &&
-          variant.size === selectedSize,
+          getVariantCombinationKey(variant) ===
+          getVariantCombinationKey({
+            gender: selectedGender,
+            color: selectedColor,
+            size: selectedSize,
+          }),
       ) ?? null,
     [product.variants, selectedColor, selectedGender, selectedSize],
   );
   const displayImage = selectedVariant?.image ?? selectedImage;
   const displayPrice = selectedVariant?.price ?? product.price;
-  const isAvailable = Boolean(selectedVariant && selectedVariant.stock > 0 && !product.soldOut);
+  const isAvailable = Boolean(
+    selectedVariant &&
+      (product.preorderEnabled || !product.stockTrackingEnabled || selectedVariant.stock > 0),
+  );
   const maxGalleryStart = Math.max(0, product.gallery.length - 4);
   const displayImageIndex = product.gallery.indexOf(displayImage);
   const effectiveGalleryStart =
@@ -256,10 +263,6 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
 
 function getColorValue(color: string, swatches: Record<string, string>) {
   return swatches[color] ?? color;
-}
-
-function uniqueList<T extends string>(items: T[]) {
-  return items.filter((item, index, list) => list.indexOf(item) === index);
 }
 
 function OptionGroup({

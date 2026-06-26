@@ -8,6 +8,7 @@ import { UploadButton, UploadThumb, type UploadPreview } from "@/components/admi
 import type { ProductCategory } from "@/lib/db/categories";
 import type { ProductWithImages } from "@/lib/db/products";
 import type { VariantOption } from "@/lib/db/variant-options";
+import { getVariantCombinationKey } from "@/lib/product-variants";
 
 type Gender = "Male" | "Female" | "Unisex";
 type ProductStatus = "draft" | "published" | "inactive";
@@ -61,6 +62,7 @@ export function ProductForm({
   const [featuredRemoved, setFeaturedRemoved] = useState(false);
   const [removedGalleryImageIds, setRemovedGalleryImageIds] = useState<string[]>([]);
   const [removedVariantImageIds, setRemovedVariantImageIds] = useState<string[]>([]);
+  const [variantError, setVariantError] = useState("");
   const [colors, setColors] = useState(getJsonList(product?.colors, ["Black"]));
   const [sizes, setSizes] = useState(getJsonList(product?.sizes, ["M"]));
   const [genders, setGenders] = useState<Gender[]>(
@@ -98,10 +100,7 @@ export function ProductForm({
     [variants],
   );
   const remainingStock = Math.max(0, Number(totalStock || 0) - assignedStock);
-  const serializedVariants = useMemo(
-    () => JSON.stringify(dedupeVariants(variants)),
-    [variants],
-  );
+  const serializedVariants = useMemo(() => JSON.stringify(variants), [variants]);
   const featuredImageUrl = product?.main_image_url ?? product?.product_images?.[0]?.image_url ?? null;
 
   function generateVariants() {
@@ -129,6 +128,7 @@ export function ProductForm({
     );
 
     setVariants([...dedupedVariants, ...generated]);
+    setVariantError("");
   }
 
   function updateVariant(key: string, stock: number) {
@@ -143,6 +143,32 @@ export function ProductForm({
     setVariants((current) =>
       current.map((variant) => (variant.key === key ? { ...variant, [field]: value } : variant)),
     );
+  }
+
+  function updateVariantChoice(
+    key: string,
+    field: "gender" | "color" | "size",
+    value: string,
+  ) {
+    const nextVariants = variants.map((variant) =>
+      variant.key === key ? { ...variant, [field]: value } : variant,
+    );
+    const changedVariant = nextVariants.find((variant) => variant.key === key);
+    const duplicate = changedVariant
+      ? nextVariants.some(
+          (variant) =>
+            variant.key !== key &&
+            getVariantCombinationKey(variant) === getVariantCombinationKey(changedVariant),
+        )
+      : false;
+
+    if (duplicate) {
+      setVariantError("That gender, color, and size combination already exists.");
+      return;
+    }
+
+    setVariants(nextVariants);
+    setVariantError("");
   }
 
   return (
@@ -340,6 +366,7 @@ export function ProductForm({
                 Generate missing variants
               </button>
             ) : null}
+            {variantError ? <p className="text-sm font-semibold text-red-600">{variantError}</p> : null}
 
             <div className="overflow-x-auto rounded-md border border-[#ece7df]">
               <table className="admin-table min-w-[900px]">
@@ -348,7 +375,6 @@ export function ProductForm({
                     <th>Gender</th>
                     <th>Color</th>
                     <th>Size</th>
-                    <th>Variant SKU</th>
                     <th>Image</th>
                     <th>Stock amount</th>
                     <th>Variant price</th>
@@ -361,18 +387,49 @@ export function ProductForm({
                   {variants.length ? (
                     variants.map((variant) => (
                       <tr key={variant.key}>
-                        <td>{variant.gender}</td>
                         <td>
-                          <span className="inline-flex items-center gap-2">
+                          <select
+                            aria-label={`Gender for ${variant.key}`}
+                            className="admin-input min-w-28"
+                            onChange={(event) => updateVariantChoice(variant.key, "gender", event.target.value)}
+                            value={variant.gender}
+                          >
+                            {availableGenders.map((gender) => (
+                              <option key={gender} value={gender}>{gender}</option>
+                            ))}
+                          </select>
+                        </td>
+                        <td>
+                          <span className="flex min-w-40 items-center gap-2">
                             <span
-                              className="h-4 w-4 rounded-full border border-[#ece7df]"
+                              aria-hidden="true"
+                              className="h-4 w-4 shrink-0 rounded-full border border-[#ece7df]"
                               style={{ backgroundColor: colorSwatches[variant.color] ?? "#fff" }}
                             />
-                            {variant.color}
+                            <select
+                              aria-label={`Color for ${variant.key}`}
+                              className="admin-input min-w-32"
+                              onChange={(event) => updateVariantChoice(variant.key, "color", event.target.value)}
+                              value={variant.color}
+                            >
+                              {availableColors.map((color) => (
+                                <option key={color} value={color}>{color}</option>
+                              ))}
+                            </select>
                           </span>
                         </td>
-                        <td>{variant.size}</td>
-                        <td>{variant.sku}</td>
+                        <td>
+                          <select
+                            aria-label={`Size for ${variant.key}`}
+                            className="admin-input min-w-24"
+                            onChange={(event) => updateVariantChoice(variant.key, "size", event.target.value)}
+                            value={variant.size}
+                          >
+                            {availableSizes.map((size) => (
+                              <option key={size} value={size}>{size}</option>
+                            ))}
+                          </select>
+                        </td>
                         <td>
                           {variant.image_url && !removedVariantImageIds.includes(variant.id ?? "") ? (
                             <div className="mb-2">
@@ -417,7 +474,10 @@ export function ProductForm({
                         <td className="text-right">
                           <button
                             className="admin-secondary-action inline-flex h-9 w-9 items-center justify-center text-red-500"
-                            onClick={() => setVariants((current) => current.filter((item) => item.key !== variant.key))}
+                            onClick={() => {
+                              setVariants((current) => current.filter((item) => item.key !== variant.key));
+                              setVariantError("");
+                            }}
                             type="button"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -427,7 +487,7 @@ export function ProductForm({
                     ))
                   ) : (
                     <tr>
-                      <td className="admin-muted" colSpan={10}>
+                      <td className="admin-muted" colSpan={9}>
                         No variants generated yet.
                       </td>
                     </tr>
@@ -787,18 +847,6 @@ function dedupeVariants(variants: DraftVariant[]) {
     seen.add(key);
     return true;
   });
-}
-
-function getVariantCombinationKey({
-  color,
-  gender,
-  size,
-}: {
-  color: string;
-  gender: string;
-  size: string;
-}) {
-  return `${gender}::${color}::${size}`.toLowerCase();
 }
 
 function addUnique(items: string[], value: string) {

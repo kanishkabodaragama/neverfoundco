@@ -6,6 +6,10 @@ import {
 } from "@/components/site/shop-data";
 import { getActiveProductBySlug } from "@/lib/db/products";
 import { listVariantOptions } from "@/lib/db/variant-options";
+import {
+  normalizeVariantCombination,
+  uniqueVariantValues,
+} from "@/lib/product-variants";
 
 export type MockProductDetail = {
   id: string;
@@ -25,6 +29,8 @@ export type MockProductDetail = {
   category: string;
   shortDescription: string;
   description: string;
+  preorderEnabled?: boolean;
+  stockTrackingEnabled?: boolean;
   soldOut?: boolean;
 };
 
@@ -69,8 +75,8 @@ async function mapDbProductToDetail(product: Awaited<ReturnType<typeof getActive
   const images = [...(product.product_images ?? [])].sort(
     (a, b) => a.sort_order - b.sort_order,
   );
-  const variants = product.product_variants ?? [];
-  const variantColors = uniqueList<ProductColor>(
+  const variants = (product.product_variants ?? []).map(normalizeVariantCombination);
+  const variantColors = uniqueVariantValues<ProductColor>(
     variants.map((variant) => variant.color as ProductColor),
   );
   const colors = variants.length
@@ -82,24 +88,28 @@ async function mapDbProductToDetail(product: Awaited<ReturnType<typeof getActive
       .map((option) => [option.name, option.color_value ?? option.name]),
   );
   const sizes = variants.length
-    ? uniqueList(variants.map((variant) => variant.size))
+    ? uniqueVariantValues(variants.map((variant) => variant.size))
     : getJsonList<string>(product.sizes, ["S", "M", "L"]);
   const genders = variants.length
-    ? uniqueList<ProductGender>(variants.map((variant) => variant.gender))
+    ? uniqueVariantValues<ProductGender>(variants.map((variant) => variant.gender))
     : getJsonList<ProductGender>(product.genders, ["Unisex"]);
   const mainImage =
     product.main_image_url || images[0]?.image_url || "/images/products/black-heavyweight-tee.png";
   const colorImageMap = Object.fromEntries(
     colors.map((color, index) => [color, images[index]?.image_url ?? mainImage]),
   );
-  const soldOut = product.stock_quantity <= 0 && !product.preorder_enabled;
+  const availableStock = variants.length
+    ? variants.reduce((total, variant) => total + variant.stock_quantity, 0)
+    : product.stock_quantity;
+  const soldOut =
+    product.stock_tracking_enabled && availableStock <= 0 && !product.preorder_enabled;
   const productPrice = Number(product.sale_price ?? product.price);
   const stockLabel = soldOut
     ? "SOLD OUT"
     : product.preorder_enabled
       ? "PRE ORDER"
       : product.show_stock_count
-        ? `${product.stock_quantity} LEFT`
+        ? `${availableStock} LEFT`
         : "IN STOCK";
   const variantImageUrls = variants
     .map((variant) => variant.image_url)
@@ -153,14 +163,12 @@ async function mapDbProductToDetail(product: Awaited<ReturnType<typeof getActive
     description:
       product.description ??
       "Part of the Never Found limited catalog: premium everyday fabric, clean streetwear styling, and no-restock scarcity.",
+    preorderEnabled: product.preorder_enabled,
+    stockTrackingEnabled: product.stock_tracking_enabled,
     soldOut,
   } satisfies MockProductDetail;
 }
 
 function getJsonList<T extends string>(value: unknown, fallback: T[]) {
   return Array.isArray(value) && value.length ? (value.map(String) as T[]) : fallback;
-}
-
-function uniqueList<T extends string>(items: T[]) {
-  return items.filter((item, index, list) => list.indexOf(item) === index);
 }
