@@ -112,10 +112,10 @@ function EvidenceProductCard({
 }) {
   return (
     <Link className="group block" href={`/products/${product.slug ?? product.id}`}>
-      <div className="relative aspect-[4/5] overflow-visible bg-transparent">
+      <div className="relative aspect-[4/5] overflow-hidden bg-white">
         <Image
           alt={product.alt}
-          className="scale-[1.12] object-contain mix-blend-multiply transition-transform duration-300 group-hover:scale-[1.16]"
+          className="scale-[1.08] object-contain transition-transform duration-300 group-hover:scale-[1.12]"
           fill
           sizes="(min-width: 768px) 45vw, 50vw"
           src={product.image}
