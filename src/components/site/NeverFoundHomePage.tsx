@@ -3,19 +3,11 @@ import Link from "next/link";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
 import { StorePrice } from "@/components/site/StorePrice";
-import {
-  mapDbProductToShopProduct,
-  shopProducts,
-  type ShopProduct,
-} from "@/components/site/shop-data";
-import { listActiveProducts } from "@/lib/db/products";
+import { shopProducts, type ShopProduct } from "@/components/site/shop-data";
 
-export async function NeverFoundHomePage() {
-  const dbProducts = await listActiveProducts();
-  const featuredProducts = (
-    dbProducts.length ? dbProducts.map(mapDbProductToShopProduct) : shopProducts
-  ).slice(0, 4);
+const featuredProducts = shopProducts.slice(0, 4);
 
+export function NeverFoundHomePage() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-ink text-bone">
       <Header />
@@ -32,7 +24,7 @@ export async function NeverFoundHomePage() {
             </span>
           </div> */}
 
-          <div className="grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 md:gap-x-10 md:gap-y-16">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-6 sm:gap-y-12 md:gap-x-10 md:gap-y-16">
             {featuredProducts.map((product, index) => (
               <EvidenceProductCard index={index} key={product.id} product={product} />
             ))}
@@ -135,7 +127,7 @@ function EvidenceProductCard({
         </div>
         <Image
           alt={product.alt}
-          className="object-contain p-8"
+          className="object-contain p-4 sm:p-6 md:p-8"
           fill
           sizes="(min-width: 768px) 45vw, 90vw"
           src={product.image}
@@ -153,15 +145,15 @@ function EvidenceProductCard({
         ) : null}
       </div>
 
-      <div className="mt-4 flex items-start justify-between">
+      <div className="mt-3 flex flex-col gap-2 sm:mt-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h3 className="font-display text-xl uppercase leading-tight">{product.name}</h3>
-          <p className="mt-1 font-mono text-[11px] uppercase tracking-wide text-ink/50">
+          <h3 className="font-display text-base uppercase leading-tight sm:text-xl">{product.name}</h3>
+          <p className="mt-1 font-mono text-[9px] uppercase tracking-wide text-ink/50 sm:text-[11px]">
             {product.stockLabel}
           </p>
         </div>
-        <div className="shrink-0 pl-4 text-right">
-          <div className="font-mono text-sm font-bold">
+        <div className="shrink-0 text-left sm:pl-4 sm:text-right">
+          <div className="font-mono text-xs font-bold sm:text-sm">
             <StorePrice amountUsd={product.price} />
           </div>
           <div className={`mt-1 font-mono text-[10px] uppercase tracking-wide ${
