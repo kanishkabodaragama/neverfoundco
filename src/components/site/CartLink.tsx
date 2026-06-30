@@ -1,17 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useCart } from "@/components/store/cart-provider";
 
 export function CartLink() {
-  const cart = useCart();
-  const count = cart.items.reduce((total, item) => total + item.quantity, 0);
-
   return (
     <Link
-      className="group flex h-24 min-h-24 items-center gap-1.5 px-0 font-mono text-sm font-bold uppercase tracking-[0.2em] text-ink transition-colors hover:text-rust md:h-auto md:min-h-9 md:gap-2 md:px-3 md:text-xs"
+      className="group flex h-24 min-h-24 items-center px-0 text-ink transition-colors hover:text-rust md:h-auto md:min-h-9 md:px-3"
       href="/cart"
-      aria-label={`Cart with ${count} items`}
+      aria-label="Cart"
     >
       <svg
         aria-hidden="true"
@@ -39,7 +35,6 @@ export function CartLink() {
           strokeWidth="1.6"
         />
       </svg>
-      <span className="min-w-4 text-center">{count}</span>
     </Link>
   );
 }
