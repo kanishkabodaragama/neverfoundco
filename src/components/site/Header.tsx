@@ -26,14 +26,42 @@ export function SiteHeader({
 
   return (
     <header className="sticky top-0 z-40 border-b border-ink/15 bg-acid/95 text-ink backdrop-blur">
-      <div className="flex min-h-24 items-center justify-between px-5 py-3 md:min-h-28 md:px-8">
-        <Link aria-label="Never Found home" className="relative block h-16 w-32 md:h-20 md:w-40" href="/">
+      <div className="relative flex min-h-28 items-center justify-between px-5 py-3 md:min-h-28 md:px-8">
+        <button
+          aria-expanded={open}
+          aria-label={open ? "Close menu" : "Open menu"}
+          className="relative z-10 flex h-6 w-8 flex-col justify-between md:hidden"
+          onClick={() => setOpen((value) => !value)}
+          type="button"
+        >
+          <span
+            className={`h-0.5 w-full origin-left bg-ink transition-transform ${
+              open ? "translate-x-px rotate-45" : ""
+            }`}
+          />
+          <span
+            className={`h-0.5 w-full bg-ink transition-opacity ${
+              open ? "opacity-0" : ""
+            }`}
+          />
+          <span
+            className={`h-0.5 w-full origin-left bg-ink transition-transform ${
+              open ? "-rotate-45" : ""
+            }`}
+          />
+        </button>
+
+        <Link
+          aria-label="Never Found home"
+          className="absolute left-1/2 top-1/2 block h-20 w-40 -translate-x-1/2 -translate-y-1/2 md:static md:h-20 md:w-40 md:translate-x-0 md:translate-y-0"
+          href="/"
+        >
           <Image
             alt="Never Found"
-            className="object-contain object-left"
+            className="object-contain object-center md:object-left"
             fill
             priority
-            sizes="(min-width: 768px) 160px, 128px"
+            sizes="(min-width: 768px) 160px, 160px"
             src="/images/brand/logo-nvr-fnd.png"
           />
         </Link>
@@ -66,29 +94,9 @@ export function SiteHeader({
           <CartLink />
         </div>
 
-        <button
-          aria-expanded={open}
-          aria-label={open ? "Close menu" : "Open menu"}
-          className="relative flex h-6 w-8 flex-col justify-between md:hidden"
-          onClick={() => setOpen((value) => !value)}
-          type="button"
-        >
-          <span
-            className={`h-0.5 w-full origin-left bg-ink transition-transform ${
-              open ? "translate-x-px rotate-45" : ""
-            }`}
-          />
-          <span
-            className={`h-0.5 w-full bg-ink transition-opacity ${
-              open ? "opacity-0" : ""
-            }`}
-          />
-          <span
-            className={`h-0.5 w-full origin-left bg-ink transition-transform ${
-              open ? "-rotate-45" : ""
-            }`}
-          />
-        </button>
+        <div className="relative z-10 md:hidden">
+          <CartLink />
+        </div>
       </div>
 
       {open ? (
