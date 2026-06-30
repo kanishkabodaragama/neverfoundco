@@ -3,11 +3,19 @@ import Link from "next/link";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
 import { StorePrice } from "@/components/site/StorePrice";
-import { shopProducts, type ShopProduct } from "@/components/site/shop-data";
+import {
+  mapDbProductToShopProduct,
+  shopProducts,
+  type ShopProduct,
+} from "@/components/site/shop-data";
+import { listActiveProducts } from "@/lib/db/products";
 
-const featuredProducts = shopProducts.slice(0, 4);
+export async function NeverFoundHomePage() {
+  const dbProducts = await listActiveProducts();
+  const featuredProducts = (
+    dbProducts.length ? dbProducts.map(mapDbProductToShopProduct) : shopProducts
+  ).slice(0, 4);
 
-export function NeverFoundHomePage() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-ink text-bone">
       <Header />
