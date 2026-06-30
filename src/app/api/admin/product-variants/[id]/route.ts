@@ -1,4 +1,5 @@
 import { adminRedirect } from "@/lib/admin-forms";
+import { tryRemoveProductImageStoragePaths } from "@/lib/admin-product-media";
 import { requireAdminApi } from "@/lib/admin-auth";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { productVariantSchema } from "@/lib/validation/admin";
@@ -7,7 +8,7 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const auth = await requireAdminApi();
+  const auth = await requireAdminApi(request);
   if (auth.response) return auth.response;
 
   const { id } = await params;
@@ -16,8 +17,16 @@ export async function POST(
   const supabase = getSupabaseAdminClient();
 
   if (formData.get("_method") === "DELETE") {
+    const { data: variant, error: variantError } = await supabase
+      .from("product_variants")
+      .select("storage_path")
+      .eq("id", id)
+      .maybeSingle();
+    if (variantError) return adminRedirect(request, redirectTo, { error: variantError.message });
+
     const { error } = await supabase.from("product_variants").delete().eq("id", id);
     if (error) return adminRedirect(request, redirectTo, { error: error.message });
+    await tryRemoveProductImageStoragePaths([variant?.storage_path]);
     return adminRedirect(request, redirectTo, { success: "Variant deleted." });
   }
 

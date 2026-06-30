@@ -37,6 +37,23 @@ export async function uploadProductImageFile({
   };
 }
 
+export async function removeProductImageStoragePaths(paths: Array<string | null | undefined>) {
+  const storagePaths = paths.filter((path): path is string => Boolean(path));
+  if (!storagePaths.length) return;
+
+  const supabase = getSupabaseAdminClient();
+  const { error } = await supabase.storage.from("product-images").remove(storagePaths);
+  if (error) throw new Error(error.message);
+}
+
+export async function tryRemoveProductImageStoragePaths(paths: Array<string | null | undefined>) {
+  try {
+    await removeProductImageStoragePaths(paths);
+  } catch {
+    // The database row is the source of truth; stale storage cleanup must not fail a saved product.
+  }
+}
+
 export function getImageFiles(formData: FormData, name: string) {
   return formData
     .getAll(name)

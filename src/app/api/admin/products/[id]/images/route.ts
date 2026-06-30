@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import { adminRedirect } from "@/lib/admin-forms";
+import { removeProductImageStoragePaths, uploadProductImageFile } from "@/lib/admin-product-media";
 import { requireAdminApi } from "@/lib/admin-auth";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { productImageSchema } from "@/lib/validation/admin";
@@ -8,7 +8,7 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const auth = await requireAdminApi();
+  const auth = await requireAdminApi(request);
   if (auth.response) return auth.response;
 
   const { id } = await params;
@@ -22,34 +22,25 @@ export async function POST(
     | null = null;
 
   if (file instanceof File && file.size > 0) {
-    if (file.size > 2 * 1024 * 1024) {
+    try {
+      const uploaded = await uploadProductImageFile({
+        file,
+        productId: id,
+        prefix: "gallery",
+      });
+
+      uploadedImage = {
+        image_url: uploaded.imageUrl,
+        storage_path: uploaded.storagePath,
+      };
+    } catch (uploadError) {
       return adminRedirect(request, `/admin/products/${id}/edit`, {
-        error: "Image must be 2 MB or smaller.",
+        error:
+          uploadError instanceof Error
+            ? uploadError.message
+            : "Image upload failed.",
       });
     }
-
-    const extension = file.name.split(".").pop() || "jpg";
-    const storagePath = `${id}/${crypto.randomUUID()}.${extension}`;
-    const supabase = getSupabaseAdminClient();
-    const { error: uploadError } = await supabase.storage
-      .from("product-images")
-      .upload(storagePath, file, {
-        contentType: file.type,
-        upsert: false,
-      });
-
-    if (uploadError) {
-      return NextResponse.json({ error: uploadError.message }, { status: 400 });
-    }
-
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("product-images").getPublicUrl(storagePath);
-
-    uploadedImage = {
-      image_url: publicUrl,
-      storage_path: storagePath,
-    };
   }
 
   const parsed = productImageSchema.safeParse({
@@ -61,6 +52,7 @@ export async function POST(
   });
 
   if (!parsed.success) {
+    await removeProductImageStoragePaths([uploadedImage?.storage_path]);
     return adminRedirect(request, `/admin/products/${id}/edit`, {
       error: parsed.error.issues[0]?.message ?? "Invalid image details.",
     });
@@ -79,6 +71,7 @@ export async function POST(
   });
 
   if (error) {
+    await removeProductImageStoragePaths([uploadedImage?.storage_path]);
     return adminRedirect(request, `/admin/products/${id}/edit`, {
       error: error.message,
     });

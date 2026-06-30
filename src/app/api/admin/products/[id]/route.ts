@@ -3,6 +3,8 @@ import { adminRedirect, getErrorMessage } from "@/lib/admin-forms";
 import {
   getImageFiles,
   getProductImageStoragePathFromUrl,
+  removeProductImageStoragePaths,
+  tryRemoveProductImageStoragePaths,
   uploadProductImageFile,
 } from "@/lib/admin-product-media";
 import { requireAdminApi } from "@/lib/admin-auth";
@@ -82,11 +84,17 @@ async function updateProduct(request: Request, id: string) {
     ...parsed.data,
   };
   const removeFeaturedImage = formData.get("remove_featured_image") === "true";
-  const { data: currentMedia } = await supabase
+  const { data: currentMedia, error: currentMediaError } = await supabase
     .from("products")
     .select("main_image_url, product_images(image_url)")
     .eq("id", id)
     .maybeSingle();
+  if (currentMediaError) {
+    return adminRedirect(request, `/admin/products/${id}/edit`, {
+      error: currentMediaError.message,
+    });
+  }
+
   const galleryImageUrls = new Set(
     (currentMedia?.product_images ?? []).map((image) => image.image_url),
   );
@@ -132,7 +140,7 @@ async function updateProduct(request: Request, id: string) {
   }
 
   if (featuredStoragePathToRemove) {
-    await supabase.storage.from("product-images").remove([featuredStoragePathToRemove]);
+    await tryRemoveProductImageStoragePaths([featuredStoragePathToRemove]);
   }
 
   try {
@@ -153,15 +161,20 @@ async function updateProduct(request: Request, id: string) {
   try {
     const galleryFiles = getImageFiles(formData, "gallery_files");
     if (galleryFiles.length) {
-      const { count } = await supabase
+      const { count, error: countError } = await supabase
         .from("product_images")
         .select("*", { count: "exact", head: true })
         .eq("product_id", id);
-      const { data: existingProduct } = await supabase
+      if (countError) throw countError;
+
+      const { data: existingProduct, error: existingProductError } = await supabase
         .from("products")
         .select("main_image_url")
         .eq("id", id)
         .maybeSingle();
+      if (existingProductError) throw existingProductError;
+
+      const uploadedStoragePaths: string[] = [];
       const rows = await Promise.all(
         galleryFiles.map(async (file, index) => {
           const uploaded = await uploadProductImageFile({
@@ -169,6 +182,7 @@ async function updateProduct(request: Request, id: string) {
             productId: id,
             prefix: "gallery",
           });
+          uploadedStoragePaths.push(uploaded.storagePath);
 
           return {
             product_id: id,
@@ -180,13 +194,18 @@ async function updateProduct(request: Request, id: string) {
         }),
       );
 
-      await supabase.from("product_images").insert(rows);
+      const { error: galleryInsertError } = await supabase.from("product_images").insert(rows);
+      if (galleryInsertError) {
+        await removeProductImageStoragePaths(uploadedStoragePaths);
+        throw galleryInsertError;
+      }
 
       if (!existingProduct?.main_image_url && (count ?? 0) === 0 && rows[0]?.image_url) {
-        await supabase
+        const { error: mainImageError } = await supabase
           .from("products")
           .update({ main_image_url: rows[0].image_url })
           .eq("id", id);
+        if (mainImageError) throw mainImageError;
       }
     }
   } catch (uploadError) {
@@ -256,12 +275,7 @@ async function syncReplacedGalleryImages({
         .eq("id", imageId);
       if (deleteError) throw deleteError;
 
-      if (existingImage.storage_path) {
-        const { error: removeError } = await supabase.storage
-          .from("product-images")
-          .remove([existingImage.storage_path]);
-        if (removeError) throw removeError;
-      }
+      await tryRemoveProductImageStoragePaths([existingImage.storage_path]);
 
       continue;
     }
@@ -281,14 +295,12 @@ async function syncReplacedGalleryImages({
       })
       .eq("id", imageId);
 
-    if (updateError) throw updateError;
-
-    if (existingImage.storage_path) {
-      const { error: removeError } = await supabase.storage
-        .from("product-images")
-        .remove([existingImage.storage_path]);
-      if (removeError) throw removeError;
+    if (updateError) {
+      await removeProductImageStoragePaths([uploaded.storagePath]);
+      throw updateError;
     }
+
+    await tryRemoveProductImageStoragePaths([existingImage.storage_path]);
   }
 }
 
@@ -336,11 +348,7 @@ async function syncProductVariants({
     if (deleteError) throw deleteError;
 
     if (removedStoragePaths.length) {
-      const { error: removeError } = await supabase.storage
-        .from("product-images")
-        .remove(removedStoragePaths);
-
-      if (removeError) throw removeError;
+      await tryRemoveProductImageStoragePaths(removedStoragePaths);
     }
   }
 
@@ -382,21 +390,23 @@ async function syncProductVariants({
         .from("product_variants")
         .update(payload)
         .eq("id", variant.id);
-      if (error) throw error;
+      if (error) {
+        await removeProductImageStoragePaths([uploaded?.storagePath]);
+        throw error;
+      }
 
       if ((uploaded || removeVariantImage) && existingVariant?.storage_path) {
-        const { error: removeError } = await supabase.storage
-          .from("product-images")
-          .remove([existingVariant.storage_path]);
-
-        if (removeError) throw removeError;
+        await tryRemoveProductImageStoragePaths([existingVariant.storage_path]);
       }
 
       continue;
     }
 
     const { error } = await supabase.from("product_variants").insert(payload);
-    if (error) throw error;
+    if (error) {
+      await removeProductImageStoragePaths([uploaded?.storagePath]);
+      throw error;
+    }
   }
 }
 

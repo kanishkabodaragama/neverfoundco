@@ -5,9 +5,13 @@ import { Header } from "@/components/site/Header";
 import { StorePrice } from "@/components/site/StorePrice";
 import { shopProducts, type ShopProduct } from "@/components/site/shop-data";
 
-const featuredProducts = shopProducts.slice(0, 4);
+export function NeverFoundHomePage({
+  products = shopProducts,
+}: {
+  products?: ShopProduct[];
+}) {
+  const featuredProducts = products.slice(0, 4);
 
-export function NeverFoundHomePage() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-ink text-bone">
       <Header />

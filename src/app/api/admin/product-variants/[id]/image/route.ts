@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 import { adminRedirect } from "@/lib/admin-forms";
+import {
+  removeProductImageStoragePaths,
+  tryRemoveProductImageStoragePaths,
+} from "@/lib/admin-product-media";
 import { requireAdminApi } from "@/lib/admin-auth";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 
@@ -9,18 +13,18 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const auth = await requireAdminApi();
+  const requestUrl = new URL(request.url);
+  const wantsJson = request.headers.get("accept")?.includes("application/json");
+  const auth = await requireAdminApi(wantsJson ? undefined : request);
   if (auth.response) return auth.response;
 
   const { id } = await params;
   const formData = await request.formData();
-  const requestUrl = new URL(request.url);
   const redirectTo = String(
     formData.get("redirect_to") ??
       requestUrl.searchParams.get("redirect_to") ??
       "/admin/products",
   );
-  const wantsJson = request.headers.get("accept")?.includes("application/json");
   const file = formData.get("file");
 
   if (!(file instanceof File) || file.size === 0) {
@@ -66,7 +70,7 @@ export async function POST(
     .single();
 
   if (variantError || !variant) {
-    await supabase.storage.from("product-images").remove([storagePath]);
+    await removeProductImageStoragePaths([storagePath]);
     const message = variantError?.message ?? "Variant not found.";
     if (wantsJson) return NextResponse.json({ error: message }, { status: 404 });
     return adminRedirect(request, redirectTo, { error: message });
@@ -81,13 +85,13 @@ export async function POST(
     .eq("id", id);
 
   if (error) {
-    await supabase.storage.from("product-images").remove([storagePath]);
+    await removeProductImageStoragePaths([storagePath]);
     if (wantsJson) return NextResponse.json({ error: error.message }, { status: 400 });
     return adminRedirect(request, redirectTo, { error: error.message });
   }
 
   if (variant.storage_path) {
-    await supabase.storage.from("product-images").remove([variant.storage_path]);
+    await tryRemoveProductImageStoragePaths([variant.storage_path]);
   }
 
   if (wantsJson) {

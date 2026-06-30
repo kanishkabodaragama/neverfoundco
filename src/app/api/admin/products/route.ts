@@ -1,6 +1,10 @@
 import { ZodError } from "zod";
 import { adminRedirect, getErrorMessage } from "@/lib/admin-forms";
-import { getImageFiles, uploadProductImageFile } from "@/lib/admin-product-media";
+import {
+  getImageFiles,
+  removeProductImageStoragePaths,
+  uploadProductImageFile,
+} from "@/lib/admin-product-media";
 import { requireAdminApi } from "@/lib/admin-auth";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { productFormSchema } from "@/lib/validation/admin";
@@ -87,14 +91,19 @@ export async function POST(request: Request) {
       });
       uploadedFeaturedImageUrl = uploaded.imageUrl;
 
-      await supabase
+      const { error: featuredUpdateError } = await supabase
         .from("products")
         .update({ main_image_url: uploaded.imageUrl })
         .eq("id", product.id);
+      if (featuredUpdateError) {
+        await removeProductImageStoragePaths([uploaded.storagePath]);
+        throw featuredUpdateError;
+      }
     }
 
     const galleryFiles = getImageFiles(formData, "gallery_files");
     if (galleryFiles.length) {
+      const galleryStoragePaths: string[] = [];
       const rows = await Promise.all(
         galleryFiles.map(async (file, index) => {
           const uploaded = await uploadProductImageFile({
@@ -102,6 +111,7 @@ export async function POST(request: Request) {
             productId: product.id,
             prefix: "gallery",
           });
+          galleryStoragePaths.push(uploaded.storagePath);
 
           return {
             product_id: product.id,
@@ -113,17 +123,23 @@ export async function POST(request: Request) {
         }),
       );
 
-      await supabase.from("product_images").insert(rows);
+      const { error: galleryInsertError } = await supabase.from("product_images").insert(rows);
+      if (galleryInsertError) {
+        await removeProductImageStoragePaths(galleryStoragePaths);
+        throw galleryInsertError;
+      }
 
       if (!uploadedFeaturedImageUrl && rows[0]?.image_url) {
-        await supabase
+        const { error: fallbackFeaturedError } = await supabase
           .from("products")
           .update({ main_image_url: rows[0].image_url })
           .eq("id", product.id);
+        if (fallbackFeaturedError) throw fallbackFeaturedError;
       }
     }
 
     if (variantRows.length) {
+      const variantStoragePaths: string[] = [];
       const variantInsertRows = await Promise.all(
         variantRows.map(async (variant) => {
           const variantFile = getImageFiles(formData, `variant_image_${variant.key}`)[0];
@@ -134,6 +150,7 @@ export async function POST(request: Request) {
                 prefix: `variant-${variant.key}`,
               })
             : null;
+          if (uploaded) variantStoragePaths.push(uploaded.storagePath);
 
           return {
             product_id: product.id,
@@ -150,14 +167,20 @@ export async function POST(request: Request) {
         }),
       );
 
-      await supabase.from("product_variants").insert(variantInsertRows);
+      const { error: variantInsertError } = await supabase
+        .from("product_variants")
+        .insert(variantInsertRows);
+      if (variantInsertError) {
+        await removeProductImageStoragePaths(variantStoragePaths);
+        throw variantInsertError;
+      }
     }
   } catch (uploadError) {
     return adminRedirect(request, `/admin/products/${product.id}/edit`, {
       error:
         uploadError instanceof Error
           ? uploadError.message
-          : "Product created, but image upload failed.",
+          : "Product created, but media or variant sync failed.",
     });
   }
 

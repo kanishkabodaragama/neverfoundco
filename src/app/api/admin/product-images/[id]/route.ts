@@ -1,21 +1,23 @@
 import { NextResponse } from "next/server";
 import { adminRedirect } from "@/lib/admin-forms";
+import { tryRemoveProductImageStoragePaths } from "@/lib/admin-product-media";
 import { requireAdminApi } from "@/lib/admin-auth";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 
 async function deleteImage(request: Request, id: string, redirectTo?: string) {
-  const auth = await requireAdminApi();
+  const auth = await requireAdminApi(request);
   if (auth.response) return auth.response;
 
   const supabase = getSupabaseAdminClient();
-  const { data: image } = await supabase
+  const { data: image, error: imageError } = await supabase
     .from("product_images")
     .select("storage_path")
     .eq("id", id)
     .maybeSingle();
 
-  if (image?.storage_path) {
-    await supabase.storage.from("product-images").remove([image.storage_path]);
+  if (imageError) {
+    if (redirectTo) return adminRedirect(request, redirectTo, { error: imageError.message });
+    return NextResponse.json({ error: imageError.message }, { status: 400 });
   }
 
   const { error } = await supabase.from("product_images").delete().eq("id", id);
@@ -24,6 +26,8 @@ async function deleteImage(request: Request, id: string, redirectTo?: string) {
     if (redirectTo) return adminRedirect(request, redirectTo, { error: error.message });
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
+
+  await tryRemoveProductImageStoragePaths([image?.storage_path]);
 
   if (redirectTo) return adminRedirect(request, redirectTo, { success: "Image deleted." });
   return NextResponse.json({ ok: true });
@@ -35,7 +39,7 @@ async function updateImage(
   redirectTo: string,
   formData: FormData,
 ) {
-  const auth = await requireAdminApi();
+  const auth = await requireAdminApi(request);
   if (auth.response) return auth.response;
 
   const supabase = getSupabaseAdminClient();

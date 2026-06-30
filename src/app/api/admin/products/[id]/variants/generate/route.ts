@@ -6,7 +6,7 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const auth = await requireAdminApi();
+  const auth = await requireAdminApi(request);
   if (auth.response) return auth.response;
 
   const { id } = await params;
