@@ -150,14 +150,14 @@ export function CartItems() {
   }
 
   return (
-    <section className="grid w-full gap-6 bg-[#F7F1E6] px-5 py-8 md:px-8 lg:grid-cols-[1fr_340px] xl:px-12">
+    <section className="grid w-full gap-8 bg-bone px-5 py-16 text-ink md:px-8 lg:grid-cols-[1fr_360px] xl:px-12">
       <div className="space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <h1 className="font-pixel text-2xl font-black uppercase md:text-3xl">
+          <h1 className="font-display text-5xl uppercase leading-none md:text-7xl">
             Your Items ({items.length})
           </h1>
           <button
-            className="text-sm font-black uppercase text-[#F05267] transition hover:text-[#10131A]"
+            className="font-mono text-xs font-bold uppercase tracking-[0.28em] text-rust transition hover:text-ink"
             onClick={cart.clearCart}
             type="button"
           >

@@ -1,114 +1,152 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CartLink } from "@/components/site/CartLink";
-import { CurrencySelector } from "@/components/site/CurrencySelector";
-import { ScrollHeader } from "@/components/site/ScrollHeader";
+import { Footer } from "@/components/site/Footer";
+import { Header } from "@/components/site/Header";
 import { StorePrice } from "@/components/site/StorePrice";
+import { Ticker } from "@/components/site/Ticker";
 import { shopProducts, type ShopProduct } from "@/components/site/shop-data";
 
 const featuredProducts = shopProducts.slice(0, 4);
 
 export function NeverFoundHomePage() {
   return (
-    <div className="min-h-screen bg-[#070B12] text-[#F7F1E6]">
+    <div className="min-h-screen overflow-x-hidden bg-ink text-bone">
       <Header />
+      <Ticker />
       <main>
-        <section className="relative min-h-[760px] overflow-hidden bg-[#F7F1E6] text-[#10131A]">
-          <Image
-            alt="Pixel character standing on a cliff looking at a city skyline"
-            className="object-cover object-[62%_center]"
-            fill
-            priority
-            sizes="100vw"
-            src="/images/arcade/hero-city.png"
-          />
-          <div className="relative z-10 grid min-h-[760px] w-full gap-10 px-6 py-12 md:px-10 lg:grid-cols-[0.82fr_1.18fr] lg:px-16">
-            <div className="relative z-10 flex flex-col justify-center">
-              <p className="font-pixel text-sm text-[#F05267] md:text-base">
-                1UP &hearts; &hearts; &hearts;
+        <section id="top" className="relative overflow-hidden bg-acid text-ink">
+          <div className="px-5 pb-8 pt-10 md:px-8 md:pb-12 md:pt-16">
+            <div className="mb-6 flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.28em] md:mb-10">
+              <span>Case file / SS26</span>
+              <span>{featuredProducts.length.toString().padStart(2, "0")} items · open</span>
+            </div>
+
+            <h1 className="-ml-1 font-display uppercase leading-[0.82]">
+              <span className="block text-[20vw] md:text-[9rem] lg:text-[11rem]">
+                NEVER
+              </span>
+              <span className="ml-[12vw] block text-[20vw] md:ml-32 md:text-[9rem] lg:text-[11rem]">
+                FOUND
+              </span>
+            </h1>
+
+            <div className="mt-8 flex flex-col gap-6 md:mt-10 md:flex-row md:items-end md:justify-between">
+              <p className="max-w-xs font-body text-sm leading-snug md:text-base">
+                Streetwear made to disappear. Every drop runs once, in small
+                count, then it is gone: untraceable, unrestocked, never found again.
               </p>
-              <h1 className="font-pixel mt-10 text-[clamp(4.2rem,10vw,9.5rem)] font-black uppercase leading-[0.86]">
-                Never
-                <br />
-                Found
-              </h1>
-              <p className="font-pixel mt-8 max-w-sm text-lg uppercase leading-relaxed">
-                Lost since 1999
-                <br />
-                Found by nobody
-              </p>
-              <div className="mt-9 flex flex-wrap items-center gap-8">
+
+              <div className="flex shrink-0 gap-3">
                 <Link
-                  className="pixel-edge bg-[#F05267] px-7 py-4 text-sm font-black uppercase text-[#FFF9EF] transition hover:translate-x-0.5"
+                  className="bg-ink px-6 py-4 text-center font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid transition-colors hover:bg-bone hover:text-ink"
                   href="/shop"
                 >
-                  ▶ Start game
+                  View drop
                 </Link>
                 <Link
-                  className="text-sm font-black uppercase text-[#10131A] transition hover:translate-x-0.5"
+                  className="border border-ink px-6 py-4 text-center font-mono text-xs font-bold uppercase tracking-[0.28em] transition-colors hover:bg-ink hover:text-acid"
                   href="/about"
                 >
-                  › View archive
+                  The story
                 </Link>
               </div>
             </div>
-            <div className="relative min-h-[420px] self-end lg:min-h-[620px]">
-              <PixelStar className="left-[12%] top-[14%]" />
-              <PixelStar className="right-[10%] top-[28%]" />
-              <PixelStar className="left-[28%] top-[42%]" />
-            </div>
           </div>
-          <div className="h-8 bg-[#070B12]" />
+
+          <div
+            className="h-3 w-full"
+            style={{
+              backgroundImage:
+                "repeating-linear-gradient(90deg, var(--color-ink) 0 6px, transparent 6px 14px)",
+            }}
+          />
         </section>
 
-        <section className="bg-[#070B12] px-6 py-10 md:px-10 lg:px-16">
-          <div className="w-full">
-            <div className="flex items-center justify-between gap-4">
-              <h2 className="font-pixel text-sm uppercase text-[#FFF9EF]">
-                <span className="pixel-blink mr-3 text-[#F05267]">▣</span>
-                Level 01
-              </h2>
-              <Link className="font-pixel text-sm uppercase hover:text-[#F05267]" href="/shop">
-                View all ›
-              </Link>
-            </div>
-            <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-              {featuredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+        <section className="bg-ink px-5 py-16 md:px-8 md:py-28">
+          <div className="mb-6 font-mono text-[11px] uppercase tracking-[0.28em] text-acid">
+            Evidence log / 01
+          </div>
+
+          <p className="text-stroke font-display text-[12vw] uppercase leading-[0.95] md:max-w-4xl md:text-6xl lg:text-7xl">
+            We do not restock. We do not archive. Wear it before it disappears.
+          </p>
+
+          <div className="mt-10 grid max-w-3xl grid-cols-2 gap-6 border-t border-acid/15 pt-8 md:grid-cols-4 md:gap-10">
+            {[
+              ["50", "units per drop"],
+              ["0", "restocks, ever"],
+              ["1", "drop a month"],
+              ["∞", "ways to wear it"],
+            ].map(([num, label]) => (
+              <div key={label}>
+                <div className="font-display text-3xl leading-none text-acid md:text-4xl">
+                  {num}
+                </div>
+                <div className="mt-2 font-mono text-[10px] uppercase tracking-wide text-bone/60 md:text-xs">
+                  {label}
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
-        <section className="bg-[#B8A8E8] px-6 py-12 text-[#10131A] md:px-10 lg:px-16">
-          <div className="grid w-full items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
-            <div>
-              <p className="text-sm font-black uppercase">{"// About"}</p>
-              <h2 className="font-pixel mt-8 max-w-2xl text-2xl font-black uppercase leading-tight md:text-3xl">
-                We document
-                <br />
-                the unnoticed_
-              </h2>
-              <p className="mt-7 max-w-md text-base leading-relaxed">
-                The streets. The noise. The culture that never made it to the
-                map. This is Never Found.
-              </p>
-              <Link className="mt-8 inline-block text-sm font-black uppercase" href="/about">
-                Read more →
-              </Link>
+        <section className="bg-bone px-5 py-16 text-ink md:px-8 md:py-24">
+          <div className="mb-10 flex items-end justify-between md:mb-14">
+            <h2 className="font-display text-4xl uppercase leading-none md:text-6xl">
+              Current
+              <br />
+              drop
+            </h2>
+            <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-ink/50">
+              {featuredProducts.length.toString().padStart(2, "0")} / {featuredProducts.length.toString().padStart(2, "0")} logged
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 md:gap-x-10 md:gap-y-16">
+            {featuredProducts.map((product, index) => (
+              <EvidenceProductCard index={index} key={product.id} product={product} />
+            ))}
+          </div>
+
+          <div className="mt-14 text-center">
+            <Link
+              className="inline-block bg-ink px-8 py-4 font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid transition-colors hover:bg-rust hover:text-ink"
+              href="/shop"
+            >
+              View full case file
+            </Link>
+          </div>
+        </section>
+
+        <section className="bg-ink px-5 py-16 md:px-8 md:py-24">
+          <div className="border border-acid/30 p-6 md:p-12">
+            <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.28em] text-acid">
+              Status: next drop pending
             </div>
-            <div className="relative min-h-[320px]">
-              <Image
-                alt="Pixel planet illustration"
-                className="object-contain"
-                fill
-                sizes="(min-width: 1024px) 560px, 100vw"
-                src="/images/arcade/pixel-planet.png"
+            <h2 className="max-w-2xl font-display text-4xl uppercase leading-[0.9] md:text-6xl">
+              Get found first. Get notified before it is gone.
+            </h2>
+
+            <form className="mt-8 flex max-w-lg flex-col gap-3 sm:flex-row">
+              <label htmlFor="home-email" className="sr-only">
+                Email address
+              </label>
+              <input
+                className="flex-1 border border-bone/30 bg-transparent px-4 py-4 font-mono text-sm text-bone outline-none placeholder:text-bone/40 focus:border-acid"
+                id="home-email"
+                placeholder="your@email.com"
+                type="email"
               />
-              <p className="font-pixel absolute bottom-0 right-0 border border-[#10131A] px-6 py-3 text-xs uppercase">
-                Location: unknown
-              </p>
-            </div>
+              <button
+                className="whitespace-nowrap bg-acid px-6 py-4 font-mono text-xs font-bold uppercase tracking-[0.28em] text-ink transition-colors hover:bg-bone"
+                type="button"
+              >
+                Notify me
+              </button>
+            </form>
+            <p className="mt-3 font-mono text-[10px] uppercase tracking-wide text-bone/40">
+              No spam. Just drop alerts. Unsubscribe anytime.
+            </p>
           </div>
         </section>
       </main>
@@ -117,115 +155,64 @@ export function NeverFoundHomePage() {
   );
 }
 
-function Header() {
-  return (
-    <ScrollHeader>
-      <div className="flex min-h-[86px] w-full items-center justify-between gap-4 px-6 md:px-10 lg:px-16">
-        <Link className="font-pixel text-2xl font-black leading-none" href="/">
-          never
-          <br />
-          found
-        </Link>
-        <nav className="font-pixel hidden items-center gap-10 text-sm uppercase md:flex">
-          {["Home", "Shop", "About", "Contact"].map((item, index) => (
-            <Link
-              className={`relative py-2 transition hover:text-[#F05267] ${
-                index === 0 ? "text-[#F05267] after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:bg-[#F05267]" : ""
-              }`}
-              href={item === "Home" ? "/" : `/${item.toLowerCase()}`}
-              key={item}
-            >
-              {item}
-            </Link>
-          ))}
-        </nav>
-        <div className="flex items-center gap-4">
-          <CurrencySelector />
-          <Link className="font-pixel text-sm uppercase transition hover:text-[#F05267]" href="/account/login">
-            Login
-          </Link>
-          <CartLink />
-        </div>
-      </div>
-    </ScrollHeader>
-  );
-}
+function EvidenceProductCard({
+  index,
+  product,
+}: {
+  index: number;
+  product: ShopProduct;
+}) {
+  const exhibit = ["A", "B", "C", "D"][index] ?? String(index + 1);
+  const rotate = ["-rotate-2", "rotate-1", "-rotate-1", "rotate-2"][index % 4];
 
-function ProductCard({ product }: { product: ShopProduct }) {
   return (
-    <Link
-      className="group block bg-[#FFF9EF] p-5 text-[#10131A] transition hover:-translate-y-1"
-      href={`/products/${product.id}`}
-    >
-      <div className="relative aspect-square">
-        <span className="absolute left-0 top-0 z-10 bg-[#B8A8E8] px-3 py-1 text-xs font-black uppercase">
-          {product.stockLabel}
-        </span>
+    <Link className="group block" href={`/products/${product.slug ?? product.id}`}>
+      <div
+        className={`relative aspect-[4/5] overflow-hidden bg-ink transition-transform duration-300 group-hover:rotate-0 ${rotate}`}
+      >
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="select-none font-display text-7xl uppercase text-acid/15">
+            NF
+          </span>
+        </div>
         <Image
           alt={product.alt}
           className="object-contain p-8"
           fill
-          sizes="(min-width: 1280px) 300px, (min-width: 640px) 44vw, 90vw"
+          sizes="(min-width: 768px) 45vw, 90vw"
           src={product.image}
+          unoptimized
         />
+        <div className="absolute left-3 top-3 bg-acid px-2 py-1 font-mono text-[10px] uppercase tracking-[0.28em] text-ink">
+          Exhibit {exhibit}
+        </div>
+        {product.soldOut ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-ink/70">
+            <span className="border border-bone/40 px-3 py-1 font-mono text-xs uppercase tracking-[0.28em] text-bone">
+              Never found again
+            </span>
+          </div>
+        ) : null}
       </div>
-      <h3 className="font-pixel mt-5 text-sm uppercase">{product.name}</h3>
-      <p className="mt-3 font-black"><StorePrice amountUsd={product.price} /></p>
-      <div className="mt-5 flex items-center justify-between">
-        <span className="text-[#F05267]">♥♥♥</span>
-        <span>→</span>
+
+      <div className="mt-4 flex items-start justify-between">
+        <div>
+          <h3 className="font-display text-xl uppercase leading-tight">{product.name}</h3>
+          <p className="mt-1 font-mono text-[11px] uppercase tracking-wide text-ink/50">
+            {product.stockLabel}
+          </p>
+        </div>
+        <div className="shrink-0 pl-4 text-right">
+          <div className="font-mono text-sm font-bold">
+            <StorePrice amountUsd={product.price} />
+          </div>
+          <div className={`mt-1 font-mono text-[10px] uppercase tracking-wide ${
+            product.soldOut ? "text-rust" : "text-ink/50"
+          }`}>
+            {product.soldOut ? "Sold out" : "Open"}
+          </div>
+        </div>
       </div>
     </Link>
-  );
-}
-
-function PixelStar({ className }: { className: string }) {
-  return (
-    <span
-      className={`pixel-blink absolute z-10 text-3xl text-[#B8A8E8] ${className}`}
-      aria-hidden="true"
-    >
-      +
-    </span>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="relative overflow-hidden bg-[#B8A8E8] px-6 py-10 text-[#10131A] md:px-10 lg:px-16">
-      <Image
-        alt="Pixel planet footer background"
-        className="object-cover object-center opacity-45"
-        fill
-        sizes="100vw"
-        src="/images/arcade/pixel-planet.png"
-      />
-      <div className="absolute inset-0 bg-[#B8A8E8]/70" />
-      <div className="relative z-10 flex w-full flex-col gap-6 md:flex-row md:items-center md:justify-between">
-        <p className="font-pixel text-xs uppercase leading-relaxed">
-          ▣ © Never Found 1999
-          <br />
-          All rights reserved
-        </p>
-        <div className="font-pixel flex flex-wrap gap-8 text-xs uppercase">
-          {["Instagram", "Tiktok", "Youtube", "Contact"].map((item) => (
-            <Link href={item === "Contact" ? "/contact" : "/about"} key={item}>
-              {item}
-            </Link>
-          ))}
-          <Link href="/privacy">Privacy</Link>
-          <Link href="/returns">Returns</Link>
-          <Link href="/terms">Terms</Link>
-        </div>
-        <Link
-          className="font-pixel text-xs uppercase leading-relaxed transition hover:text-[#F05267]"
-          href="https://neurait.com"
-          rel="noreferrer"
-          target="_blank"
-        >
-          Developed and maintained by Neura IT
-        </Link>
-      </div>
-    </footer>
   );
 }

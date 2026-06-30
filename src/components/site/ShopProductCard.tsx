@@ -31,42 +31,47 @@ export function ShopProductCard({ product }: { product: ShopProduct }) {
 
   return (
     <article
-      className={`group relative space-y-3 ${product.soldOut ? "opacity-60 grayscale" : ""}`}
+      className={`group relative space-y-4 ${product.soldOut ? "opacity-70 grayscale" : ""}`}
     >
       <Link
         aria-label={`View ${product.name}`}
-        className="relative block aspect-[4/4.35] overflow-hidden border-2 border-[#17251f] bg-[#ead8bd] transition group-hover:-translate-y-1 group-hover:rotate-[-0.8deg]"
+        className="relative block aspect-[4/5] overflow-hidden bg-ink transition-transform duration-300 group-hover:-rotate-1"
         href={`/products/${product.slug ?? product.id}`}
       >
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="select-none font-display text-7xl uppercase text-acid/15">
+            NF
+          </span>
+        </div>
         <Image
           alt={product.alt}
-          className="object-contain p-4"
+          className="object-contain p-8"
           fill
           sizes="(min-width: 1280px) 22vw, (min-width: 768px) 31vw, 90vw"
           src={product.image}
           unoptimized
         />
         <span
-          className={`absolute right-3 top-3 flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#17251f] text-center text-[0.58rem] font-black uppercase leading-none ${
+          className={`absolute left-3 top-3 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.28em] ${
             product.soldOut
-              ? "rotate-12 bg-[#d9532f] text-[#17251f]"
-              : "bg-[#123f32] text-[#ead8bd]"
+              ? "bg-rust text-ink"
+              : "bg-acid text-ink"
           }`}
         >
           {product.stockLabel}
         </span>
       </Link>
-      <div className="flex items-start justify-between gap-3 text-[0.82rem] font-black uppercase leading-tight">
+      <div className="flex items-start justify-between gap-3 text-ink">
         <div>
-          <h3>
+          <h3 className="font-display text-xl uppercase leading-tight">
             <Link className="hover:text-[#d9532f]" href={`/products/${product.slug ?? product.id}`}>
               {product.name}
             </Link>
           </h3>
-          <p><StorePrice amountUsd={product.price} /></p>
+          <p className="mt-1 font-mono text-sm font-bold"><StorePrice amountUsd={product.price} /></p>
         </div>
         <button
-          className="border-2 border-[#17251f] px-3 py-2 text-[0.7rem] transition hover:bg-[#17251f] hover:text-[#ead8bd] disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-[#17251f]"
+          className="border border-ink px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] transition hover:bg-ink hover:text-acid disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-ink"
           disabled={product.soldOut || !defaultVariant}
           onClick={addToCart}
           type="button"

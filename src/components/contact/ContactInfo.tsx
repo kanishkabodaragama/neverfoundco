@@ -12,19 +12,19 @@ const contactItems = [
 export function ContactInfo() {
   return (
     <div className="relative">
-      <h2 className="font-pixel text-base uppercase">
+      <h2 className="font-display text-3xl uppercase leading-none">
         Other Ways To Reach Us
       </h2>
       <div className="mt-6 grid gap-5">
         <div className="grid gap-5">
           {contactItems.map((item) => (
             <div className="grid grid-cols-[44px_1fr] gap-4" key={item.label}>
-              <span className="flex h-10 w-10 items-center justify-center border border-[#FFF9EF]/20 text-lg">
+              <span className="flex h-10 w-10 items-center justify-center border border-acid/30 font-mono text-lg text-acid">
                 {item.icon}
               </span>
               <div>
-                <p className="font-black uppercase text-[#F05267]">{item.label}</p>
-                <p className="text-sm font-bold leading-snug text-[#FFF9EF]/75">{item.value}</p>
+                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-acid">{item.label}</p>
+                <p className="mt-1 text-sm font-semibold leading-snug text-bone/70">{item.value}</p>
               </div>
             </div>
           ))}

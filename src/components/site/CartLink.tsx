@@ -1,5 +1,6 @@
 "use client";
 
+import { ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { useCart } from "@/components/store/cart-provider";
 
@@ -9,11 +10,12 @@ export function CartLink() {
 
   return (
     <Link
-      className="font-pixel flex items-center gap-3 text-sm uppercase transition hover:text-[#F05267]"
+      className="flex min-h-9 items-center gap-2 border border-acid/40 px-3 font-mono text-xs font-bold uppercase tracking-[0.2em] text-acid transition-colors hover:bg-acid hover:text-ink"
       href="/cart"
+      aria-label={`Cart with ${count} items`}
     >
-      Cart ({count})
-      <span className="pixel-blink text-[#F05267]">▣</span>
+      <ShoppingBag className="size-4" aria-hidden="true" />
+      <span>{count}</span>
     </Link>
   );
 }

@@ -19,24 +19,26 @@ export default async function ShopPage() {
   const products = dbProducts.length ? dbProducts.map(mapDbProductToShopProduct) : shopProducts;
 
   return (
-    <div className="min-h-screen w-full bg-[#F7F1E6] text-[#10131A]">
+    <div className="min-h-screen w-full bg-ink text-bone">
       <SiteHeader active="shop" />
       <main>
-        <section className="w-full bg-[#F7F1E6] px-5 py-8 md:px-8 xl:px-12">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="font-pixel text-xs uppercase text-[#F05267]">Level 01</p>
-              <h1 className="font-pixel mt-3 text-2xl uppercase md:text-3xl">
-                Shop drops
-              </h1>
-            </div>
-            <p className="max-w-md text-sm font-bold leading-relaxed">
-              Limited streetwear files. Small batches, no restocks, clean product cards.
-            </p>
+        <section className="w-full bg-acid px-5 py-12 text-ink md:px-8 md:py-16 xl:px-12">
+          <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.28em]">
+            <span>Evidence room / drops</span>
+            <span>{products.length.toString().padStart(2, "0")} logged</span>
           </div>
+          <h1 className="mt-7 font-display text-[18vw] uppercase leading-[0.82] md:text-8xl lg:text-9xl">
+            Current
+            <br />
+            Drop
+          </h1>
+          <p className="mt-6 max-w-md text-sm font-semibold leading-snug md:text-base">
+            Limited streetwear files. Small batches, no restocks, clean product
+            evidence for pieces that disappear.
+          </p>
         </section>
-        <section className="w-full bg-[#070B12] px-5 py-8 text-[#FFF9EF] md:px-8 xl:px-12">
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <section className="w-full bg-bone px-5 py-16 text-ink md:px-8 xl:px-12">
+          <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
             {products.map((product) => (
               <ShopProductCard key={product.id} product={product} />
             ))}

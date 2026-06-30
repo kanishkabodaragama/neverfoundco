@@ -26,18 +26,18 @@ export function PromoCode({
 
   return (
     <form
-      className="grid gap-5 border border-dashed border-[#10131A]/30 bg-[#FFF9EF] p-6 md:grid-cols-[1fr_1.3fr]"
+      className="grid gap-5 border border-dashed border-ink bg-bone p-6 md:grid-cols-[1fr_1.3fr]"
       onSubmit={handleSubmit}
     >
       <div className="grid grid-cols-[56px_1fr] gap-4">
-        <span className="text-4xl">🏷</span>
+        <span className="font-display text-4xl leading-none text-rust">NF</span>
         <div>
-          <h2 className="text-lg font-black uppercase">Got A Code?</h2>
-          <p className="text-sm font-bold">Use it before you check out.</p>
-          {message ? <p className="mt-2 text-sm font-black uppercase text-[#F05267]">{message}</p> : null}
+          <h2 className="font-display text-2xl uppercase leading-none">Got A Code?</h2>
+          <p className="mt-1 text-sm font-semibold text-ink/65">Use it before you check out.</p>
+          {message ? <p className="mt-2 font-mono text-xs font-bold uppercase tracking-wide text-rust">{message}</p> : null}
           {appliedCode ? (
             <button
-              className="mt-2 text-xs font-black uppercase text-[#10131A]/65 underline"
+              className="mt-2 font-mono text-xs font-bold uppercase tracking-wide text-ink/65 underline"
               onClick={() => {
                 setCode("");
                 onRemove();
@@ -54,7 +54,7 @@ export function PromoCode({
           Promo Code
         </label>
         <input
-          className="min-h-12 flex-1 border-2 border-[#17251f] bg-transparent px-4 text-sm font-bold outline-none placeholder:text-[#17251f]"
+          className="min-h-12 flex-1 border border-ink bg-transparent px-4 font-mono text-sm font-bold uppercase outline-none placeholder:text-ink/45 focus:border-rust"
           id="promo-code"
           name="promoCode"
           onChange={(event) => setCode(event.target.value.toUpperCase())}
@@ -62,7 +62,7 @@ export function PromoCode({
           value={code}
         />
         <button
-          className="min-h-12 bg-[#070B12] px-8 text-sm font-black uppercase text-[#FFF9EF] transition hover:bg-[#F05267]"
+          className="min-h-12 bg-ink px-8 font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid transition hover:bg-rust hover:text-ink"
           disabled={disabled || isApplying}
           type="submit"
         >

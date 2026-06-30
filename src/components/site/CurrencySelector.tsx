@@ -10,16 +10,16 @@ export function CurrencySelector() {
   const { currency, setCurrency } = useStoreCurrency();
 
   return (
-    <label className="font-pixel flex items-center gap-2 text-sm uppercase">
+    <label className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-[0.2em]">
       <span className="sr-only">Currency</span>
       <select
         aria-label="Currency"
-        className="max-w-[92px] border border-[#FFF9EF]/30 bg-transparent px-2 py-2 text-xs uppercase text-[#FFF9EF] outline-none transition hover:border-[#F05267] focus:border-[#F05267]"
+        className="max-w-[96px] border border-acid/30 bg-transparent px-2 py-2 text-[11px] uppercase text-bone outline-none transition hover:border-acid focus:border-acid"
         onChange={(event) => setCurrency(event.target.value as StoreCurrency)}
         value={currency}
       >
         {currencyOptions.map((option) => (
-          <option className="bg-[#070B12] text-[#FFF9EF]" key={option.code} value={option.code}>
+          <option className="bg-ink text-bone" key={option.code} value={option.code}>
             {option.flag} {option.label}
           </option>
         ))}

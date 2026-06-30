@@ -2,10 +2,28 @@ import type { Metadata } from "next";
 import { CartProvider } from "@/components/store/cart-provider";
 import { CurrencyProvider } from "@/components/store/currency-provider";
 import "./globals.css";
-import { Geist } from "next/font/google";
+import { Anton, Inter, Space_Mono } from "next/font/google";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const display = Anton({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-display",
+  display: "swap",
+});
+
+const mono = Space_Mono({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-mono",
+  display: "swap",
+});
+
+const body = Inter({
+  subsets: ["latin"],
+  variable: "--font-body",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -15,7 +33,8 @@ export const metadata: Metadata = {
     default: "Never Found Co",
     template: "%s | Never Found Co",
   },
-  description: "Simple e-commerce store with secure PayHere checkout.",
+  description:
+    "Limited drops. Untraceable fits. Once it is gone, it is gone — Never Found.",
 };
 
 export default function RootLayout({
@@ -24,8 +43,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("h-full antialiased", "font-sans", geist.variable)}>
-      <body className="min-h-full">
+    <html
+      lang="en"
+      className={cn(
+        "h-full antialiased",
+        display.variable,
+        mono.variable,
+        body.variable,
+      )}
+    >
+      <body className="min-h-full bg-ink text-bone">
+        <div className="grain" />
         <CurrencyProvider>
           <CartProvider>{children}</CartProvider>
         </CurrencyProvider>

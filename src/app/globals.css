@@ -7,9 +7,15 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
-  --font-heading: var(--font-sans);
+  --color-ink: #0a0a0a;
+  --color-bone: #f5f3ec;
+  --color-acid: #e8ff3d;
+  --color-acid-dim: #c4d62e;
+  --color-rust: #ff4d1c;
+  --font-sans: "Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Space Mono", "Space Mono Fallback", ui-monospace, monospace;
+  --font-display: "Anton", "Anton Fallback", Impact, sans-serif;
+  --font-heading: "Anton", "Anton Fallback", Impact, sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -49,18 +55,35 @@
 }
 
 body {
-  font-family: "IBM Plex Mono", "Space Mono", "Geist Mono", ui-monospace, monospace;
+  font-family: var(--font-body), "Inter", ui-sans-serif, system-ui, sans-serif;
+  background: #0a0a0a;
+  color: #f5f3ec;
+  -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background: #f05267;
-  color: #fff9ef;
+  background: #e8ff3d;
+  color: #0a0a0a;
+}
+
+:focus-visible {
+  outline: 2px solid #e8ff3d;
+  outline-offset: 3px;
 }
 
 @layer utilities {
   .font-pixel {
-    font-family: "Pixelify Sans", "Press Start 2P", "IBM Plex Mono", ui-monospace, monospace;
+    font-family: var(--font-display), "Anton", Impact, sans-serif;
     letter-spacing: 0;
+  }
+
+  .font-display {
+    font-family: var(--font-display), "Anton", Impact, sans-serif;
+    letter-spacing: 0;
+  }
+
+  .font-body {
+    font-family: var(--font-body), "Inter", ui-sans-serif, system-ui, sans-serif;
   }
 
   .admin-input {
@@ -328,6 +351,52 @@ body {
 
   .pixel-blink {
     animation: pixel-blink 2.6s steps(2, end) infinite;
+  }
+
+  .ticker {
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .ticker__track {
+    display: inline-flex;
+    animation: ticker 22s linear infinite;
+  }
+
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    pointer-events: none;
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48ZmlsdGVyIGlkPSJuIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC44NSIgbnVtT2N0YXZlcz0iMyIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNuKSIvPjwvc3ZnPg==");
+  }
+
+  .text-stroke {
+    -webkit-text-stroke: 1.5px #e8ff3d;
+    color: transparent;
+  }
+
+  @media (min-width: 768px) {
+    .text-stroke {
+      -webkit-text-stroke-width: 2px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ticker__track {
+      animation: none;
+    }
+  }
+
+  @keyframes ticker {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
   }
 
   @keyframes pixel-blink {

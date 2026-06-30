@@ -124,7 +124,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
         <div className="order-2 grid gap-3 md:order-1">
           <button
             aria-label="Previous product images"
-            className="hidden h-9 w-24 place-items-center border border-[#10131A]/20 bg-[#FFF9EF] disabled:cursor-not-allowed disabled:opacity-35 md:grid"
+            className="hidden h-9 w-24 place-items-center border border-ink/20 bg-bone disabled:cursor-not-allowed disabled:opacity-35 md:grid"
             disabled={effectiveGalleryStart === 0}
             onClick={() => moveGallery(-1)}
             type="button"
@@ -135,8 +135,8 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
           {visibleGallery.map((image, index) => (
             <button
               aria-label={`View product image ${effectiveGalleryStart + index + 1}`}
-              className={`relative h-24 w-24 shrink-0 bg-[#FFF9EF] ${
-                image === displayImage ? "border-2 border-[#F05267]" : "border border-[#10131A]/15"
+              className={`relative h-24 w-24 shrink-0 bg-bone ${
+                image === displayImage ? "border-2 border-rust" : "border border-ink/15"
               }`}
               key={`${image}-${effectiveGalleryStart + index}`}
               onClick={() => setSelectedImage(image)}
@@ -155,7 +155,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
           </div>
           <button
             aria-label="Next product images"
-            className="hidden h-9 w-24 place-items-center border border-[#10131A]/20 bg-[#FFF9EF] disabled:cursor-not-allowed disabled:opacity-35 md:grid"
+            className="hidden h-9 w-24 place-items-center border border-ink/20 bg-bone disabled:cursor-not-allowed disabled:opacity-35 md:grid"
             disabled={effectiveGalleryStart >= maxGalleryStart}
             onClick={() => moveGallery(1)}
             type="button"
@@ -164,7 +164,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
           </button>
         </div>
 
-        <div className="relative order-1 min-h-[430px] bg-[#FFF9EF] md:order-2 lg:min-h-[610px]">
+        <div className="relative order-1 min-h-[430px] bg-ink md:order-2 lg:min-h-[610px]">
           <Image
             alt={product.alt}
             className="object-contain p-6 md:p-10"
@@ -178,20 +178,20 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
       </div>
 
       <div className="flex flex-col justify-center">
-        <span className="w-fit bg-[#B8A8E8] px-3 py-1 text-xs font-black uppercase">
+        <span className="w-fit bg-acid px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-ink">
           {product.stockLabel}
         </span>
-        <h1 className="font-pixel mt-6 max-w-xl text-3xl font-black uppercase leading-tight md:text-4xl">
+        <h1 className="mt-6 max-w-xl font-display text-5xl uppercase leading-none md:text-7xl">
           {product.name}
         </h1>
-        <p className="font-pixel mt-5 text-2xl uppercase text-[#F05267]">
+        <p className="mt-5 font-mono text-2xl font-bold uppercase text-rust">
           <StorePrice amountUsd={displayPrice} />
         </p>
-        <p className="mt-6 max-w-md whitespace-pre-line text-sm font-bold leading-relaxed">
+        <p className="mt-6 max-w-md whitespace-pre-line text-sm font-semibold leading-relaxed text-ink/70">
           {product.shortDescription}
         </p>
 
-        <div className="my-7 h-px w-full bg-[#B8A8E8]" />
+        <div className="my-7 h-px w-full bg-acid" />
 
         <div className="space-y-6">
           <OptionGroup label={`Gender: ${selectedGender}`}>
@@ -212,8 +212,8 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
                 aria-label={`Select ${color}`}
                 className={`h-10 w-10 border ${
                   selectedColor === color
-                    ? "border-2 border-[#F05267]"
-                    : "border-[#10131A]/20"
+                    ? "border-2 border-rust"
+                    : "border-ink/20"
                 }`}
                 style={{ backgroundColor: getColorValue(color, product.colorSwatches) }}
                 key={color}
@@ -236,13 +236,13 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
           </OptionGroup>
 
           {!selectedVariant ? (
-            <p className="text-sm font-black uppercase text-[#F05267]">
+            <p className="text-sm font-black uppercase text-rust">
               This combination is not available.
             </p>
           ) : null}
 
           <button
-            className="pixel-edge flex w-full items-center justify-center gap-3 bg-[#F05267] px-6 py-4 text-sm font-black uppercase text-[#FFF9EF] transition hover:translate-x-0.5 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-3 bg-ink px-6 py-4 font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid transition-colors hover:bg-rust hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
             disabled={!isAvailable}
             onClick={addSelectedVariant}
             type="button"
@@ -274,7 +274,7 @@ function OptionGroup({
 }) {
   return (
     <div>
-      <p className="font-pixel text-xs uppercase">{label}</p>
+      <p className="font-mono text-[11px] font-bold uppercase tracking-[0.28em]">{label}</p>
       <div className="mt-4 flex flex-wrap gap-3">{children}</div>
     </div>
   );
@@ -291,8 +291,8 @@ function OptionButton({
 }) {
   return (
     <button
-      className={`min-w-16 border px-5 py-3 text-xs font-black uppercase transition hover:border-[#F05267] hover:text-[#F05267] ${
-        selected ? "border-[#F05267] text-[#F05267]" : "border-[#10131A]"
+      className={`min-w-16 border px-5 py-3 font-mono text-xs font-bold uppercase tracking-[0.2em] transition hover:border-rust hover:text-rust ${
+        selected ? "border-rust text-rust" : "border-ink"
       }`}
       onClick={onClick}
       type="button"

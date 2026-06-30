@@ -13,7 +13,7 @@ export function ContactForm() {
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
-      <h2 className="font-pixel text-base uppercase">
+      <h2 className="font-display text-3xl uppercase leading-none">
         Send Us A Message
       </h2>
       {[
@@ -24,7 +24,7 @@ export function ContactForm() {
         <label className="block" key={name}>
           <span className="sr-only">{label}</span>
           <input
-            className="min-h-12 w-full border border-[#FFF9EF]/20 bg-transparent px-4 text-sm font-black uppercase outline-none placeholder:text-[#FFF9EF]/50 focus:border-[#F05267]"
+            className="min-h-12 w-full border border-bone/30 bg-transparent px-4 font-mono text-sm uppercase text-bone outline-none placeholder:text-bone/40 focus:border-acid"
             name={name}
             placeholder={label}
             required
@@ -35,19 +35,19 @@ export function ContactForm() {
       <label className="block">
         <span className="sr-only">Your Message</span>
         <textarea
-          className="min-h-32 w-full resize-none border border-[#FFF9EF]/20 bg-transparent px-4 py-4 text-sm font-black uppercase outline-none placeholder:text-[#FFF9EF]/50 focus:border-[#F05267]"
+          className="min-h-32 w-full resize-none border border-bone/30 bg-transparent px-4 py-4 font-mono text-sm uppercase text-bone outline-none placeholder:text-bone/40 focus:border-acid"
           name="message"
           placeholder="Your Message"
           required
         />
       </label>
       <button
-        className="pixel-edge bg-[#F05267] px-8 py-4 text-sm font-black uppercase text-[#FFF9EF] transition hover:translate-x-0.5"
+        className="bg-acid px-8 py-4 font-mono text-xs font-bold uppercase tracking-[0.28em] text-ink transition-colors hover:bg-bone"
         type="submit"
       >
-        Send Message -&gt;
+        Send Message
       </button>
-      {message ? <p className="text-sm font-black uppercase text-[#F05267]">{message}</p> : null}
+      {message ? <p className="font-mono text-xs font-bold uppercase tracking-wide text-acid">{message}</p> : null}
     </form>
   );
 }

@@ -14,8 +14,8 @@ export function CartItemCard({
   onRemove: (id: string) => void;
 }) {
   return (
-    <article className="grid gap-0 border border-[#10131A]/10 bg-[#FFF9EF] transition hover:-translate-y-1 md:grid-cols-[150px_1fr_110px_140px_40px]">
-      <div className="relative min-h-[150px] bg-[#FFF9EF]">
+    <article className="grid gap-0 border border-ink bg-bone transition hover:-rotate-1 md:grid-cols-[150px_1fr_110px_140px_48px]">
+      <div className="relative min-h-[150px] bg-ink">
         <Image
           alt={item.alt}
           className="object-contain p-5"
@@ -24,32 +24,32 @@ export function CartItemCard({
         />
       </div>
       <div className="space-y-4 p-5">
-        <h3 className="font-pixel text-sm uppercase">{item.name}</h3>
-        <div className="text-sm font-bold leading-snug">
+        <h3 className="font-display text-2xl uppercase leading-none">{item.name}</h3>
+        <div className="font-mono text-xs uppercase tracking-wide text-ink/60">
           <p>{item.color}</p>
           <p>Size: {item.size}</p>
         </div>
-        <span className="inline-flex bg-[#070B12] px-3 py-2 text-xs font-black uppercase text-[#FFF9EF]">
+        <span className="inline-flex bg-acid px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-ink">
           {item.stockLabel}
         </span>
       </div>
-      <div className="flex items-start p-5 text-sm font-black uppercase md:justify-center">
+      <div className="flex items-start p-5 font-mono text-sm font-bold uppercase md:justify-center">
         <StorePrice amountUsd={item.price} />
       </div>
       <div className="flex items-start p-5">
-        <div className="flex border border-[#10131A]/20 text-sm font-black">
+        <div className="flex border border-ink font-mono text-sm font-bold">
           <button
-            className="px-4 py-2 transition hover:bg-[#070B12] hover:text-[#FFF9EF]"
+            className="px-4 py-2 transition hover:bg-ink hover:text-acid"
             onClick={() => onQuantityChange(item.id, item.quantity - 1)}
             type="button"
           >
             -
           </button>
-          <span className="border-x border-[#10131A]/20 px-4 py-2">
+          <span className="border-x border-ink px-4 py-2">
             {item.quantity}
           </span>
           <button
-            className="px-4 py-2 transition hover:bg-[#070B12] hover:text-[#FFF9EF]"
+            className="px-4 py-2 transition hover:bg-ink hover:text-acid"
             onClick={() => onQuantityChange(item.id, item.quantity + 1)}
             type="button"
           >
@@ -59,7 +59,7 @@ export function CartItemCard({
       </div>
       <button
         aria-label={`Remove ${item.name}`}
-        className="p-5 text-2xl transition hover:text-[#F05267]"
+        className="p-5 text-2xl transition hover:bg-rust hover:text-ink"
         onClick={() => onRemove(item.id)}
         type="button"
       >

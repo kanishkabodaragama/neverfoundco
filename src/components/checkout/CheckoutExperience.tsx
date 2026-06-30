@@ -231,13 +231,13 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
   }
 
   return (
-    <section className="grid w-full gap-6 bg-[#F7F1E6] px-5 py-8 md:grid-cols-[1.1fr_0.9fr] md:px-8 xl:px-12">
+    <section className="grid w-full gap-8 bg-bone px-5 py-16 text-ink md:grid-cols-[1.1fr_0.9fr] md:px-8 xl:px-12">
       <form className="space-y-6" onSubmit={handleSubmit}>
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-[#F05267]">
+          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">
             Checkout
           </p>
-          <h1 className="font-pixel mt-3 text-2xl font-black uppercase md:text-3xl">
+          <h1 className="mt-4 font-display text-5xl uppercase leading-none md:text-7xl">
             Complete order
           </h1>
         </div>
@@ -250,7 +250,7 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
               <span className="sr-only">Phone Number</span>
               <span className="grid grid-cols-[120px_1fr] gap-3">
                 <select
-                  className="w-full border border-[#10131A]/15 bg-[#FFF9EF] px-3 py-4 text-sm font-black uppercase outline-none focus:border-[#F05267]"
+                  className="w-full border border-ink/20 bg-bone px-3 py-4 font-mono text-sm font-bold uppercase outline-none focus:border-rust"
                   onChange={(event) => setPhoneCode(event.target.value)}
                   value={phoneCode}
                 >
@@ -261,7 +261,7 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
                   ))}
                 </select>
                 <input
-                  className="w-full border border-[#10131A]/15 bg-[#FFF9EF] px-4 py-4 text-sm font-black uppercase outline-none placeholder:text-[#10131A]/45 focus:border-[#F05267]"
+                  className="w-full border border-ink/20 bg-bone px-4 py-4 font-mono text-sm font-bold uppercase outline-none placeholder:text-ink/45 focus:border-rust"
                   name="customerPhone"
                   placeholder="Phone Number"
                   type="tel"
@@ -279,7 +279,7 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
               <label className="block">
                 <span className="sr-only">Billing Country</span>
                 <select
-                  className="w-full border border-[#10131A]/15 bg-[#FFF9EF] px-4 py-4 text-sm font-black uppercase outline-none focus:border-[#F05267]"
+                  className="w-full border border-ink/20 bg-bone px-4 py-4 font-mono text-sm font-bold uppercase outline-none focus:border-rust"
                   onChange={(event) => {
                     setBillingCountryCode(event.target.value);
                     setPhoneCode(getCallingCode(event.target.value));
@@ -298,7 +298,7 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
               <label className="block">
                 <span className="sr-only">Billing Region</span>
                 <select
-                  className="w-full border border-[#10131A]/15 bg-[#FFF9EF] px-4 py-4 text-sm font-black uppercase outline-none focus:border-[#F05267]"
+                  className="w-full border border-ink/20 bg-bone px-4 py-4 font-mono text-sm font-bold uppercase outline-none focus:border-rust"
                   onChange={(event) => {
                     setBillingRegion(event.target.value);
                     setShippingFee(null);
@@ -313,7 +313,7 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
                   ))}
                 </select>
                 {billingRegions.length === 0 ? (
-                  <p className="mt-2 text-xs font-bold uppercase text-[#10131A]/55">
+                  <p className="mt-2 text-xs font-bold uppercase text-ink/55">
                     No regions are configured for this country yet.
                   </p>
                 ) : null}
@@ -323,10 +323,10 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
               <CheckoutInput label="Billing City" name="billingCity" />
               <CheckoutInput label="Billing Postal Code" name="billingPostalCode" />
             </div>
-            <label className="flex cursor-pointer items-start gap-3 border border-[#10131A]/10 bg-[#F7F1E6] p-4 text-sm font-black uppercase">
+            <label className="flex cursor-pointer items-start gap-3 border border-ink bg-bone p-4 font-mono text-xs font-bold uppercase tracking-wide">
               <input
                 checked={deliverySameAsBilling}
-                className="mt-1 h-5 w-5 accent-[#F05267]"
+                className="mt-1 h-5 w-5 accent-acid"
                 onChange={(event) => {
                   setDeliverySameAsBilling(event.target.checked);
                   setDeliveryCountryCode(billingCountryCode);
@@ -349,7 +349,7 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
                 <label className="block">
                   <span className="sr-only">Delivery Country</span>
                   <select
-                    className="w-full border border-[#10131A]/15 bg-[#FFF9EF] px-4 py-4 text-sm font-black uppercase outline-none focus:border-[#F05267]"
+                    className="w-full border border-ink/20 bg-bone px-4 py-4 font-mono text-sm font-bold uppercase outline-none focus:border-rust"
                     onChange={(event) => {
                       setDeliveryCountryCode(event.target.value);
                       setDeliveryRegion("");
@@ -367,7 +367,7 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
                 <label className="block">
                   <span className="sr-only">Delivery Region</span>
                   <select
-                    className="w-full border border-[#10131A]/15 bg-[#FFF9EF] px-4 py-4 text-sm font-black uppercase outline-none focus:border-[#F05267]"
+                  className="w-full border border-ink/20 bg-bone px-4 py-4 font-mono text-sm font-bold uppercase outline-none focus:border-rust"
                     onChange={(event) => {
                       setDeliveryRegion(event.target.value);
                       setShippingFee(null);
@@ -382,7 +382,7 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
                     ))}
                   </select>
                   {deliveryRegions.length === 0 ? (
-                    <p className="mt-2 text-xs font-bold uppercase text-[#10131A]/55">
+                    <p className="mt-2 text-xs font-bold uppercase text-ink/55">
                       No regions are configured for this country yet.
                     </p>
                   ) : null}
@@ -397,23 +397,23 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
         ) : null}
 
         <Panel title="Payment Option">
-          <label className="block cursor-pointer bg-[#070B12] p-5 text-[#FFF9EF] transition hover:translate-x-0.5">
+          <label className="block cursor-pointer bg-ink p-5 text-bone transition hover:translate-x-0.5">
             <span className="flex items-start gap-4">
               <input
-                className="mt-1 h-5 w-5 accent-[#F05267]"
+                className="mt-1 h-5 w-5 accent-acid"
                 defaultChecked
                 name="payment"
                 type="radio"
                 value="payhere"
               />
               <span>
-                <span className="block font-pixel text-base uppercase">
+                <span className="block font-display text-3xl uppercase leading-none">
                   PayHere
                 </span>
-                <span className="mt-2 block text-sm font-black uppercase text-[#B8A8E8]">
+                <span className="mt-2 block font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid">
                   Visa / MasterCard card payments
                 </span>
-                <span className="mt-3 block max-w-xl text-sm font-bold leading-relaxed">
+                <span className="mt-3 block max-w-xl text-sm font-semibold leading-relaxed text-bone/70">
                   Orders are created on the server, then redirected to PayHere
                   with a verified checkout hash.
                 </span>
@@ -423,26 +423,26 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
         </Panel>
 
         <button
-          className="pixel-edge bg-[#F05267] px-8 py-4 text-sm font-black uppercase text-[#FFF9EF] transition hover:translate-x-0.5"
+          className="bg-acid px-8 py-4 font-mono text-xs font-bold uppercase tracking-[0.28em] text-ink transition-colors hover:bg-ink hover:text-acid"
           disabled={isSubmitting || cart.items.length === 0}
           type="submit"
         >
-          {isSubmitting ? "Preparing payment..." : "Continue With PayHere ->"}
+          {isSubmitting ? "Preparing payment..." : "Continue With PayHere"}
         </button>
         {message ? (
-          <p className="text-sm font-black uppercase text-[#F05267]">
+          <p className="font-mono text-xs font-bold uppercase tracking-wide text-rust">
             {message}
           </p>
         ) : null}
       </form>
 
       <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
-        <div className="bg-[#070B12] p-5 text-[#FFF9EF]">
-          <h2 className="font-pixel text-base font-black uppercase">Order Summary</h2>
+        <div className="bg-ink p-5 text-bone">
+          <h2 className="font-display text-3xl uppercase leading-none">Order Summary</h2>
           <div className="mt-6 space-y-4">
             {items.map((item) => (
               <div
-                className="grid grid-cols-[1fr_auto] gap-4 bg-[#FFF9EF] p-4 text-[#10131A]"
+                className="grid grid-cols-[1fr_auto] gap-4 bg-bone p-4 text-ink"
                 key={item.id}
               >
                 <div>
@@ -457,7 +457,7 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
               </div>
             ))}
           </div>
-          <div className="mt-6 space-y-3 text-sm font-black uppercase">
+          <div className="mt-6 space-y-3 font-mono text-sm font-bold uppercase">
             <SummaryRow label="Subtotal" value={format(subtotal)} />
             {appliedDiscount > 0 ? (
               <SummaryRow
@@ -481,7 +481,7 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
               value={format(total)}
             />
           </div>
-          <p className="mt-4 border-t border-[#FFF9EF]/15 pt-4 text-xs font-bold leading-relaxed text-[#FFF9EF]/65">
+          <p className="mt-4 border-t border-bone/15 pt-4 text-xs font-bold leading-relaxed text-bone/65">
             Converted using live exchange data from {rateSource}. Actual bank
             buying and selling rates may differ slightly.
           </p>
@@ -538,8 +538,8 @@ function Panel({
 }) {
   return (
     <div className="space-y-4">
-      <h2 className="font-pixel text-base font-black uppercase">{title}</h2>
-      <div className="border border-[#10131A]/10 bg-[#FFF9EF] p-4">{children}</div>
+      <h2 className="font-display text-3xl uppercase leading-none">{title}</h2>
+      <div className="border border-ink bg-bone p-4">{children}</div>
     </div>
   );
 }
@@ -559,7 +559,7 @@ function CheckoutInput({
     <label className="block">
       <span className="sr-only">{label}</span>
       <input
-        className="w-full border border-[#10131A]/15 bg-[#FFF9EF] px-4 py-4 text-sm font-black uppercase outline-none placeholder:text-[#10131A]/45 focus:border-[#F05267]"
+        className="w-full border border-ink/20 bg-bone px-4 py-4 font-mono text-sm font-bold uppercase outline-none placeholder:text-ink/45 focus:border-rust"
         name={name}
         onChange={(event) => onChange?.(event.target.value)}
         placeholder={label}
@@ -598,7 +598,7 @@ function SummaryRow({
   return (
     <div className="flex items-center justify-between gap-4">
       <span>{label}</span>
-      <span className={highlight ? "text-2xl text-[#F05267]" : ""}>
+      <span className={highlight ? "text-2xl text-acid" : ""}>
         {value}
       </span>
     </div>

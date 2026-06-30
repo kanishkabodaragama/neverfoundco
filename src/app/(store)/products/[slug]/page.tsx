@@ -83,13 +83,13 @@ function NeverFoundProductPage({
     .slice(0, 4);
 
   return (
-    <div className="min-h-screen w-full bg-[#F7F1E6] text-[#10131A]">
+    <div className="min-h-screen w-full bg-bone text-ink">
       <SiteHeader active="shop" />
       <main>
-        <section className="bg-[#F7F1E6] px-5 py-8 md:px-8 xl:px-12">
+        <section className="bg-bone px-5 py-10 md:px-8 xl:px-12">
           <nav
             aria-label="Breadcrumb"
-            className="font-pixel flex flex-wrap items-center gap-3 text-[11px] uppercase"
+            className="flex flex-wrap items-center gap-3 font-mono text-[11px] uppercase tracking-[0.28em] text-ink/55"
           >
             <Link href="/">Home</Link>
             <span>›</span>
@@ -103,20 +103,20 @@ function NeverFoundProductPage({
           <ProductDetailClient product={product} />
         </section>
 
-        <section className="grid w-full gap-8 border-t border-[#B8A8E8] bg-[#F7F1E6] px-5 py-9 md:px-8 lg:grid-cols-[1fr_0.8fr_1fr] xl:px-12">
+        <section className="grid w-full gap-8 border-t border-ink bg-bone px-5 py-12 md:px-8 lg:grid-cols-[1fr_0.8fr_1fr] xl:px-12">
           <div>
-            <h2 className="font-pixel text-xs uppercase text-[#8F7BD5]">
-              {"// Product Details"}
+            <h2 className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">
+              Product Details
             </h2>
             {product.description ? (
-              <div className="mt-6 whitespace-pre-line text-sm font-bold leading-relaxed">
+              <div className="mt-6 whitespace-pre-line text-sm font-semibold leading-relaxed text-ink/70">
                 {product.description}
               </div>
             ) : (
-              <ul className="mt-6 space-y-3 text-sm font-bold">
+              <ul className="mt-6 space-y-3 text-sm font-semibold text-ink/70">
                 {detailBullets.map((detail) => (
                   <li className="flex gap-4" key={detail}>
-                    <span className="text-[#8F7BD5]">✣</span>
+                    <span className="text-rust">◆</span>
                     {detail}
                   </li>
                 ))}
@@ -124,20 +124,20 @@ function NeverFoundProductPage({
             )}
           </div>
 
-          <div className="flex flex-col items-center justify-center py-8 text-[#8F7BD5]">
-            <span className="text-8xl leading-none">✥</span>
-            <p className="font-pixel mt-5 text-xs uppercase">NF-1999</p>
+          <div className="flex flex-col items-center justify-center bg-ink py-8 text-acid">
+            <span className="font-display text-8xl leading-none">NF</span>
+            <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.28em]">NF-1999</p>
           </div>
 
           <div id="size-chart">
-            <h2 className="font-pixel text-xs uppercase text-[#8F7BD5]">
-              {"// Size Chart"}
+            <h2 className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">
+              Size Chart
             </h2>
-            <table className="mt-6 w-full border-collapse text-center text-sm font-bold">
+            <table className="mt-6 w-full border-collapse text-center font-mono text-xs font-bold uppercase">
               <thead>
                 <tr>
                   {["Size", "Chest", "Length", "Sleeve"].map((heading) => (
-                    <th className="border border-[#10131A] px-3 py-3 uppercase" key={heading}>
+                    <th className="border border-ink px-3 py-3 uppercase" key={heading}>
                       {heading}
                     </th>
                   ))}
@@ -147,7 +147,7 @@ function NeverFoundProductPage({
                 {sizeRows.map((row) => (
                   <tr key={row[0]}>
                     {row.map((cell) => (
-                      <td className="border border-[#10131A] px-3 py-3" key={cell}>
+                      <td className="border border-ink px-3 py-3" key={cell}>
                         {cell}
                       </td>
                     ))}
@@ -155,48 +155,47 @@ function NeverFoundProductPage({
                 ))}
               </tbody>
             </table>
-            <p className="mt-4 text-xs font-black uppercase">* Measurements in cm</p>
+            <p className="mt-4 font-mono text-[10px] font-bold uppercase tracking-wide">* Measurements in cm</p>
           </div>
         </section>
 
-        <section className="bg-[#070B12] px-5 py-10 text-[#FFF9EF] md:px-8 xl:px-12">
+        <section className="bg-ink px-5 py-16 text-bone md:px-8 xl:px-12">
           <div className="flex items-center justify-between gap-4">
-            <h2 className="font-pixel text-sm uppercase">
-              <span className="pixel-blink mr-3 text-[#B8A8E8]">▣</span>
+            <h2 className="font-display text-4xl uppercase leading-none">
               You may also like
             </h2>
-            <Link className="font-pixel text-xs uppercase hover:text-[#F05267]" href="/shop">
-              View all ›
+            <Link className="font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid hover:text-rust" href="/shop">
+              View all
             </Link>
           </div>
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
             {related.map((item) => (
               <RelatedProductCard key={item.id} product={item} />
             ))}
           </div>
         </section>
 
-        <section className="grid w-full items-center gap-6 bg-[#B8A8E8] px-5 py-8 text-[#10131A] md:grid-cols-[1fr_1.2fr_auto] md:px-8 xl:px-12">
+        <section className="grid w-full items-center gap-6 bg-acid px-5 py-10 text-ink md:grid-cols-[1fr_1.2fr_auto] md:px-8 xl:px-12">
           <div className="flex items-center gap-5">
             <span className="text-4xl">✉</span>
             <div>
-              <h2 className="font-pixel text-sm uppercase">Stay in the loop.</h2>
-              <p className="mt-2 text-sm font-bold">
+              <h2 className="font-display text-3xl uppercase leading-none">Stay in the loop.</h2>
+              <p className="mt-2 text-sm font-semibold">
                 New drops. Secret locations. No spam.
               </p>
             </div>
           </div>
           <input
             aria-label="Email address"
-            className="w-full border border-[#FFF9EF] bg-transparent px-5 py-4 text-sm font-black uppercase outline-none placeholder:text-[#10131A]"
+            className="w-full border border-ink bg-transparent px-5 py-4 font-mono text-sm font-bold uppercase outline-none placeholder:text-ink/60"
             placeholder="Your email"
             type="email"
           />
           <button
-            className="pixel-edge bg-[#F05267] px-9 py-4 text-sm font-black uppercase text-[#FFF9EF] transition hover:translate-x-0.5"
+            className="bg-ink px-9 py-4 font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid transition-colors hover:bg-bone hover:text-ink"
             type="button"
           >
-            Join ›
+            Join
           </button>
         </section>
       </main>
@@ -212,12 +211,17 @@ function RelatedProductCard({
 }) {
   return (
     <Link
-      className="group block bg-[#FFF9EF] p-5 text-[#10131A] transition hover:-translate-y-1"
+      className="group block text-bone"
       href={`/products/${product.slug ?? product.id}`}
     >
-      <div className="relative aspect-square">
-        <span className="absolute left-0 top-0 z-10 bg-[#B8A8E8] px-3 py-1 text-xs font-black uppercase">
-          New
+      <div className="relative aspect-[4/5] overflow-hidden bg-ink transition-transform duration-300 group-hover:-rotate-1">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="select-none font-display text-7xl uppercase text-acid/15">
+            NF
+          </span>
+        </div>
+        <span className="absolute left-3 top-3 z-10 bg-acid px-2 py-1 font-mono text-[10px] uppercase tracking-[0.28em] text-ink">
+          Exhibit
         </span>
         <Image
           alt={product.alt}
@@ -228,11 +232,10 @@ function RelatedProductCard({
           unoptimized
         />
       </div>
-      <h3 className="font-pixel mt-5 text-sm uppercase">{product.name}</h3>
-      <p className="mt-3 font-black"><StorePrice amountUsd={product.price} /></p>
-      <div className="mt-5 flex items-center justify-between">
-        <span className="text-[#F05267]">♥♥♥</span>
-        <span>→</span>
+      <h3 className="mt-5 font-display text-xl uppercase leading-tight">{product.name}</h3>
+      <p className="mt-2 font-mono text-sm font-bold text-acid"><StorePrice amountUsd={product.price} /></p>
+      <div className="mt-4 font-mono text-[10px] uppercase tracking-[0.28em] text-bone/50">
+        <span>View file</span>
       </div>
     </Link>
   );

@@ -1,39 +1,67 @@
 import Link from "next/link";
-import Image from "next/image";
+import { Ticker } from "@/components/site/Ticker";
+
 export function Footer() {
   return (
-    <footer className="relative overflow-hidden bg-[#B8A8E8] px-5 py-10 text-[#10131A] md:px-8 lg:px-10 xl:px-12">
-      <Image
-        alt="Pixel planet footer background"
-        className="object-cover object-center opacity-45"
-        fill
-        sizes="100vw"
-        src="/images/arcade/pixel-planet.png"
-      />
-      <div className="absolute inset-0 bg-[#B8A8E8]/70" />
-      <div className="relative z-10 mx-auto flex w-full flex-col gap-6 md:flex-row md:items-center md:justify-between">
-        <p className="font-pixel text-xs uppercase leading-relaxed">
-          ▣ © Never Found 1999
-          <br />
-          All rights reserved
-        </p>
-        <div className="font-pixel flex flex-wrap gap-7 text-xs uppercase">
-          <Link href="/about">Instagram</Link>
-          <Link href="/about">Tiktok</Link>
-          <Link href="/about">Youtube</Link>
-          <Link href="/contact">Contact</Link>
-          <Link href="/privacy">Privacy</Link>
-          <Link href="/returns">Returns</Link>
-          <Link href="/terms">Terms</Link>
+    <footer className="bg-ink text-bone">
+      <Ticker />
+      <div className="px-5 py-12 md:px-8 md:py-16">
+        <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
+          <div>
+            <Link aria-label="Never Found home" className="mb-4 flex items-center gap-2" href="/">
+              <span className="font-display text-2xl leading-none tracking-tight text-acid">
+                NEVER
+              </span>
+              <span className="border border-acid px-1.5 py-0.5 font-display text-2xl leading-none tracking-tight">
+                FOUND
+              </span>
+            </Link>
+            <p className="max-w-xs font-mono text-[11px] uppercase tracking-wide text-bone/40">
+              Independent streetwear. Small runs. No restocks. Based nowhere
+              in particular.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-10 font-mono text-xs uppercase tracking-[0.28em]">
+            <div className="flex flex-col gap-3 text-bone/60">
+              <span className="mb-1 text-acid/70">Shop</span>
+              <Link className="transition-colors hover:text-acid" href="/shop">
+                Current drop
+              </Link>
+              <Link className="transition-colors hover:text-acid" href="/cart">
+                Cart
+              </Link>
+              <Link className="transition-colors hover:text-acid" href="/account/login">
+                Orders
+              </Link>
+            </div>
+            <div className="flex flex-col gap-3 text-bone/60">
+              <span className="mb-1 text-acid/70">Files</span>
+              <Link className="transition-colors hover:text-acid" href="/about">
+                Manifesto
+              </Link>
+              <Link className="transition-colors hover:text-acid" href="/contact">
+                Contact
+              </Link>
+              <Link className="transition-colors hover:text-acid" href="/privacy">
+                Privacy
+              </Link>
+              <Link className="transition-colors hover:text-acid" href="/returns">
+                Returns
+              </Link>
+              <Link className="transition-colors hover:text-acid" href="/terms">
+                Terms
+              </Link>
+            </div>
+          </div>
         </div>
-        <Link
-          className="font-pixel text-xs uppercase leading-relaxed transition hover:text-[#F05267]"
-          href="https://neurait.com"
-          rel="noreferrer"
-          target="_blank"
-        >
-          Developed and maintained by Neura IT
-        </Link>
+
+        <div className="mt-12 flex flex-col-reverse items-start justify-between gap-4 border-t border-acid/10 pt-6 font-mono text-[10px] uppercase tracking-wide text-bone/30 md:flex-row md:items-center">
+          <span>&copy; {new Date().getFullYear()} Never Found. All units accounted for.</span>
+          <Link className="transition-colors hover:text-acid" href="https://neurait.com" rel="noreferrer" target="_blank">
+            Developed and maintained by Neura IT
+          </Link>
+        </div>
       </div>
     </footer>
   );

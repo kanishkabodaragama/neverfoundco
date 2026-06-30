@@ -36,10 +36,10 @@ const sections = [
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-[#F7F1E6] text-[#10131A]">
+    <div className="min-h-screen bg-bone text-ink">
       <Header />
       <main className="w-full px-5 py-8 md:px-8 xl:px-12">
-        <p className="font-pixel text-xs uppercase text-[#F05267]">Policy file</p>
+        <p className="font-pixel text-xs uppercase text-rust">Policy file</p>
         <h1 className="font-pixel mt-3 text-2xl uppercase md:text-3xl">
           Privacy Policy
         </h1>
@@ -50,13 +50,13 @@ export default function PrivacyPage() {
         </p>
         <div className="mt-8 grid gap-5">
           {sections.map((section) => (
-            <section className="border border-[#10131A]/15 bg-white/40 p-5" key={section.title}>
+            <section className="border border-ink/15 bg-white/40 p-5" key={section.title}>
               <h2 className="font-pixel text-sm uppercase">{section.title}</h2>
               <p className="mt-3 text-sm font-bold leading-relaxed">{section.body}</p>
             </section>
           ))}
         </div>
-        <p className="mt-8 max-w-2xl text-xs font-bold uppercase tracking-wide text-[#F05267]">
+        <p className="mt-8 max-w-2xl text-xs font-bold uppercase tracking-wide text-rust">
           Last updated: June 25, 2026
         </p>
       </main>
