@@ -5,11 +5,7 @@ import type { DropProduct } from "@/components/site/landing-data";
 
 export function ProductCard({ product }: { product: DropProduct }) {
   return (
-    <article
-      className={`group relative space-y-2.5 ${
-        product.soldOut ? "opacity-70 grayscale" : ""
-      }`}
-    >
+    <article className={`group relative mx-2 space-y-2.5 sm:mx-0 ${product.soldOut ? "opacity-75" : ""}`}>
       <Link
         aria-label={`View ${product.name}`}
         className="relative block aspect-square overflow-hidden border-2 border-[#17251f] bg-[#ead8bd] transition group-hover:-translate-y-1 group-hover:rotate-[-1deg]"
@@ -23,13 +19,13 @@ export function ProductCard({ product }: { product: DropProduct }) {
           src={product.image}
         />
         <span
-          className={`absolute right-3 top-3 flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#17251f] text-center text-[0.58rem] font-black uppercase leading-none ${
+          className={`absolute right-3 top-3 px-2 py-1 font-mono text-[10px] font-black uppercase tracking-[0.18em] ${
             product.soldOut
-              ? "rotate-12 bg-[#d9532f] text-[#17251f]"
+              ? "bg-rust text-bone"
               : "bg-[#123f32] text-[#ead8bd]"
           }`}
         >
-          {product.stockLabel}
+          {product.soldOut ? "Sold out" : product.stockLabel}
         </span>
       </Link>
       <div className="text-[0.8rem] font-black uppercase leading-tight">

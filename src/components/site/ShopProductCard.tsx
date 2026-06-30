@@ -31,7 +31,7 @@ export function ShopProductCard({ product }: { product: ShopProduct }) {
 
   return (
     <article
-      className={`group relative space-y-4 ${product.soldOut ? "opacity-70 grayscale" : ""}`}
+      className={`group relative mx-2 space-y-4 sm:mx-0 ${product.soldOut ? "opacity-75" : ""}`}
     >
       <Link
         aria-label={`View ${product.name}`}
@@ -52,13 +52,13 @@ export function ShopProductCard({ product }: { product: ShopProduct }) {
           unoptimized
         />
         <span
-          className={`absolute left-3 top-3 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.28em] ${
+          className={`absolute top-3 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.28em] ${
             product.soldOut
-              ? "bg-rust text-ink"
-              : "bg-acid text-ink"
+              ? "right-3 bg-rust font-black text-bone"
+              : "left-3 bg-acid text-ink"
           }`}
         >
-          {product.stockLabel}
+          {product.soldOut ? "Sold out" : product.stockLabel}
         </span>
       </Link>
       <div className="flex items-start justify-between gap-3 text-ink">

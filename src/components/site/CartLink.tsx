@@ -6,7 +6,7 @@ import Link from "next/link";
 export function CartLink() {
   return (
     <Link
-      className="group flex h-20 min-h-20 items-center justify-center px-1 text-ink transition-colors hover:text-rust md:h-auto md:min-h-9 md:px-3"
+      className="group flex h-16 min-h-16 items-center justify-center px-1 text-ink transition-colors hover:text-rust md:h-auto md:min-h-9 md:px-3"
       href="/cart"
       aria-label="Cart"
     >
@@ -14,10 +14,10 @@ export function CartLink() {
         alt=""
         aria-hidden="true"
         className="block object-contain transition-opacity group-hover:opacity-75 md:hidden"
-        height={50}
+        height={42}
         priority
         src="/images/icons/mobile-cart.png"
-        width={50}
+        width={42}
       />
       <svg
         aria-hidden="true"

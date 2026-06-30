@@ -28,7 +28,7 @@ export function NeverFoundHomePage({
             </span>
           </div> */}
 
-          <div className="grid grid-cols-2 gap-x-3 gap-y-9 sm:gap-x-6 sm:gap-y-12 md:gap-x-16 md:gap-y-24 lg:gap-x-24 lg:gap-y-28">
+          <div className="mx-2 grid grid-cols-2 gap-x-3 gap-y-9 sm:mx-4 sm:gap-x-6 sm:gap-y-12 md:mx-0 md:gap-x-16 md:gap-y-24 lg:gap-x-24 lg:gap-y-28">
             {featuredProducts.map((product) => (
               <EvidenceProductCard key={product.id} product={product} />
             ))}
@@ -126,11 +126,9 @@ function EvidenceProductCard({
           unoptimized
         />
         {product.soldOut ? (
-          <div className="absolute inset-0 flex items-center justify-center bg-ink/70">
-            <span className="border border-bone/40 px-3 py-1 font-mono text-xs uppercase tracking-[0.28em] text-bone">
-              Never found again
-            </span>
-          </div>
+          <span className="absolute right-1 top-1 z-10 bg-rust px-2 py-1 font-mono text-[9px] font-black uppercase tracking-[0.18em] text-bone sm:right-2 sm:top-2 sm:text-[10px]">
+            Sold out
+          </span>
         ) : null}
       </div>
 

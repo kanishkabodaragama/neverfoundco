@@ -52,8 +52,8 @@ export function AdminNav({
             aria-current={active ? "page" : undefined}
             className={`flex items-center gap-3 rounded-md px-3 py-2.5 text-[0.875rem] transition ${
               active
-                ? "bg-[#f0ede8] font-semibold text-[#332c26]"
-                : "text-[#81796f] hover:bg-[#f6f3ef] hover:text-[#332c26]"
+                ? "bg-[#f0ede8] font-semibold text-[#332c26] dark:bg-[#2b241e] dark:text-[#f8f4ee]"
+                : "text-[#81796f] hover:bg-[#f6f3ef] hover:text-[#332c26] dark:text-[#b9afa4] dark:hover:bg-[#26221e] dark:hover:text-[#f8f4ee]"
             }`}
             href={href}
             key={href}

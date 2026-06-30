@@ -35,12 +35,12 @@ export function SiteHeader({
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 bg-acid/95 text-ink backdrop-blur">
+    <header className="sticky top-0 z-40 bg-acid text-ink">
       <div className="relative flex min-h-28 items-center justify-between px-3 py-0 md:min-h-28 md:px-8 md:py-3">
         <button
           aria-expanded={open}
           aria-label={open ? "Close menu" : "Open menu"}
-          className="relative z-10 flex h-20 w-14 items-center justify-center p-1 text-ink transition-opacity hover:opacity-75 md:hidden"
+          className="relative z-10 flex h-16 w-12 items-center justify-center p-1 text-ink transition-opacity hover:opacity-75 md:hidden"
           onClick={() => setOpen((value) => !value)}
           type="button"
         >
@@ -51,10 +51,10 @@ export function SiteHeader({
               alt=""
               aria-hidden="true"
               className="object-contain"
-              height={52}
+              height={44}
               priority
               src="/images/icons/mobile-menu.png"
-              width={52}
+              width={44}
             />
           )}
         </button>
@@ -102,7 +102,7 @@ export function SiteHeader({
           <CartLink />
         </div>
 
-        <div className="relative z-10 flex h-20 w-14 items-center justify-center md:hidden">
+        <div className="relative z-10 flex h-16 w-12 items-center justify-center md:hidden">
           <CartLink />
         </div>
       </div>
