@@ -4,7 +4,8 @@ import { useRef, useState } from "react";
 import { cropImageFileToSquare, setInputFiles } from "@/components/admin/image-cropper";
 import { UploadButton, UploadThumb, type UploadPreview } from "@/components/admin/upload-thumbnail";
 
-const MAX_FILE_SIZE = 2 * 1024 * 1024;
+const MAX_FILE_SIZE_MB = 3;
+const MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024;
 
 export function ProductImageUploadForm({
   action,
@@ -22,7 +23,7 @@ export function ProductImageUploadForm({
     const croppedFile = await cropImageFileToSquare(file);
 
     if (croppedFile.size > MAX_FILE_SIZE) {
-      setMessage("Cropped image must be 2 MB or smaller.");
+      setMessage(`Cropped image must be ${MAX_FILE_SIZE_MB} MB or smaller. Please upload a different image.`);
       if (inputRef.current) inputRef.current.value = "";
       return null;
     }
@@ -33,8 +34,8 @@ export function ProductImageUploadForm({
       id: `${croppedFile.name}-${croppedFile.lastModified}`,
       name: croppedFile.name,
       url: URL.createObjectURL(croppedFile),
-      progress: 100,
-      complete: true,
+      progress: 0,
+      complete: false,
     });
 
     return croppedFile;
@@ -49,7 +50,7 @@ export function ProductImageUploadForm({
     const file = formData.get("file");
 
     if (file instanceof File && file.size > MAX_FILE_SIZE) {
-      setMessage("Image must be 2 MB or smaller.");
+      setMessage(`Image must be ${MAX_FILE_SIZE_MB} MB or smaller. Please upload a different image.`);
       return;
     }
 
@@ -116,7 +117,7 @@ export function ProductImageUploadForm({
             const file = event.target.files?.[0];
             if (!file) return;
             if (file.size > MAX_FILE_SIZE) {
-              setMessage("Image must be 2 MB or smaller.");
+              setMessage(`Image must be ${MAX_FILE_SIZE_MB} MB or smaller. Please upload a different image.`);
               event.target.value = "";
               return;
             }
@@ -125,7 +126,7 @@ export function ProductImageUploadForm({
         >
           {preview ? "Image selected" : "Choose image"}
         </UploadButton>
-        <span className="text-[0.65rem] text-[#9a9288]">Max 2 MB</span>
+        <span className="text-[0.65rem] text-[#9a9288]">Max {MAX_FILE_SIZE_MB} MB</span>
       </label>
       <label className="grid gap-2 text-xs font-semibold uppercase text-[#81796f]">
         Alt text

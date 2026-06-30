@@ -44,7 +44,7 @@ export function UploadThumb({
           </a>
         ) : (
           <span className="absolute inset-0 grid place-items-center bg-white/60 text-xs font-semibold text-[#332c26]">
-            {item.progress}%
+            {item.progress > 0 ? `${item.progress}%` : "Ready"}
           </span>
         )}
       </span>
@@ -79,9 +79,13 @@ export function UploadButton({
 }) {
   return (
     <label
+      aria-disabled={disabled ? "true" : undefined}
       className={`admin-secondary-action inline-flex w-fit items-center gap-2 px-3 py-2 ${
         disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"
       }`}
+      onClick={(event) => {
+        if (disabled) event.preventDefault();
+      }}
     >
       <ImageUp className="h-4 w-4" />
       {children}
@@ -89,7 +93,6 @@ export function UploadButton({
         ref={inputRef}
         accept="image/*"
         className="sr-only"
-        disabled={disabled}
         multiple={multiple}
         name={name}
         onChange={onChange}

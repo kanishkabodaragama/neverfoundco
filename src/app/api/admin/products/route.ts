@@ -91,13 +91,19 @@ export async function POST(request: Request) {
       });
       uploadedFeaturedImageUrl = uploaded.imageUrl;
 
-      const { error: featuredUpdateError } = await supabase
+      const { data: featuredUpdate, error: featuredUpdateError } = await supabase
         .from("products")
         .update({ main_image_url: uploaded.imageUrl })
-        .eq("id", product.id);
+        .eq("id", product.id)
+        .select("main_image_url")
+        .single();
       if (featuredUpdateError) {
         await removeProductImageStoragePaths([uploaded.storagePath]);
         throw featuredUpdateError;
+      }
+      if (featuredUpdate?.main_image_url !== uploaded.imageUrl) {
+        await removeProductImageStoragePaths([uploaded.storagePath]);
+        throw new Error("Featured image was uploaded but could not be verified in the database.");
       }
     }
 
@@ -123,18 +129,30 @@ export async function POST(request: Request) {
         }),
       );
 
-      const { error: galleryInsertError } = await supabase.from("product_images").insert(rows);
+      const { data: insertedGalleryRows, error: galleryInsertError } = await supabase
+        .from("product_images")
+        .insert(rows)
+        .select("id");
       if (galleryInsertError) {
         await removeProductImageStoragePaths(galleryStoragePaths);
         throw galleryInsertError;
       }
+      if ((insertedGalleryRows?.length ?? 0) !== rows.length) {
+        await removeProductImageStoragePaths(galleryStoragePaths);
+        throw new Error("Gallery images were uploaded but could not be verified in the database.");
+      }
 
       if (!uploadedFeaturedImageUrl && rows[0]?.image_url) {
-        const { error: fallbackFeaturedError } = await supabase
+        const { data: fallbackFeatured, error: fallbackFeaturedError } = await supabase
           .from("products")
           .update({ main_image_url: rows[0].image_url })
-          .eq("id", product.id);
+          .eq("id", product.id)
+          .select("main_image_url")
+          .single();
         if (fallbackFeaturedError) throw fallbackFeaturedError;
+        if (fallbackFeatured?.main_image_url !== rows[0].image_url) {
+          throw new Error("Fallback featured image could not be verified in the database.");
+        }
       }
     }
 
@@ -167,12 +185,17 @@ export async function POST(request: Request) {
         }),
       );
 
-      const { error: variantInsertError } = await supabase
+      const { data: insertedVariantRows, error: variantInsertError } = await supabase
         .from("product_variants")
-        .insert(variantInsertRows);
+        .insert(variantInsertRows)
+        .select("id");
       if (variantInsertError) {
         await removeProductImageStoragePaths(variantStoragePaths);
         throw variantInsertError;
+      }
+      if ((insertedVariantRows?.length ?? 0) !== variantInsertRows.length) {
+        await removeProductImageStoragePaths(variantStoragePaths);
+        throw new Error("Variants were saved but could not be verified in the database.");
       }
     }
   } catch (uploadError) {

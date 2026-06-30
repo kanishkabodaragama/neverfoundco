@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Bold,
   CalendarClock,
@@ -38,7 +38,15 @@ type DraftVariant = {
 };
 type FileUploadPreview = UploadPreview & { file: File };
 
-const MAX_FILE_SIZE = 2 * 1024 * 1024;
+const MAX_FILE_SIZE_MB = 3;
+const MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024;
+const PRODUCT_UPLOAD_PROGRESS_EVENT = "neverfound-product-upload-progress";
+
+type ProductUploadProgress = {
+  complete?: boolean;
+  error?: string;
+  progress: number;
+};
 
 const fallbackCategories = ["T-Shirts", "Hoodies", "Shirts", "Pants", "Accessories"];
 const fallbackColors = ["Black", "Blue", "Blush", "Brown", "Cream", "Dark Navy Blue", "Green", "Ivory", "Mint", "Navy Blue", "Purple", "Sage Green", "Stone", "White", "Yellow"];
@@ -73,6 +81,8 @@ export function ProductForm({
   const [removedGalleryImageIds, setRemovedGalleryImageIds] = useState<string[]>([]);
   const [removedVariantImageIds, setRemovedVariantImageIds] = useState<string[]>([]);
   const [variantError, setVariantError] = useState("");
+  const [submitError, setSubmitError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [colors, setColors] = useState(getJsonList(product?.colors, ["Black"]));
   const [sizes, setSizes] = useState(getJsonList(product?.sizes, ["M"]));
   const [genders, setGenders] = useState<Gender[]>(
@@ -112,6 +122,61 @@ export function ProductForm({
   const remainingStock = Math.max(0, Number(totalStock || 0) - assignedStock);
   const serializedVariants = useMemo(() => JSON.stringify(variants), [variants]);
   const featuredImageUrl = product?.main_image_url ?? product?.product_images?.[0]?.image_url ?? null;
+
+  function dispatchUploadProgress(detail: ProductUploadProgress) {
+    window.dispatchEvent(new CustomEvent(PRODUCT_UPLOAD_PROGRESS_EVENT, { detail }));
+  }
+
+  function submitProductForm(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (isSubmitting) return;
+
+    const form = event.currentTarget;
+    const request = new XMLHttpRequest();
+    const formData = new FormData(form);
+
+    setIsSubmitting(true);
+    setSubmitError("");
+    dispatchUploadProgress({ progress: 1 });
+
+    request.open("POST", form.action);
+    request.setRequestHeader("Accept", "text/html");
+
+    request.upload.onprogress = (progressEvent) => {
+      if (!progressEvent.lengthComputable) return;
+      const uploadProgress = Math.round((progressEvent.loaded / progressEvent.total) * 95);
+      dispatchUploadProgress({
+        progress: Math.max(1, Math.min(uploadProgress, 95)),
+      });
+    };
+
+    request.onload = () => {
+      const responseUrl = request.responseURL ? new URL(request.responseURL) : null;
+      const redirectError = responseUrl?.searchParams.get("error");
+
+      if (request.status >= 200 && request.status < 400 && !redirectError) {
+        dispatchUploadProgress({ progress: 100, complete: true });
+        window.setTimeout(() => {
+          window.location.assign(request.responseURL || form.action);
+        }, 300);
+        return;
+      }
+
+      const message = redirectError || request.responseText || "Product save failed.";
+      setIsSubmitting(false);
+      setSubmitError(message);
+      dispatchUploadProgress({ progress: 0, error: message });
+    };
+
+    request.onerror = () => {
+      const message = "Product save failed. Please check your connection and try again.";
+      setIsSubmitting(false);
+      setSubmitError(message);
+      dispatchUploadProgress({ progress: 0, error: message });
+    };
+
+    request.send(formData);
+  }
 
   function generateVariants() {
     const colorValues = basis.color ? colors : ["Default"];
@@ -182,7 +247,13 @@ export function ProductForm({
   }
 
   return (
-    <form action={action} className="space-y-6" encType="multipart/form-data" method="post">
+    <form
+      action={action}
+      className="space-y-6"
+      encType="multipart/form-data"
+      method="post"
+      onSubmit={submitProductForm}
+    >
       {product ? <input name="_method" type="hidden" value="PATCH" /> : null}
       {product ? <input name="redirect_to" type="hidden" value={`/admin/products/${product.id}/edit`} /> : null}
       <input name="colors" type="hidden" value={colors.join(",")} />
@@ -527,7 +598,7 @@ export function ProductForm({
 
       <section className="admin-card p-4">
         <h2 className="font-semibold">Media</h2>
-        <p className="admin-muted mt-1">Upload one featured product image and gallery images. Each image must be below 2 MB.</p>
+        <p className="admin-muted mt-1">Upload one featured product image and gallery images. Each image must be below {MAX_FILE_SIZE_MB} MB.</p>
         {featuredImageUrl || product?.product_images?.length ? (
           <div className="mt-4 grid gap-4 md:grid-cols-[180px_1fr]">
             <div className="grid gap-4">
@@ -595,11 +666,14 @@ export function ProductForm({
       </section>
 
       <div className="flex justify-end gap-3">
+        {submitError ? (
+          <p className="self-center text-sm font-semibold text-red-600">{submitError}</p>
+        ) : null}
         <button className="admin-secondary-action px-4 py-2.5" name="submit_status" type="submit" value="draft">
-          Save as draft
+          {isSubmitting ? "Saving..." : "Save as draft"}
         </button>
         <button className="admin-action px-4 py-2.5" name="submit_status" type="submit" value="published">
-          Publish product
+          {isSubmitting ? "Publishing..." : "Publish product"}
         </button>
       </div>
     </form>
@@ -727,20 +801,25 @@ function FilePreviewInput({
   const [previews, setPreviews] = useState<FileUploadPreview[]>([]);
   const [message, setMessage] = useState("");
 
-  function animateProgress(items: FileUploadPreview[]) {
-    setPreviews(items.map((item) => ({ ...item, progress: 12, complete: false })));
-    [35, 68, 100].forEach((value, index) => {
-      window.setTimeout(() => {
-        setPreviews((current) =>
-          current.map((item) => ({
-            ...item,
-            progress: value,
-            complete: value === 100,
-          })),
-        );
-      }, 140 * (index + 1));
-    });
-  }
+  useEffect(() => {
+    function handleProgress(event: Event) {
+      const detail = (event as CustomEvent<ProductUploadProgress>).detail;
+
+      setPreviews((current) =>
+        current.map((item) => ({
+          ...item,
+          complete: Boolean(detail.complete),
+          progress: detail.progress,
+        })),
+      );
+
+      if (detail.error) setMessage(detail.error);
+    }
+
+    window.addEventListener(PRODUCT_UPLOAD_PROGRESS_EVENT, handleProgress);
+    return () => window.removeEventListener(PRODUCT_UPLOAD_PROGRESS_EVENT, handleProgress);
+  }, []);
+
 
   function removePreview(id: string) {
     const removed = previews.find((preview) => preview.id === id);
@@ -775,7 +854,7 @@ function FilePreviewInput({
           const oversized = files.find((file) => file.size > MAX_FILE_SIZE);
 
           if (oversized) {
-            setMessage(`${oversized.name} is larger than 2 MB after cropping.`);
+            setMessage(`${oversized.name} is larger than ${MAX_FILE_SIZE_MB} MB after cropping. Please upload a different image.`);
             event.target.value = "";
             return;
           }
@@ -791,7 +870,7 @@ function FilePreviewInput({
             file,
           }));
           setMessage("");
-          animateProgress(items);
+          setPreviews(items);
         }}
       >
         {!multiple && previews.length ? "Image selected" : "Upload"}
@@ -831,7 +910,7 @@ function DirectVariantImageUpload({
       const [croppedFile] = await cropImageFilesToSquare([file]);
 
       if (!croppedFile || croppedFile.size > MAX_FILE_SIZE) {
-        throw new Error("Image must be 2 MB or smaller after cropping.");
+        throw new Error(`Image must be ${MAX_FILE_SIZE_MB} MB or smaller after cropping. Please upload a different image.`);
       }
 
       const formData = new FormData();

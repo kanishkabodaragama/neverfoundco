@@ -8,10 +8,20 @@ import { CurrencySelector } from "@/components/site/CurrencySelector";
 
 const navItems = [
   { label: "Home", href: "/" },
-  { label: "Drops", href: "/shop" },
   { label: "Manifesto", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];
+
+function isActiveNavItem(
+  href: string,
+  active: "home" | "shop" | "about" | "contact",
+) {
+  if (href === "/") {
+    return active === "home";
+  }
+
+  return href.includes(active);
+}
 
 export function Header() {
   return <SiteHeader active="home" />;
@@ -53,10 +63,10 @@ export function SiteHeader({
         </Link>
 
         <nav className="hidden items-center gap-8 font-mono text-xs uppercase tracking-[0.28em] text-ink/75 md:flex">
-          {navItems.slice(1).map((item) => (
+          {navItems.map((item) => (
             <Link
               className={`transition-colors hover:text-rust ${
-                item.href.includes(active) ? "text-rust" : ""
+                isActiveNavItem(item.href, active) ? "text-rust" : ""
               }`}
               href={item.href}
               key={item.label}

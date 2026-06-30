@@ -84,6 +84,8 @@ async function updateProduct(request: Request, id: string) {
     ...parsed.data,
   };
   const removeFeaturedImage = formData.get("remove_featured_image") === "true";
+  let uploadedFeaturedStoragePath: string | null = null;
+  let expectedFeaturedImageUrl: string | null | undefined;
   const { data: currentMedia, error: currentMediaError } = await supabase
     .from("products")
     .select("main_image_url, product_images(image_url)")
@@ -111,8 +113,11 @@ async function updateProduct(request: Request, id: string) {
         prefix: "featured",
       });
       updateData.main_image_url = uploaded.imageUrl;
+      uploadedFeaturedStoragePath = uploaded.storagePath;
+      expectedFeaturedImageUrl = uploaded.imageUrl;
     } else if (removeFeaturedImage) {
       updateData.main_image_url = null;
+      expectedFeaturedImageUrl = null;
     }
 
     if (
@@ -131,11 +136,27 @@ async function updateProduct(request: Request, id: string) {
     });
   }
 
-  const { error } = await supabase.from("products").update(updateData).eq("id", id);
+  const { data: updatedProduct, error } = await supabase
+    .from("products")
+    .update(updateData)
+    .eq("id", id)
+    .select("main_image_url")
+    .single();
 
   if (error) {
+    await tryRemoveProductImageStoragePaths([uploadedFeaturedStoragePath]);
     return adminRedirect(request, `/admin/products/${id}/edit`, {
       error: error.message,
+    });
+  }
+
+  if (
+    expectedFeaturedImageUrl !== undefined &&
+    updatedProduct?.main_image_url !== expectedFeaturedImageUrl
+  ) {
+    await tryRemoveProductImageStoragePaths([uploadedFeaturedStoragePath]);
+    return adminRedirect(request, `/admin/products/${id}/edit`, {
+      error: "Featured image was uploaded but could not be verified in the database.",
     });
   }
 
@@ -194,18 +215,30 @@ async function updateProduct(request: Request, id: string) {
         }),
       );
 
-      const { error: galleryInsertError } = await supabase.from("product_images").insert(rows);
+      const { data: insertedGalleryRows, error: galleryInsertError } = await supabase
+        .from("product_images")
+        .insert(rows)
+        .select("id");
       if (galleryInsertError) {
         await removeProductImageStoragePaths(uploadedStoragePaths);
         throw galleryInsertError;
       }
+      if ((insertedGalleryRows?.length ?? 0) !== rows.length) {
+        await removeProductImageStoragePaths(uploadedStoragePaths);
+        throw new Error("Gallery images were uploaded but could not be verified in the database.");
+      }
 
       if (!existingProduct?.main_image_url && (count ?? 0) === 0 && rows[0]?.image_url) {
-        const { error: mainImageError } = await supabase
+        const { data: mainImageProduct, error: mainImageError } = await supabase
           .from("products")
           .update({ main_image_url: rows[0].image_url })
-          .eq("id", id);
+          .eq("id", id)
+          .select("main_image_url")
+          .single();
         if (mainImageError) throw mainImageError;
+        if (mainImageProduct?.main_image_url !== rows[0].image_url) {
+          throw new Error("Fallback featured image could not be verified in the database.");
+        }
       }
     }
   } catch (uploadError) {
@@ -286,18 +319,27 @@ async function syncReplacedGalleryImages({
       prefix: `gallery-replace-${imageId}`,
     });
 
-    const { error: updateError } = await supabase
+    const { data: updatedImage, error: updateError } = await supabase
       .from("product_images")
       .update({
         image_url: uploaded.imageUrl,
         storage_path: uploaded.storagePath,
         alt_text: productName,
       })
-      .eq("id", imageId);
+      .eq("id", imageId)
+      .select("image_url, storage_path")
+      .single();
 
     if (updateError) {
       await removeProductImageStoragePaths([uploaded.storagePath]);
       throw updateError;
+    }
+    if (
+      updatedImage?.image_url !== uploaded.imageUrl ||
+      updatedImage?.storage_path !== uploaded.storagePath
+    ) {
+      await removeProductImageStoragePaths([uploaded.storagePath]);
+      throw new Error("Replacement image was uploaded but could not be verified in the database.");
     }
 
     await tryRemoveProductImageStoragePaths([existingImage.storage_path]);
@@ -386,13 +428,23 @@ async function syncProductVariants({
 
     if (variant.id) {
       const existingVariant = existingVariantMap.get(variant.id);
-      const { error } = await supabase
+      const { data: updatedVariant, error } = await supabase
         .from("product_variants")
         .update(payload)
-        .eq("id", variant.id);
+        .eq("id", variant.id)
+        .select("image_url, storage_path")
+        .single();
       if (error) {
         await removeProductImageStoragePaths([uploaded?.storagePath]);
         throw error;
+      }
+      if (
+        uploaded &&
+        (updatedVariant?.image_url !== uploaded.imageUrl ||
+          updatedVariant?.storage_path !== uploaded.storagePath)
+      ) {
+        await removeProductImageStoragePaths([uploaded.storagePath]);
+        throw new Error("Variant image was uploaded but could not be verified in the database.");
       }
 
       if ((uploaded || removeVariantImage) && existingVariant?.storage_path) {
@@ -402,10 +454,22 @@ async function syncProductVariants({
       continue;
     }
 
-    const { error } = await supabase.from("product_variants").insert(payload);
+    const { data: insertedVariant, error } = await supabase
+      .from("product_variants")
+      .insert(payload)
+      .select("image_url, storage_path")
+      .single();
     if (error) {
       await removeProductImageStoragePaths([uploaded?.storagePath]);
       throw error;
+    }
+    if (
+      uploaded &&
+      (insertedVariant?.image_url !== uploaded.imageUrl ||
+        insertedVariant?.storage_path !== uploaded.storagePath)
+    ) {
+      await removeProductImageStoragePaths([uploaded.storagePath]);
+      throw new Error("Variant image was uploaded but could not be verified in the database.");
     }
   }
 }

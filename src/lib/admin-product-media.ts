@@ -1,6 +1,7 @@
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 
-const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
+export const MAX_IMAGE_SIZE_MB = 3;
+export const MAX_IMAGE_SIZE = MAX_IMAGE_SIZE_MB * 1024 * 1024;
 
 export async function uploadProductImageFile({
   file,
@@ -12,7 +13,7 @@ export async function uploadProductImageFile({
   prefix?: string;
 }) {
   if (file.size > MAX_IMAGE_SIZE) {
-    throw new Error("Image must be 2 MB or smaller.");
+    throw new Error(`Image must be ${MAX_IMAGE_SIZE_MB} MB or smaller.`);
   }
 
   const extension = file.name.split(".").pop() || "jpg";
@@ -26,6 +27,15 @@ export async function uploadProductImageFile({
     });
 
   if (error) throw new Error(error.message);
+
+  const { error: verifyError } = await supabase.storage
+    .from("product-images")
+    .createSignedUrl(storagePath, 60);
+
+  if (verifyError) {
+    await supabase.storage.from("product-images").remove([storagePath]);
+    throw new Error("Image upload could not be verified. Please try again.");
+  }
 
   const {
     data: { publicUrl },

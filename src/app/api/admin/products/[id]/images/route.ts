@@ -65,15 +65,29 @@ export async function POST(
   }
 
   const supabase = getSupabaseAdminClient();
-  const { error } = await supabase.from("product_images").insert({
-    ...parsed.data,
-    product_id: id,
-  });
+  const { data: insertedImage, error } = await supabase
+    .from("product_images")
+    .insert({
+      ...parsed.data,
+      product_id: id,
+    })
+    .select("image_url, storage_path")
+    .single();
 
   if (error) {
     await removeProductImageStoragePaths([uploadedImage?.storage_path]);
     return adminRedirect(request, `/admin/products/${id}/edit`, {
       error: error.message,
+    });
+  }
+  if (
+    uploadedImage &&
+    (insertedImage?.image_url !== uploadedImage.image_url ||
+      insertedImage?.storage_path !== uploadedImage.storage_path)
+  ) {
+    await removeProductImageStoragePaths([uploadedImage.storage_path]);
+    return adminRedirect(request, `/admin/products/${id}/edit`, {
+      error: "Image was uploaded but could not be verified in the database.",
     });
   }
 

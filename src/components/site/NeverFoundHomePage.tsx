@@ -28,7 +28,7 @@ export function NeverFoundHomePage({
             </span>
           </div> */}
 
-          <div className="grid grid-cols-2 gap-x-3 gap-y-9 sm:gap-x-6 sm:gap-y-12 md:gap-x-10 md:gap-y-16">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-9 sm:gap-x-6 sm:gap-y-12 md:gap-x-16 md:gap-y-24 lg:gap-x-24 lg:gap-y-28">
             {featuredProducts.map((product) => (
               <EvidenceProductCard key={product.id} product={product} />
             ))}
@@ -119,7 +119,7 @@ function EvidenceProductCard({
       <div className="relative aspect-[4/5] overflow-visible bg-transparent">
         <Image
           alt={product.alt}
-          className="scale-[1.12] object-contain mix-blend-multiply transition-transform duration-300 group-hover:scale-[1.16]"
+          className="scale-[1.12] object-contain mix-blend-multiply transition-transform duration-300 group-hover:scale-[1.16] md:scale-[0.96] md:group-hover:scale-100"
           fill
           sizes="(min-width: 768px) 45vw, 50vw"
           src={product.image}

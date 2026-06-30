@@ -37,7 +37,7 @@ export default async function AdminProductsPage({
         </p>
       </div>
       <AdminAlert error={flash.error} success={flash.success} />
-      <div className="admin-card overflow-hidden">
+      <div className="admin-card overflow-visible">
         <div className="flex flex-wrap items-center gap-3 border-b border-[#ece7df] p-4">
           <label className="relative min-w-72 flex-1">
             <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#81796f]" />
@@ -82,7 +82,7 @@ export default async function AdminProductsPage({
             Trash 0
           </span>
         </div>
-        <div className="overflow-x-visible">
+        <div className="overflow-x-visible pb-28">
           <table className="admin-table min-w-[980px]">
             <thead>
               <tr>
