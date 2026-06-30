@@ -10,11 +10,11 @@ export function CartLink() {
 
   return (
     <Link
-      className="flex min-h-9 items-center gap-2 px-3 font-mono text-xs font-bold uppercase tracking-[0.2em] text-ink transition-colors hover:bg-ink hover:text-acid"
+      className="flex h-24 min-h-24 items-center gap-2.5 px-0 font-mono text-sm font-bold uppercase tracking-[0.2em] text-ink transition-colors hover:bg-ink hover:text-acid md:h-auto md:min-h-9 md:gap-2 md:px-3 md:text-xs"
       href="/cart"
       aria-label={`Cart with ${count} items`}
     >
-      <ShoppingBag className="size-4" aria-hidden="true" />
+      <ShoppingBag className="size-7 md:size-4" aria-hidden="true" />
       <span>{count}</span>
     </Link>
   );

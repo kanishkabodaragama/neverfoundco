@@ -15,7 +15,7 @@ import {
 import { slugify } from "@/lib/utils";
 
 async function updateProduct(request: Request, id: string) {
-  const auth = await requireAdminApi();
+  const auth = await requireAdminApi(request);
   if (auth.response) return auth.response;
 
   const formData = await request.formData();
@@ -96,12 +96,6 @@ async function updateProduct(request: Request, id: string) {
     const featuredFile = getImageFiles(formData, "featured_file")[0];
     const currentFeaturedUrl = currentMedia?.main_image_url ?? null;
 
-    if (featuredFile && currentFeaturedUrl && !removeFeaturedImage) {
-      return adminRedirect(request, `/admin/products/${id}/edit`, {
-        error: "Remove the current featured image before uploading a replacement.",
-      });
-    }
-
     if (featuredFile) {
       const uploaded = await uploadProductImageFile({
         file: featuredFile,
@@ -113,7 +107,11 @@ async function updateProduct(request: Request, id: string) {
       updateData.main_image_url = null;
     }
 
-    if (removeFeaturedImage && currentFeaturedUrl && !galleryImageUrls.has(currentFeaturedUrl)) {
+    if (
+      (featuredFile || removeFeaturedImage) &&
+      currentFeaturedUrl &&
+      !galleryImageUrls.has(currentFeaturedUrl)
+    ) {
       featuredStoragePathToRemove = getProductImageStoragePathFromUrl(currentFeaturedUrl);
     }
   } catch (uploadError) {
@@ -403,7 +401,7 @@ async function syncProductVariants({
 }
 
 async function deleteProduct(request: Request, id: string) {
-  const auth = await requireAdminApi();
+  const auth = await requireAdminApi(request);
   if (auth.response) return auth.response;
 
   const supabase = getSupabaseAdminClient();
@@ -417,7 +415,7 @@ async function deleteProduct(request: Request, id: string) {
 }
 
 async function toggleProduct(request: Request, id: string, isActive: boolean) {
-  const auth = await requireAdminApi();
+  const auth = await requireAdminApi(request);
   if (auth.response) return auth.response;
 
   const supabase = getSupabaseAdminClient();
@@ -455,7 +453,7 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const auth = await requireAdminApi();
+  const auth = await requireAdminApi(request);
   if (auth.response) return auth.response;
 
   const { id } = await params;

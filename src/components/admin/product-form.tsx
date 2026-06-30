@@ -530,7 +530,7 @@ export function ProductForm({
         <p className="admin-muted mt-1">Upload one featured product image and gallery images. Each image must be below 2 MB.</p>
         {featuredImageUrl || product?.product_images?.length ? (
           <div className="mt-4 grid gap-4 md:grid-cols-[180px_1fr]">
-            <div>
+            <div className="grid gap-4">
               {featuredImageUrl && !featuredRemoved ? (
                 <ExistingImagePreview
                   label="Current featured image"
@@ -538,11 +538,19 @@ export function ProductForm({
                   onRemove={() => setFeaturedRemoved(true)}
                   url={featuredImageUrl}
                 />
-              ) : (
-                <FilePreviewInput label="Featured image replacement" name="featured_file" />
-              )}
-              {featuredImageUrl && !featuredRemoved ? (
-                <p className="admin-muted mt-2 text-xs">Remove current featured image before replacing it.</p>
+              ) : null}
+              <FilePreviewInput
+                label={
+                  featuredImageUrl && !featuredRemoved
+                    ? "Replace featured image"
+                    : "Featured image"
+                }
+                name="featured_file"
+              />
+              {featuredRemoved ? (
+                <p className="text-xs font-semibold text-red-600">
+                  Featured image will be removed unless you upload a replacement.
+                </p>
               ) : null}
             </div>
             <div>

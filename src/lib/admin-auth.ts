@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
+import { adminRedirect } from "@/lib/admin-forms";
 import { hasSupabasePublicEnv } from "@/lib/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
@@ -44,13 +45,17 @@ export async function requireAdmin() {
   return admin;
 }
 
-export async function requireAdminApi() {
+export async function requireAdminApi(request?: Request) {
   const admin = await getCurrentAdmin();
 
   if (!admin) {
     return {
       admin: null,
-      response: NextResponse.json({ error: "Unauthorized" }, { status: 401 }),
+      response: request
+        ? adminRedirect(request, "/admin/login", {
+            error: "Please sign in again before saving admin changes.",
+          })
+        : NextResponse.json({ error: "Unauthorized" }, { status: 401 }),
     };
   }
 

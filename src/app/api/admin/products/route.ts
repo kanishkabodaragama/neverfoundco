@@ -11,7 +11,7 @@ import {
 import { slugify } from "@/lib/utils";
 
 export async function POST(request: Request) {
-  const auth = await requireAdminApi();
+  const auth = await requireAdminApi(request);
   if (auth.response) return auth.response;
 
   const formData = await request.formData();

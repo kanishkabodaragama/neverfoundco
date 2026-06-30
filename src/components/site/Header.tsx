@@ -26,11 +26,11 @@ export function SiteHeader({
 
   return (
     <header className="sticky top-0 z-40 border-b border-ink/15 bg-acid/95 text-ink backdrop-blur">
-      <div className="relative flex min-h-28 items-center justify-between px-5 py-3 md:min-h-28 md:px-8">
+      <div className="relative flex min-h-28 items-center justify-between px-5 py-0 md:min-h-28 md:px-8 md:py-3">
         <button
           aria-expanded={open}
           aria-label={open ? "Close menu" : "Open menu"}
-          className="relative z-10 flex h-6 w-8 flex-col justify-between md:hidden"
+          className="relative z-10 flex h-24 w-10 flex-col justify-center gap-2 md:hidden"
           onClick={() => setOpen((value) => !value)}
           type="button"
         >
@@ -53,7 +53,7 @@ export function SiteHeader({
 
         <Link
           aria-label="Never Found home"
-          className="absolute left-1/2 top-1/2 block h-20 w-40 -translate-x-1/2 -translate-y-1/2 md:static md:h-20 md:w-40 md:translate-x-0 md:translate-y-0"
+          className="absolute left-1/2 top-1/2 block h-24 w-48 -translate-x-1/2 -translate-y-1/2 md:static md:h-20 md:w-40 md:translate-x-0 md:translate-y-0"
           href="/"
         >
           <Image
@@ -61,7 +61,7 @@ export function SiteHeader({
             className="object-contain object-center md:object-left"
             fill
             priority
-            sizes="(min-width: 768px) 160px, 160px"
+            sizes="(min-width: 768px) 160px, 192px"
             src="/images/brand/logo-nvr-fnd.png"
           />
         </Link>

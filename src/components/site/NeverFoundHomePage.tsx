@@ -3,7 +3,6 @@ import Link from "next/link";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
 import { StorePrice } from "@/components/site/StorePrice";
-import { Ticker } from "@/components/site/Ticker";
 import { shopProducts, type ShopProduct } from "@/components/site/shop-data";
 
 const featuredProducts = shopProducts.slice(0, 4);
@@ -12,54 +11,33 @@ export function NeverFoundHomePage() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-ink text-bone">
       <Header />
-      <Ticker />
       <main>
-        <section id="top" className="relative overflow-hidden bg-acid text-ink">
-          <div className="px-5 pb-8 pt-10 md:px-8 md:pb-12 md:pt-16">
-            <div className="mb-6 flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.28em] md:mb-10">
-              <span>Case file / SS26</span>
-              <span>{featuredProducts.length.toString().padStart(2, "0")} items · open</span>
-            </div>
-
-            <h1 className="-ml-1 font-display uppercase leading-[0.82]">
-              <span className="block text-[20vw] md:text-[9rem] lg:text-[11rem]">
-                NEVER
-              </span>
-              <span className="ml-[12vw] block text-[20vw] md:ml-32 md:text-[9rem] lg:text-[11rem]">
-                FOUND
-              </span>
-            </h1>
-
-            <div className="mt-8 flex flex-col gap-6 md:mt-10 md:flex-row md:items-end md:justify-between">
-              <p className="max-w-xs font-body text-sm leading-snug md:text-base">
-                Streetwear made to disappear. Every drop runs once, in small
-                count, then it is gone: untraceable, unrestocked, never found again.
-              </p>
-
-              <div className="flex shrink-0 gap-3">
-                <Link
-                  className="bg-ink px-6 py-4 text-center font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid transition-colors hover:bg-bone hover:text-ink"
-                  href="/shop"
-                >
-                  View drop
-                </Link>
-                <Link
-                  className="border border-ink px-6 py-4 text-center font-mono text-xs font-bold uppercase tracking-[0.28em] transition-colors hover:bg-ink hover:text-acid"
-                  href="/about"
-                >
-                  The story
-                </Link>
-              </div>
-            </div>
+        <section className="bg-acid px-5 py-16 text-ink md:px-8 md:py-24">
+          <div className="mb-10 flex items-end justify-between md:mb-14">
+            <h2 className="font-display text-4xl uppercase leading-none md:text-6xl">
+              Current
+              <br />
+              drop
+            </h2>
+            <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-ink/50">
+              {featuredProducts.length.toString().padStart(2, "0")} / {featuredProducts.length.toString().padStart(2, "0")} logged
+            </span>
           </div>
 
-          <div
-            className="h-3 w-full"
-            style={{
-              backgroundImage:
-                "repeating-linear-gradient(90deg, var(--color-ink) 0 6px, transparent 6px 14px)",
-            }}
-          />
+          <div className="grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 md:gap-x-10 md:gap-y-16">
+            {featuredProducts.map((product, index) => (
+              <EvidenceProductCard index={index} key={product.id} product={product} />
+            ))}
+          </div>
+
+          <div className="mt-14 text-center">
+            <Link
+              className="inline-block bg-ink px-8 py-4 font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid transition-colors hover:bg-rust hover:text-ink"
+              href="/shop"
+            >
+              View full case file
+            </Link>
+          </div>
         </section>
 
         <section className="bg-ink px-5 py-16 md:px-8 md:py-28">
@@ -87,34 +65,6 @@ export function NeverFoundHomePage() {
                 </div>
               </div>
             ))}
-          </div>
-        </section>
-
-        <section className="bg-bone px-5 py-16 text-ink md:px-8 md:py-24">
-          <div className="mb-10 flex items-end justify-between md:mb-14">
-            <h2 className="font-display text-4xl uppercase leading-none md:text-6xl">
-              Current
-              <br />
-              drop
-            </h2>
-            <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-ink/50">
-              {featuredProducts.length.toString().padStart(2, "0")} / {featuredProducts.length.toString().padStart(2, "0")} logged
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 md:gap-x-10 md:gap-y-16">
-            {featuredProducts.map((product, index) => (
-              <EvidenceProductCard index={index} key={product.id} product={product} />
-            ))}
-          </div>
-
-          <div className="mt-14 text-center">
-            <Link
-              className="inline-block bg-ink px-8 py-4 font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid transition-colors hover:bg-rust hover:text-ink"
-              href="/shop"
-            >
-              View full case file
-            </Link>
           </div>
         </section>
 
