@@ -30,30 +30,16 @@ export function SiteHeader({
         <button
           aria-expanded={open}
           aria-label={open ? "Close menu" : "Open menu"}
-          className="relative z-10 flex h-24 w-10 flex-col justify-center gap-2 md:hidden"
+          className="relative z-10 flex h-24 w-11 items-center justify-start text-ink transition-colors hover:text-rust md:hidden"
           onClick={() => setOpen((value) => !value)}
           type="button"
         >
-          <span
-            className={`h-0.5 w-full origin-left bg-ink transition-transform ${
-              open ? "translate-x-px rotate-45" : ""
-            }`}
-          />
-          <span
-            className={`h-0.5 w-full bg-ink transition-opacity ${
-              open ? "opacity-0" : ""
-            }`}
-          />
-          <span
-            className={`h-0.5 w-full origin-left bg-ink transition-transform ${
-              open ? "-rotate-45" : ""
-            }`}
-          />
+          {open ? <CloseGlyph /> : <MenuGlyph />}
         </button>
 
         <Link
           aria-label="Never Found home"
-          className="absolute left-1/2 top-1/2 block h-24 w-48 -translate-x-1/2 -translate-y-1/2 md:static md:h-20 md:w-40 md:translate-x-0 md:translate-y-0"
+          className="absolute left-1/2 top-1/2 block h-24 w-48 -translate-x-1/2 -translate-y-1/2 md:relative md:left-auto md:top-auto md:h-20 md:w-40 md:translate-x-0 md:translate-y-0"
           href="/"
         >
           <Image
@@ -117,12 +103,11 @@ export function SiteHeader({
           <span className="text-xs font-bold text-ink/55">Menu</span>
           <button
             aria-label="Close menu"
-            className="relative h-8 w-8"
+            className="flex h-10 w-10 items-center justify-center text-ink"
             onClick={() => setOpen(false)}
             type="button"
           >
-            <span className="absolute left-0 top-1/2 h-0.5 w-full -translate-y-1/2 rotate-45 bg-ink" />
-            <span className="absolute left-0 top-1/2 h-0.5 w-full -translate-y-1/2 -rotate-45 bg-ink" />
+            <CloseGlyph />
           </button>
         </div>
 
@@ -151,5 +136,59 @@ export function SiteHeader({
         </div>
       </nav>
     </header>
+  );
+}
+
+function MenuGlyph() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-11 w-11"
+      fill="none"
+      viewBox="0 0 44 44"
+    >
+      <path
+        d="M8 13.5H36M13 22H31M8 30.5H36"
+        className="stroke-current"
+        strokeLinecap="round"
+        strokeWidth="2"
+      />
+      <path
+        d="M22 5.5L26 9.5L22 13.5L18 9.5L22 5.5Z"
+        className="stroke-current"
+        strokeLinejoin="round"
+        strokeWidth="1.6"
+      />
+      <path
+        d="M22 38.5L18 34.5L22 30.5L26 34.5L22 38.5Z"
+        className="stroke-current"
+        strokeLinejoin="round"
+        strokeWidth="1.6"
+      />
+    </svg>
+  );
+}
+
+function CloseGlyph() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-11 w-11"
+      fill="none"
+      viewBox="0 0 44 44"
+    >
+      <path
+        d="M12 12L32 32M32 12L12 32"
+        className="stroke-current"
+        strokeLinecap="round"
+        strokeWidth="2"
+      />
+      <path
+        d="M22 5.5L26 9.5L22 13.5L18 9.5L22 5.5ZM22 38.5L18 34.5L22 30.5L26 34.5L22 38.5Z"
+        className="stroke-current opacity-70"
+        strokeLinejoin="round"
+        strokeWidth="1.4"
+      />
+    </svg>
   );
 }

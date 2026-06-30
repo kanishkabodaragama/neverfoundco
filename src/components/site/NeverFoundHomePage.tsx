@@ -24,9 +24,9 @@ export function NeverFoundHomePage() {
             </span>
           </div> */}
 
-          <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-6 sm:gap-y-12 md:gap-x-10 md:gap-y-16">
-            {featuredProducts.map((product, index) => (
-              <EvidenceProductCard index={index} key={product.id} product={product} />
+          <div className="grid grid-cols-2 gap-x-3 gap-y-9 sm:gap-x-6 sm:gap-y-12 md:gap-x-10 md:gap-y-16">
+            {featuredProducts.map((product) => (
+              <EvidenceProductCard key={product.id} product={product} />
             ))}
           </div>
 
@@ -106,36 +106,21 @@ export function NeverFoundHomePage() {
 }
 
 function EvidenceProductCard({
-  index,
   product,
 }: {
-  index: number;
   product: ShopProduct;
 }) {
-  const exhibit = ["A", "B", "C", "D"][index] ?? String(index + 1);
-  const rotate = ["-rotate-2", "rotate-1", "-rotate-1", "rotate-2"][index % 4];
-
   return (
     <Link className="group block" href={`/products/${product.slug ?? product.id}`}>
-      <div
-        className={`relative aspect-[4/5] overflow-hidden bg-ink transition-transform duration-300 group-hover:rotate-0 ${rotate}`}
-      >
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="select-none font-display text-7xl uppercase text-acid/15">
-            NF
-          </span>
-        </div>
+      <div className="relative aspect-[4/5] overflow-visible bg-transparent">
         <Image
           alt={product.alt}
-          className="object-contain p-4 sm:p-6 md:p-8"
+          className="scale-[1.12] object-contain mix-blend-multiply transition-transform duration-300 group-hover:scale-[1.16]"
           fill
-          sizes="(min-width: 768px) 45vw, 90vw"
+          sizes="(min-width: 768px) 45vw, 50vw"
           src={product.image}
           unoptimized
         />
-        <div className="absolute left-3 top-3 bg-acid px-2 py-1 font-mono text-[10px] uppercase tracking-[0.28em] text-ink">
-          Exhibit {exhibit}
-        </div>
         {product.soldOut ? (
           <div className="absolute inset-0 flex items-center justify-center bg-ink/70">
             <span className="border border-bone/40 px-3 py-1 font-mono text-xs uppercase tracking-[0.28em] text-bone">
