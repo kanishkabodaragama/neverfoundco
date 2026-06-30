@@ -5,7 +5,7 @@ import type { DropProduct } from "@/components/site/landing-data";
 
 export function ProductCard({ product }: { product: DropProduct }) {
   return (
-    <article className={`group relative mx-2 space-y-2.5 sm:mx-0 ${product.soldOut ? "opacity-75" : ""}`}>
+    <article className={`group relative mx-2 space-y-2.5 text-center sm:mx-0 sm:text-left md:space-y-0 ${product.soldOut ? "opacity-75" : ""}`}>
       <Link
         aria-label={`View ${product.name}`}
         className="relative block aspect-square overflow-hidden border-2 border-[#17251f] bg-[#ead8bd] transition group-hover:-translate-y-1 group-hover:rotate-[-1deg]"
@@ -28,7 +28,7 @@ export function ProductCard({ product }: { product: DropProduct }) {
           {product.soldOut ? "Sold out" : product.stockLabel}
         </span>
       </Link>
-      <div className="text-[0.8rem] font-black uppercase leading-tight">
+      <div className="text-[0.8rem] font-black uppercase leading-tight md:-mt-2 lg:-mt-3">
         <h3>
           <Link className="hover:text-[#d9532f]" href={`/products/${product.slug}`}>
             {product.name}

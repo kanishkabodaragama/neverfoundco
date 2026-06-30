@@ -219,7 +219,7 @@ function RelatedProductCard({
 }) {
   return (
     <Link
-      className="group block text-bone"
+      className="group mx-2 block text-center text-bone sm:mx-0 sm:text-left"
       href={`/products/${product.slug ?? product.id}`}
     >
       <div className="relative aspect-[4/5] overflow-hidden bg-ink transition-transform duration-300 group-hover:-rotate-1">
@@ -228,8 +228,14 @@ function RelatedProductCard({
             NF
           </span>
         </div>
-        <span className="absolute left-3 top-3 z-10 bg-acid px-2 py-1 font-mono text-[10px] uppercase tracking-[0.28em] text-ink">
-          Exhibit
+        <span
+          className={`absolute top-3 z-10 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.28em] ${
+            product.soldOut
+              ? "right-3 bg-rust font-black text-bone"
+              : "left-3 bg-acid text-ink"
+          }`}
+        >
+          {product.soldOut ? "Sold out" : product.stockLabel}
         </span>
         <Image
           alt={product.alt}
@@ -240,10 +246,12 @@ function RelatedProductCard({
           unoptimized
         />
       </div>
-      <h3 className="mt-5 font-display text-xl uppercase leading-tight">{product.name}</h3>
-      <p className="mt-2 font-mono text-sm font-bold text-acid"><StorePrice amountUsd={product.price} /></p>
-      <div className="mt-4 font-mono text-[10px] uppercase tracking-[0.28em] text-bone/50">
-        <span>View file</span>
+      <div className="mt-1 md:-mt-2 lg:-mt-3">
+        <h3 className="font-display text-xl uppercase leading-tight">{product.name}</h3>
+        <p className="mt-1 font-mono text-sm font-bold text-acid"><StorePrice amountUsd={product.price} /></p>
+        <div className="mt-2 font-mono text-[10px] uppercase tracking-[0.28em] text-bone/50">
+          <span>View file</span>
+        </div>
       </div>
     </Link>
   );

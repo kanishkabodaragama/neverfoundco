@@ -135,18 +135,10 @@ function EvidenceProductCard({
       <div className="mt-1 flex flex-col items-center gap-1 text-center sm:mt-2 md:-mt-5 md:flex-row md:items-start md:justify-between md:text-left lg:-mt-7">
         <div>
           <h3 className="font-display text-base uppercase leading-tight sm:text-xl">{product.name}</h3>
-          <p className="mt-1 font-mono text-[9px] uppercase tracking-wide text-ink/50 sm:text-[11px]">
-            {product.stockLabel}
-          </p>
         </div>
         <div className="shrink-0 text-center md:pl-4 md:text-right">
           <div className="font-mono text-xs font-bold sm:text-sm">
             <StorePrice amountUsd={product.price} />
-          </div>
-          <div className={`mt-1 font-mono text-[10px] uppercase tracking-wide ${
-            product.soldOut ? "text-rust" : "text-ink/50"
-          }`}>
-            {product.soldOut ? "Sold out" : "Open"}
           </div>
         </div>
       </div>

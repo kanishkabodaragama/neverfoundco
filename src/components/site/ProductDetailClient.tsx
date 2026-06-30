@@ -119,7 +119,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
   }
 
   return (
-    <div className="mt-8 grid w-full gap-8 lg:grid-cols-[55fr_45fr] xl:gap-12">
+    <div className="mt-8 grid w-full gap-6 lg:grid-cols-[55fr_45fr] lg:gap-4 xl:gap-5">
       <div className="grid gap-5 md:grid-cols-[96px_1fr]">
         <div className="order-2 grid gap-3 md:order-1">
           <button
@@ -177,7 +177,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
         </div>
       </div>
 
-      <div className="flex flex-col justify-center">
+      <div className="flex flex-col items-center justify-center text-center lg:items-start lg:text-left">
         <span className="w-fit bg-acid px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-ink">
           {product.stockLabel}
         </span>
@@ -193,7 +193,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
 
         <div className="my-7 h-px w-full bg-acid" />
 
-        <div className="space-y-6">
+        <div className="w-full space-y-6">
           <OptionGroup label={`Gender: ${selectedGender}`}>
             {availableGenders.map((gender) => (
               <OptionButton
@@ -273,9 +273,9 @@ function OptionGroup({
   label: string;
 }) {
   return (
-    <div>
+    <div className="text-center lg:text-left">
       <p className="font-mono text-[11px] font-bold uppercase tracking-[0.28em]">{label}</p>
-      <div className="mt-4 flex flex-wrap gap-3">{children}</div>
+      <div className="mt-4 flex flex-wrap justify-center gap-3 lg:justify-start">{children}</div>
     </div>
   );
 }
