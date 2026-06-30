@@ -31,7 +31,7 @@ export function ShopProductCard({ product }: { product: ShopProduct }) {
 
   return (
     <article
-      className={`group relative mx-2 space-y-4 sm:mx-0 ${product.soldOut ? "opacity-75" : ""}`}
+      className={`group relative mx-2 space-y-2 sm:mx-0 ${product.soldOut ? "opacity-75" : ""}`}
     >
       <Link
         aria-label={`View ${product.name}`}
@@ -61,7 +61,7 @@ export function ShopProductCard({ product }: { product: ShopProduct }) {
           {product.soldOut ? "Sold out" : product.stockLabel}
         </span>
       </Link>
-      <div className="flex items-start justify-between gap-3 text-ink">
+      <div className="flex flex-col items-center justify-between gap-2 text-center text-ink sm:flex-row sm:items-start sm:gap-3 sm:text-left">
         <div>
           <h3 className="font-display text-xl uppercase leading-tight">
             <Link className="hover:text-[#d9532f]" href={`/products/${product.slug ?? product.id}`}>
@@ -71,7 +71,7 @@ export function ShopProductCard({ product }: { product: ShopProduct }) {
           <p className="mt-1 font-mono text-sm font-bold"><StorePrice amountUsd={product.price} /></p>
         </div>
         <button
-          className="border border-ink px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] transition hover:bg-ink hover:text-acid disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-ink"
+          className="border border-ink px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] transition hover:bg-ink hover:text-acid disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-ink sm:mt-0"
           disabled={product.soldOut || !defaultVariant}
           onClick={addToCart}
           type="button"

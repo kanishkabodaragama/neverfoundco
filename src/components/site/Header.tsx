@@ -36,11 +36,11 @@ export function SiteHeader({
 
   return (
     <header className="sticky top-0 z-40 bg-acid text-ink">
-      <div className="relative flex min-h-28 items-center justify-between px-3 py-0 md:min-h-28 md:px-8 md:py-3">
+      <div className="relative grid min-h-28 grid-cols-[3rem_1fr_3rem] items-center px-3 py-0 md:flex md:min-h-28 md:justify-between md:px-8 md:py-3">
         <button
           aria-expanded={open}
           aria-label={open ? "Close menu" : "Open menu"}
-          className="relative z-10 flex h-16 w-12 items-center justify-center p-1 text-ink transition-opacity hover:opacity-75 md:hidden"
+          className="relative z-10 col-start-1 flex h-14 w-10 items-center justify-center justify-self-start p-1 text-ink transition-opacity hover:opacity-75 md:hidden"
           onClick={() => setOpen((value) => !value)}
           type="button"
         >
@@ -51,17 +51,17 @@ export function SiteHeader({
               alt=""
               aria-hidden="true"
               className="object-contain"
-              height={44}
+              height={36}
               priority
               src="/images/icons/mobile-menu.png"
-              width={44}
+              width={36}
             />
           )}
         </button>
 
         <Link
           aria-label="Never Found home"
-          className="absolute left-1/2 top-1/2 block h-24 w-48 -translate-x-1/2 -translate-y-1/2 md:relative md:left-auto md:top-auto md:h-20 md:w-40 md:translate-x-0 md:translate-y-0"
+          className="relative col-start-2 block h-24 w-48 justify-self-center md:relative md:left-auto md:top-auto md:h-20 md:w-40 md:translate-x-0 md:translate-y-0"
           href="/"
         >
           <Image
@@ -102,7 +102,7 @@ export function SiteHeader({
           <CartLink />
         </div>
 
-        <div className="relative z-10 flex h-16 w-12 items-center justify-center md:hidden">
+        <div className="relative z-10 col-start-3 flex h-14 w-10 items-center justify-center justify-self-end md:hidden">
           <CartLink />
         </div>
       </div>
@@ -165,7 +165,7 @@ function CloseGlyph() {
   return (
     <svg
       aria-hidden="true"
-      className="h-11 w-11"
+      className="h-9 w-9"
       fill="none"
       viewBox="0 0 44 44"
     >

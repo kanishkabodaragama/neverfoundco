@@ -16,7 +16,7 @@ export function NeverFoundHomePage({
     <div className="min-h-screen overflow-x-hidden bg-ink text-bone">
       <Header />
       <main>
-        <section className="bg-acid px-5 py-16 text-ink md:px-8 md:py-24">
+        <section className="bg-acid px-5 pb-16 pt-6 text-ink md:px-8 md:py-24">
           {/* <div className="mb-10 flex items-end justify-between md:mb-14">
             <h2 className="font-display text-4xl uppercase leading-none md:text-6xl">
               Current
@@ -132,14 +132,14 @@ function EvidenceProductCard({
         ) : null}
       </div>
 
-      <div className="mt-3 flex flex-col gap-2 sm:mt-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="mt-1 flex flex-col items-center gap-1 text-center sm:mt-2 md:flex-row md:items-start md:justify-between md:text-left">
         <div>
           <h3 className="font-display text-base uppercase leading-tight sm:text-xl">{product.name}</h3>
           <p className="mt-1 font-mono text-[9px] uppercase tracking-wide text-ink/50 sm:text-[11px]">
             {product.stockLabel}
           </p>
         </div>
-        <div className="shrink-0 text-left sm:pl-4 sm:text-right">
+        <div className="shrink-0 text-center md:pl-4 md:text-right">
           <div className="font-mono text-xs font-bold sm:text-sm">
             <StorePrice amountUsd={product.price} />
           </div>
