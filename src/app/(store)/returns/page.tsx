@@ -39,23 +39,23 @@ export default function ReturnsPage() {
     <div className="min-h-screen bg-bone text-ink">
       <Header />
       <main className="w-full px-5 py-8 md:px-8 xl:px-12">
-        <p className="font-pixel text-xs uppercase text-rust">Return file</p>
-        <h1 className="font-pixel mt-3 text-2xl uppercase md:text-3xl">
+        <p className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">Return file</p>
+        <h1 className="mt-4 font-display text-5xl uppercase leading-none md:text-7xl">
           Return Policy
         </h1>
-        <p className="mt-5 max-w-2xl text-sm font-bold leading-relaxed">
+        <p className="mt-5 max-w-2xl text-sm font-semibold leading-relaxed text-ink/70">
           We want every order to land properly. Review the return rules below
           and contact us with your order number before sending anything back.
         </p>
         <div className="mt-8 grid gap-5">
           {sections.map((section) => (
-            <section className="border border-ink/15 bg-white/40 p-5" key={section.title}>
-              <h2 className="font-pixel text-sm uppercase">{section.title}</h2>
-              <p className="mt-3 text-sm font-bold leading-relaxed">{section.body}</p>
+            <section className="border border-ink bg-bone p-5" key={section.title}>
+              <h2 className="font-display text-2xl uppercase leading-none">{section.title}</h2>
+              <p className="mt-3 text-sm font-semibold leading-relaxed text-ink/70">{section.body}</p>
             </section>
           ))}
         </div>
-        <p className="mt-8 max-w-2xl text-xs font-bold uppercase tracking-wide text-rust">
+        <p className="mt-8 max-w-2xl font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-rust">
           Last updated: June 25, 2026
         </p>
       </main>

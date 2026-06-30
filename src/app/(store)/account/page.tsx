@@ -24,11 +24,12 @@ export default async function AccountPage() {
       <main className="px-5 py-10 md:px-8 xl:px-12">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="font-pixel text-2xl uppercase md:text-3xl">My orders</h1>
-            <p className="mt-2 text-sm font-bold">{email}</p>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">Customer file</p>
+            <h1 className="mt-3 font-display text-5xl uppercase leading-none md:text-7xl">My orders</h1>
+            <p className="mt-2 font-mono text-xs font-bold uppercase tracking-wide text-ink/60">{email}</p>
           </div>
           <form action="/api/account/logout" method="post">
-            <button className="border border-ink px-4 py-3 text-xs font-black uppercase" type="submit">
+            <button className="border border-ink px-4 py-3 font-mono text-xs font-bold uppercase tracking-[0.28em] transition-colors hover:bg-ink hover:text-acid" type="submit">
               Logout
             </button>
           </form>
@@ -36,35 +37,35 @@ export default async function AccountPage() {
 
         <div className="mt-8 grid gap-4">
           {orders.map((order) => (
-            <section className="border border-ink/15 bg-bone p-5" key={order.id}>
+            <section className="border border-ink bg-bone p-5" key={order.id}>
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                  <h2 className="font-pixel text-sm uppercase">{order.order_number}</h2>
-                  <p className="mt-2 text-sm font-bold">{new Date(order.created_at).toLocaleString("en-US")}</p>
+                  <h2 className="font-display text-3xl uppercase leading-none">{order.order_number}</h2>
+                  <p className="mt-2 font-mono text-xs font-bold uppercase tracking-wide text-ink/60">{new Date(order.created_at).toLocaleString("en-US")}</p>
                 </div>
-                <div className="flex flex-wrap gap-2 text-xs font-black uppercase">
+                <div className="flex flex-wrap gap-2 font-mono text-[10px] font-bold uppercase tracking-wide">
                   <span className="border border-ink/15 px-3 py-2">Payment: {order.payment_status}</span>
                   <span className="border border-rust px-3 py-2 text-rust">Order: {order.order_status}</span>
                 </div>
               </div>
-              <div className="mt-5 divide-y divide-[#10131A]/10">
+              <div className="mt-5 divide-y divide-ink/10">
                 {order.order_items.map((item) => (
-                  <div className="grid grid-cols-[1fr_auto] gap-4 py-3 text-sm font-bold" key={item.id}>
+                  <div className="grid grid-cols-[1fr_auto] gap-4 py-3 text-sm font-semibold text-ink/70" key={item.id}>
                     <span>{item.quantity} x {item.product_name}</span>
                     <span>{formatMoney(Number(item.total_price), "USD")}</span>
                   </div>
                 ))}
               </div>
               <div className="mt-5 flex flex-wrap items-center justify-between gap-4 border-t border-ink/10 pt-4">
-                <p className="font-pixel text-sm uppercase">{formatMoney(Number(order.total), "USD")}</p>
-                <a className="bg-[#10131A] px-4 py-3 text-xs font-black uppercase text-bone" href={`/api/orders/${order.order_number}/receipt`}>
+                <p className="font-mono text-sm font-bold uppercase">{formatMoney(Number(order.total), "USD")}</p>
+                <a className="bg-ink px-4 py-3 font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid transition-colors hover:bg-rust hover:text-ink" href={`/api/orders/${order.order_number}/receipt`}>
                   Download receipt
                 </a>
               </div>
             </section>
           ))}
           {!orders.length ? (
-            <p className="border border-ink/15 bg-bone p-6 text-sm font-bold">
+            <p className="border border-ink bg-bone p-6 text-sm font-semibold text-ink/70">
               No orders found for this account.
             </p>
           ) : null}

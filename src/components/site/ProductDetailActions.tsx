@@ -28,18 +28,18 @@ export function ProductDetailActions({
   return (
     <div className="grid gap-3">
       <button
-        className="pixel-edge flex w-full items-center justify-center gap-3 bg-[#F05267] px-6 py-4 text-sm font-black uppercase text-[#FFF9EF] transition hover:translate-x-0.5 disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex w-full items-center justify-center gap-3 bg-ink px-6 py-4 font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid transition-colors hover:bg-rust hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
         disabled={soldOut}
         onClick={handleAddToCart}
         type="button"
       >
-        {soldOut ? "Sold Out" : added ? "Added To Cart" : "▶ Add To Cart"}
+        {soldOut ? "Sold Out" : added ? "Added To Cart" : "Add To Cart"}
       </button>
       <button
-        className="w-full border border-[#10131A] px-6 py-4 text-sm font-black uppercase transition hover:translate-x-0.5 hover:border-[#F05267] hover:text-[#F05267]"
+        className="w-full border border-ink px-6 py-4 font-mono text-xs font-bold uppercase tracking-[0.28em] transition-colors hover:border-rust hover:text-rust"
         type="button"
       >
-        ♡ Add To Wishlist
+        Add To Wishlist
       </button>
     </div>
   );
