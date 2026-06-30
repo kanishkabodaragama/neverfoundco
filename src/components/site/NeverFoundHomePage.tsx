@@ -13,7 +13,7 @@ export function NeverFoundHomePage() {
       <Header />
       <main>
         <section className="bg-acid px-5 py-16 text-ink md:px-8 md:py-24">
-          <div className="mb-10 flex items-end justify-between md:mb-14">
+          {/* <div className="mb-10 flex items-end justify-between md:mb-14">
             <h2 className="font-display text-4xl uppercase leading-none md:text-6xl">
               Current
               <br />
@@ -22,7 +22,7 @@ export function NeverFoundHomePage() {
             <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-ink/50">
               {featuredProducts.length.toString().padStart(2, "0")} / {featuredProducts.length.toString().padStart(2, "0")} logged
             </span>
-          </div>
+          </div> */}
 
           <div className="grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 md:gap-x-10 md:gap-y-16">
             {featuredProducts.map((product, index) => (
