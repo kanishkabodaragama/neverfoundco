@@ -38,7 +38,7 @@ export function Footer() {
             <div className="flex flex-col gap-3 text-bone/60">
               <span className="mb-1 text-acid/70">Files</span>
               <Link className="transition-colors hover:text-acid" href="/about">
-                Manifesto
+                About Us
               </Link>
               <Link className="transition-colors hover:text-acid" href="/contact">
                 Contact

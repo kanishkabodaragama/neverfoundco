@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen w-full bg-ink text-bone">
+    <div className="min-h-screen w-full bg-acid text-ink">
       <Header />
       <main>
         <section className="w-full bg-acid px-5 py-12 text-ink md:px-8 md:py-20 xl:px-12">
@@ -41,7 +41,7 @@ export default function ContactPage() {
           </div>
         </section>
         <section
-          className="grid w-full gap-10 bg-ink px-5 py-16 text-bone md:grid-cols-[1fr_1.1fr] md:px-8 xl:px-12"
+          className="grid w-full gap-10 bg-acid px-5 py-12 text-ink md:grid-cols-[1fr_1.1fr] md:px-8 md:py-16 xl:px-12"
           id="contact"
         >
           <ContactForm />

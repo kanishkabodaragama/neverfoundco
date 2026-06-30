@@ -35,17 +35,12 @@ export function ShopProductCard({ product }: { product: ShopProduct }) {
     >
       <Link
         aria-label={`View ${product.name}`}
-        className="relative block aspect-[4/5] overflow-hidden bg-ink transition-transform duration-300 group-hover:-rotate-1"
+        className="relative block aspect-[4/5] overflow-visible bg-transparent transition-transform duration-300 group-hover:-rotate-1"
         href={`/products/${product.slug ?? product.id}`}
       >
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="select-none font-display text-7xl uppercase text-acid/15">
-            NF
-          </span>
-        </div>
         <Image
           alt={product.alt}
-          className="object-contain p-8"
+          className="scale-[1.06] object-contain p-3 transition-transform duration-300 group-hover:scale-[1.1] md:scale-[0.94] md:p-4 md:group-hover:scale-[0.98]"
           fill
           sizes="(min-width: 1280px) 22vw, (min-width: 768px) 31vw, 90vw"
           src={product.image}
@@ -61,7 +56,7 @@ export function ShopProductCard({ product }: { product: ShopProduct }) {
           {product.soldOut ? "Sold out" : product.stockLabel}
         </span>
       </Link>
-      <div className="flex flex-col items-center justify-between gap-2 text-center text-ink sm:flex-row sm:items-start sm:gap-3 sm:text-left md:-mt-2 lg:-mt-3">
+      <div className="flex flex-col items-center justify-between gap-2 text-center text-ink sm:flex-row sm:items-start sm:gap-3 sm:text-left md:-mt-4 lg:-mt-6">
         <div>
           <h3 className="font-display text-xl uppercase leading-tight">
             <Link className="hover:text-[#d9532f]" href={`/products/${product.slug ?? product.id}`}>
@@ -70,14 +65,15 @@ export function ShopProductCard({ product }: { product: ShopProduct }) {
           </h3>
           <p className="mt-1 font-mono text-sm font-bold"><StorePrice amountUsd={product.price} /></p>
         </div>
-        <button
-          className="border border-ink px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] transition hover:bg-ink hover:text-acid disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-ink sm:mt-0"
-          disabled={product.soldOut || !defaultVariant}
-          onClick={addToCart}
-          type="button"
-        >
-          {product.soldOut || !defaultVariant ? "Gone" : isAdded ? "Added" : "Add"}
-        </button>
+        {!product.soldOut && defaultVariant ? (
+          <button
+            className="border border-ink px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] transition hover:bg-ink hover:text-acid sm:mt-0"
+            onClick={addToCart}
+            type="button"
+          >
+            {isAdded ? "Added" : "Add"}
+          </button>
+        ) : null}
       </div>
     </article>
   );

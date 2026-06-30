@@ -19,12 +19,12 @@ export function ContactInfo() {
         <div className="grid gap-5">
           {contactItems.map((item) => (
             <div className="grid grid-cols-[44px_1fr] gap-4" key={item.label}>
-              <span className="flex h-10 w-10 items-center justify-center border border-acid/30 font-mono text-lg text-acid">
+              <span className="flex h-10 w-10 items-center justify-center border border-ink/30 font-mono text-lg text-rust">
                 {item.icon}
               </span>
               <div>
-                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-acid">{item.label}</p>
-                <p className="mt-1 text-sm font-semibold leading-snug text-bone/70">{item.value}</p>
+                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">{item.label}</p>
+                <p className="mt-1 text-sm font-semibold leading-snug text-ink/70">{item.value}</p>
               </div>
             </div>
           ))}

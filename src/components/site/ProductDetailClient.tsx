@@ -124,7 +124,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
         <div className="order-2 grid gap-3 md:order-1">
           <button
             aria-label="Previous product images"
-            className="hidden h-9 w-24 place-items-center border border-ink/20 bg-bone disabled:cursor-not-allowed disabled:opacity-35 md:grid"
+            className="hidden h-9 w-24 place-items-center border border-ink/20 bg-transparent disabled:cursor-not-allowed disabled:opacity-35 md:grid"
             disabled={effectiveGalleryStart === 0}
             onClick={() => moveGallery(-1)}
             type="button"
@@ -135,7 +135,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
           {visibleGallery.map((image, index) => (
             <button
               aria-label={`View product image ${effectiveGalleryStart + index + 1}`}
-              className={`relative h-24 w-24 shrink-0 bg-bone ${
+              className={`relative h-24 w-24 shrink-0 bg-transparent ${
                 image === displayImage ? "border-2 border-rust" : "border border-ink/15"
               }`}
               key={`${image}-${effectiveGalleryStart + index}`}
@@ -155,7 +155,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
           </div>
           <button
             aria-label="Next product images"
-            className="hidden h-9 w-24 place-items-center border border-ink/20 bg-bone disabled:cursor-not-allowed disabled:opacity-35 md:grid"
+            className="hidden h-9 w-24 place-items-center border border-ink/20 bg-transparent disabled:cursor-not-allowed disabled:opacity-35 md:grid"
             disabled={effectiveGalleryStart >= maxGalleryStart}
             onClick={() => moveGallery(1)}
             type="button"
@@ -164,10 +164,10 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
           </button>
         </div>
 
-        <div className="relative order-1 min-h-[430px] bg-ink md:order-2 lg:min-h-[610px]">
+        <div className="relative order-1 min-h-[430px] bg-transparent md:order-2 lg:min-h-[610px]">
           <Image
             alt={product.alt}
-            className="object-contain p-6 md:p-10"
+            className="scale-[1.03] object-contain p-3 md:scale-[0.98] md:p-4"
             fill
             priority
             sizes="(min-width: 1024px) 50vw, 100vw"

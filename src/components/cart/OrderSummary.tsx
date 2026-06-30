@@ -16,7 +16,7 @@ export function OrderSummary({
 
   return (
     <aside className="space-y-4">
-      <div className="bg-ink p-5 text-bone">
+      <div className="border border-ink p-5 text-ink">
         <h2 className="font-display text-3xl uppercase leading-none">Order Summary</h2>
         <div className="mt-7 space-y-4 font-mono text-sm font-bold uppercase">
           <div className="flex justify-between gap-4">
@@ -33,22 +33,22 @@ export function OrderSummary({
             <span>Shipping</span>
             <span><StorePrice amountUsd={shipping} /></span>
           </div>
-          <div className="h-px bg-acid/15" />
+          <div className="h-px bg-ink/20" />
           <div className="flex items-end justify-between gap-4">
             <span className="text-xl font-black">Total</span>
-            <span className="text-xl font-black text-acid">
+            <span className="text-xl font-black text-rust">
               <StorePrice amountUsd={total} />
             </span>
           </div>
         </div>
         <Link
-          className="mt-7 flex justify-center bg-acid px-6 py-4 font-mono text-xs font-bold uppercase tracking-[0.28em] text-ink transition-colors hover:bg-bone"
+          className="mt-7 flex justify-center bg-ink px-6 py-4 font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid transition-colors hover:bg-rust hover:text-ink"
           href="/checkout"
         >
           Proceed To Checkout
         </Link>
       </div>
-      <div className="space-y-4 border border-ink bg-bone p-5 text-ink">
+      <div className="space-y-4 border border-ink bg-transparent p-5 text-ink">
         {[
           ["01", "Worldwide Shipping", "We ship everywhere. Wear it anywhere."],
           ["02", "No Restocks", "If it's sold out, it's never coming back."],
@@ -63,11 +63,8 @@ export function OrderSummary({
           </div>
         ))}
       </div>
-      <figure className="relative min-h-[160px] overflow-hidden bg-ink">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="select-none font-display text-8xl uppercase text-acid/15">NF</span>
-        </div>
-        <p className="absolute bottom-3 left-5 bg-acid px-4 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-ink">
+      <figure className="relative min-h-[120px] overflow-hidden border border-ink">
+        <p className="absolute bottom-3 left-5 bg-ink px-4 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-acid">
           Case open
         </p>
       </figure>

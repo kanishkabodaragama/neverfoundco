@@ -83,10 +83,10 @@ function NeverFoundProductPage({
     .slice(0, 4);
 
   return (
-    <div className="min-h-screen w-full bg-bone text-ink">
+    <div className="min-h-screen w-full bg-acid text-ink">
       <SiteHeader active="shop" />
       <main>
-        <section className="bg-bone px-5 py-10 md:px-8 xl:px-12">
+        <section className="bg-acid px-5 py-8 md:px-8 md:py-10 xl:px-12">
           <nav
             aria-label="Breadcrumb"
             className="flex flex-wrap items-center gap-3 font-mono text-[11px] uppercase tracking-[0.28em] text-ink/55"
@@ -103,7 +103,7 @@ function NeverFoundProductPage({
           <ProductDetailClient product={product} />
         </section>
 
-        <section className="grid w-full gap-8 border-t border-ink bg-bone px-5 py-12 md:px-8 lg:grid-cols-[1fr_0.8fr_1fr] xl:px-12">
+        <section className="grid w-full gap-8 border-t border-ink bg-acid px-5 py-12 md:px-8 lg:grid-cols-[1fr_0.8fr_1fr] xl:px-12">
           <div>
             <h2 className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">
               Product Details
@@ -124,9 +124,9 @@ function NeverFoundProductPage({
             )}
           </div>
 
-          <div className="flex flex-col items-center justify-center bg-ink py-8 text-acid">
+          <div className="flex flex-col items-center justify-center border border-ink py-8 text-ink">
             <span className="font-display text-8xl leading-none">NF</span>
-            <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.28em]">NF-1999</p>
+            <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.28em] text-rust">NF-1999</p>
           </div>
 
           <div id="size-chart">
@@ -167,12 +167,12 @@ function NeverFoundProductPage({
           </div>
         </section>
 
-        <section className="bg-ink px-5 py-16 text-bone md:px-8 xl:px-12">
+        <section className="bg-acid px-5 py-14 text-ink md:px-8 md:py-16 xl:px-12">
           <div className="flex items-center justify-between gap-4">
             <h2 className="font-display text-4xl uppercase leading-none">
               You may also like
             </h2>
-            <Link className="font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid hover:text-rust" href="/shop">
+            <Link className="font-mono text-xs font-bold uppercase tracking-[0.28em] text-rust hover:text-ink" href="/shop">
               View all
             </Link>
           </div>
@@ -219,15 +219,10 @@ function RelatedProductCard({
 }) {
   return (
     <Link
-      className="group mx-2 block text-center text-bone sm:mx-0 sm:text-left"
+      className="group mx-2 block text-center text-ink sm:mx-0 sm:text-left"
       href={`/products/${product.slug ?? product.id}`}
     >
-      <div className="relative aspect-[4/5] overflow-hidden bg-ink transition-transform duration-300 group-hover:-rotate-1">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="select-none font-display text-7xl uppercase text-acid/15">
-            NF
-          </span>
-        </div>
+      <div className="relative aspect-[4/5] overflow-visible bg-transparent transition-transform duration-300 group-hover:-rotate-1">
         <span
           className={`absolute top-3 z-10 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.28em] ${
             product.soldOut
@@ -239,19 +234,16 @@ function RelatedProductCard({
         </span>
         <Image
           alt={product.alt}
-          className="object-contain p-8"
+          className="scale-[1.06] object-contain p-3 transition-transform duration-300 group-hover:scale-[1.1] md:scale-[0.94] md:p-4 md:group-hover:scale-[0.98]"
           fill
           sizes="(min-width: 1280px) 300px, (min-width: 640px) 44vw, 90vw"
           src={product.image}
           unoptimized
         />
       </div>
-      <div className="mt-1 md:-mt-2 lg:-mt-3">
+      <div className="mt-1 md:-mt-4 lg:-mt-6">
         <h3 className="font-display text-xl uppercase leading-tight">{product.name}</h3>
-        <p className="mt-1 font-mono text-sm font-bold text-acid"><StorePrice amountUsd={product.price} /></p>
-        <div className="mt-2 font-mono text-[10px] uppercase tracking-[0.28em] text-bone/50">
-          <span>View file</span>
-        </div>
+        <p className="mt-1 font-mono text-sm font-bold text-ink"><StorePrice amountUsd={product.price} /></p>
       </div>
     </Link>
   );

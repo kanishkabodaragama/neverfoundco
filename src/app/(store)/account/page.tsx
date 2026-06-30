@@ -19,7 +19,7 @@ export default async function AccountPage() {
   const orders = await listCustomerOrders(email);
 
   return (
-    <div className="min-h-screen bg-bone text-ink">
+    <div className="min-h-screen bg-acid text-ink">
       <Header />
       <main className="px-5 py-10 md:px-8 xl:px-12">
         <div className="flex flex-wrap items-end justify-between gap-4">
@@ -37,7 +37,7 @@ export default async function AccountPage() {
 
         <div className="mt-8 grid gap-4">
           {orders.map((order) => (
-            <section className="border border-ink bg-bone p-5" key={order.id}>
+            <section className="border border-ink bg-transparent p-5" key={order.id}>
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <h2 className="font-display text-3xl uppercase leading-none">{order.order_number}</h2>
@@ -65,7 +65,7 @@ export default async function AccountPage() {
             </section>
           ))}
           {!orders.length ? (
-            <p className="border border-ink bg-bone p-6 text-sm font-semibold text-ink/70">
+            <p className="border border-ink bg-transparent p-6 text-sm font-semibold text-ink/70">
               No orders found for this account.
             </p>
           ) : null}

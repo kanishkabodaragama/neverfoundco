@@ -150,7 +150,7 @@ export function CartItems() {
   }
 
   return (
-    <section className="grid w-full gap-8 bg-bone px-5 py-16 text-ink md:px-8 lg:grid-cols-[1fr_360px] xl:px-12">
+    <section className="grid w-full gap-8 bg-acid px-5 py-12 text-ink md:px-8 md:py-16 lg:grid-cols-[1fr_360px] xl:px-12">
       <div className="space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <h1 className="font-display text-5xl uppercase leading-none md:text-7xl">

@@ -19,7 +19,7 @@ export default async function ShopPage() {
   const products = dbProducts.length ? dbProducts.map(mapDbProductToShopProduct) : shopProducts;
 
   return (
-    <div className="min-h-screen w-full bg-ink text-bone">
+    <div className="min-h-screen w-full bg-acid text-ink">
       <SiteHeader active="shop" />
       <main>
         <section className="w-full bg-acid px-5 py-12 text-ink md:px-8 md:py-16 xl:px-12">
@@ -37,7 +37,7 @@ export default async function ShopPage() {
             evidence for pieces that disappear.
           </p>
         </section>
-        <section className="w-full bg-bone px-5 py-16 text-ink md:px-8 xl:px-12">
+        <section className="w-full bg-acid px-5 py-12 text-ink md:px-8 md:py-16 xl:px-12">
           <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
             {products.map((product) => (
               <ShopProductCard key={product.id} product={product} />

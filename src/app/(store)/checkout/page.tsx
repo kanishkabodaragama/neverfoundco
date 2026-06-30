@@ -17,7 +17,7 @@ export default async function CheckoutPage() {
   const countries = await listCheckoutCountries();
 
   return (
-    <div className="min-h-screen w-full bg-ink text-bone">
+    <div className="min-h-screen w-full bg-acid text-ink">
       <Header />
       <main>
         <CheckoutExperience countries={countries} />

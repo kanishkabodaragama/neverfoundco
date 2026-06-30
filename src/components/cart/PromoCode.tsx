@@ -26,7 +26,7 @@ export function PromoCode({
 
   return (
     <form
-      className="grid gap-5 border border-dashed border-ink bg-bone p-6 md:grid-cols-[1fr_1.3fr]"
+      className="grid gap-5 border border-dashed border-ink bg-transparent p-6 md:grid-cols-[1fr_1.3fr]"
       onSubmit={handleSubmit}
     >
       <div className="grid grid-cols-[56px_1fr] gap-4">

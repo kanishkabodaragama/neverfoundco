@@ -14,11 +14,11 @@ export function CartItemCard({
   onRemove: (id: string) => void;
 }) {
   return (
-    <article className="grid gap-0 border border-ink bg-bone transition hover:-rotate-1 md:grid-cols-[150px_1fr_110px_140px_48px]">
-      <div className="relative min-h-[150px] bg-ink">
+    <article className="grid gap-0 border border-ink bg-transparent transition hover:-rotate-1 md:grid-cols-[150px_1fr_110px_140px_48px]">
+      <div className="relative min-h-[150px] bg-transparent">
         <Image
           alt={item.alt}
-          className="object-contain p-5"
+          className="object-contain p-3"
           fill
           src={item.image}
         />
@@ -29,7 +29,7 @@ export function CartItemCard({
           <p>{item.color}</p>
           <p>Size: {item.size}</p>
         </div>
-        <span className="inline-flex bg-acid px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-ink">
+        <span className="inline-flex border border-ink px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-ink">
           {item.stockLabel}
         </span>
       </div>

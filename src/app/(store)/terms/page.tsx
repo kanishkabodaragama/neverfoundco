@@ -40,7 +40,7 @@ const sections = [
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-bone text-ink">
+    <div className="min-h-screen bg-acid text-ink">
       <Header />
       <main className="w-full px-5 py-8 md:px-8 xl:px-12">
         <p className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">Terms file</p>
@@ -53,7 +53,7 @@ export default function TermsPage() {
         </p>
         <div className="mt-8 grid gap-5">
           {sections.map((section) => (
-            <section className="border border-ink bg-bone p-5" key={section.title}>
+            <section className="border border-ink bg-transparent p-5" key={section.title}>
               <h2 className="font-display text-2xl uppercase leading-none">{section.title}</h2>
               <p className="mt-3 text-sm font-semibold leading-relaxed text-ink/70">{section.body}</p>
             </section>

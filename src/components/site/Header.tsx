@@ -8,7 +8,7 @@ import { CurrencySelector } from "@/components/site/CurrencySelector";
 
 const navItems = [
   { label: "Home", href: "/" },
-  { label: "Manifesto", href: "/about" },
+  { label: "About Us", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];
 
