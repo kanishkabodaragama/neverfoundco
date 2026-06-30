@@ -31,7 +31,7 @@ export function ShopProductCard({ product }: { product: ShopProduct }) {
 
   return (
     <article
-      className={`group relative mx-2 space-y-2 sm:mx-0 ${product.soldOut ? "opacity-75" : ""}`}
+      className={`group relative mx-2 space-y-2 sm:mx-0 md:space-y-0 ${product.soldOut ? "opacity-75" : ""}`}
     >
       <Link
         aria-label={`View ${product.name}`}
@@ -61,7 +61,7 @@ export function ShopProductCard({ product }: { product: ShopProduct }) {
           {product.soldOut ? "Sold out" : product.stockLabel}
         </span>
       </Link>
-      <div className="flex flex-col items-center justify-between gap-2 text-center text-ink sm:flex-row sm:items-start sm:gap-3 sm:text-left">
+      <div className="flex flex-col items-center justify-between gap-2 text-center text-ink sm:flex-row sm:items-start sm:gap-3 sm:text-left md:-mt-2 lg:-mt-3">
         <div>
           <h3 className="font-display text-xl uppercase leading-tight">
             <Link className="hover:text-[#d9532f]" href={`/products/${product.slug ?? product.id}`}>
