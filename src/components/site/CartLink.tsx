@@ -10,7 +10,7 @@ export function CartLink() {
 
   return (
     <Link
-      className="flex min-h-9 items-center gap-2 border border-ink/35 px-3 font-mono text-xs font-bold uppercase tracking-[0.2em] text-ink transition-colors hover:bg-ink hover:text-acid"
+      className="flex min-h-9 items-center gap-2 px-3 font-mono text-xs font-bold uppercase tracking-[0.2em] text-ink transition-colors hover:bg-ink hover:text-acid"
       href="/cart"
       aria-label={`Cart with ${count} items`}
     >

@@ -99,11 +99,37 @@ export function SiteHeader({
         </div>
       </div>
 
-      {open ? (
-        <nav className="flex flex-col border-t border-ink/15 bg-acid font-mono text-sm uppercase tracking-[0.28em] md:hidden">
+      <div
+        className={`fixed inset-0 z-40 bg-ink/55 transition-opacity duration-300 md:hidden ${
+          open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+        }`}
+        aria-hidden="true"
+        onClick={() => setOpen(false)}
+      />
+
+      <nav
+        className={`fixed left-0 top-0 z-50 flex h-dvh w-[82vw] max-w-sm flex-col bg-acid font-mono text-sm uppercase tracking-[0.28em] shadow-2xl transition-transform duration-300 ease-out md:hidden ${
+          open ? "translate-x-0" : "-translate-x-full"
+        }`}
+        aria-label="Mobile navigation"
+      >
+        <div className="flex min-h-28 items-center justify-between border-b border-ink/15 px-5">
+          <span className="text-xs font-bold text-ink/55">Menu</span>
+          <button
+            aria-label="Close menu"
+            className="relative h-8 w-8"
+            onClick={() => setOpen(false)}
+            type="button"
+          >
+            <span className="absolute left-0 top-1/2 h-0.5 w-full -translate-y-1/2 rotate-45 bg-ink" />
+            <span className="absolute left-0 top-1/2 h-0.5 w-full -translate-y-1/2 -rotate-45 bg-ink" />
+          </button>
+        </div>
+
+        <div className="flex flex-col">
           {navItems.map((item) => (
             <Link
-              className="border-b border-ink/10 px-5 py-4 text-ink/75 active:bg-ink active:text-acid"
+              className="border-b border-ink/10 px-5 py-5 text-ink/75 active:bg-ink active:text-acid"
               href={item.href}
               key={item.label}
               onClick={() => setOpen(false)}
@@ -111,10 +137,10 @@ export function SiteHeader({
               {item.label}
             </Link>
           ))}
-          <div className="grid grid-cols-[1fr_auto] items-center gap-3 border-b border-ink/10 px-5 py-4">
-            <CurrencySelector />
-            <CartLink />
-          </div>
+        </div>
+
+        <div className="mt-auto grid gap-4 border-t border-ink/15 px-5 py-5">
+          <CurrencySelector />
           <Link
             className="bg-ink px-5 py-4 text-center font-bold text-acid"
             href="/account/login"
@@ -122,8 +148,8 @@ export function SiteHeader({
           >
             Login
           </Link>
-        </nav>
-      ) : null}
+        </div>
+      </nav>
     </header>
   );
 }
