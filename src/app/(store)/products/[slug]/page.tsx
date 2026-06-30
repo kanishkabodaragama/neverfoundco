@@ -24,11 +24,11 @@ const detailBullets = [
 ];
 
 const sizeRows = [
-  ["S", "58", "68", "57"],
-  ["M", "60", "70", "58"],
-  ["L", "62", "72", "59"],
-  ["XL", "64", "74", "60"],
-  ["XXL", "66", "76", "61"],
+  ["S", "17", "26.5", "19.5", "8.5"],
+  ["M", "20", "27.5", "21", "9"],
+  ["L", "21", "28.5", "22", "9.5"],
+  ["XL", "22", "29.5", "23", "10"],
+  ["2XL", "23", "29.5", "24", "11.5"],
 ];
 
 export const dynamic = "force-dynamic";
@@ -133,29 +133,37 @@ function NeverFoundProductPage({
             <h2 className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">
               Size Chart
             </h2>
-            <table className="mt-6 w-full border-collapse text-center font-mono text-xs font-bold uppercase">
-              <thead>
-                <tr>
-                  {["Size", "Chest", "Length", "Sleeve"].map((heading) => (
-                    <th className="border border-ink px-3 py-3 uppercase" key={heading}>
-                      {heading}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {sizeRows.map((row) => (
-                  <tr key={row[0]}>
-                    {row.map((cell) => (
-                      <td className="border border-ink px-3 py-3" key={cell}>
-                        {cell}
-                      </td>
+            <div className="mt-6 overflow-x-auto">
+              <table className="w-full min-w-[560px] border-collapse text-center font-mono text-xs font-bold uppercase">
+                <thead>
+                  <tr>
+                    {[
+                      "Size",
+                      "Shoulder (inches)",
+                      "Height (inches)",
+                      "Chest (inches)",
+                      "Sleeve (inches)",
+                    ].map((heading) => (
+                      <th className="border border-ink px-3 py-3 uppercase" key={heading}>
+                        {heading}
+                      </th>
                     ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-            <p className="mt-4 font-mono text-[10px] font-bold uppercase tracking-wide">* Measurements in cm</p>
+                </thead>
+                <tbody>
+                  {sizeRows.map((row) => (
+                    <tr key={row[0]}>
+                      {row.map((cell) => (
+                        <td className="border border-ink px-3 py-3" key={cell}>
+                          {cell}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-4 font-mono text-[10px] font-bold uppercase tracking-wide">* Measurements in inches</p>
           </div>
         </section>
 

@@ -1,17 +1,27 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 
 export function CartLink() {
   return (
     <Link
-      className="group flex h-24 min-h-24 items-center px-0 text-ink transition-colors hover:text-rust md:h-auto md:min-h-9 md:px-3"
+      className="group flex h-20 min-h-20 items-center justify-center px-1 text-ink transition-colors hover:text-rust md:h-auto md:min-h-9 md:px-3"
       href="/cart"
       aria-label="Cart"
     >
+      <Image
+        alt=""
+        aria-hidden="true"
+        className="block object-contain transition-opacity group-hover:opacity-75 md:hidden"
+        height={50}
+        priority
+        src="/images/icons/mobile-cart.png"
+        width={50}
+      />
       <svg
         aria-hidden="true"
-        className="h-10 w-9 md:h-5 md:w-5"
+        className="hidden h-10 w-9 md:block md:h-5 md:w-5"
         fill="none"
         viewBox="0 0 36 44"
       >

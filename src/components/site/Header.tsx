@@ -35,16 +35,28 @@ export function SiteHeader({
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-ink/15 bg-acid/95 text-ink backdrop-blur">
-      <div className="relative flex min-h-28 items-center justify-between px-5 py-0 md:min-h-28 md:px-8 md:py-3">
+    <header className="sticky top-0 z-40 bg-acid/95 text-ink backdrop-blur">
+      <div className="relative flex min-h-28 items-center justify-between px-3 py-0 md:min-h-28 md:px-8 md:py-3">
         <button
           aria-expanded={open}
           aria-label={open ? "Close menu" : "Open menu"}
-          className="relative z-10 flex h-24 w-11 items-center justify-start text-ink transition-colors hover:text-rust md:hidden"
+          className="relative z-10 flex h-20 w-14 items-center justify-center p-1 text-ink transition-opacity hover:opacity-75 md:hidden"
           onClick={() => setOpen((value) => !value)}
           type="button"
         >
-          {open ? <CloseGlyph /> : <MenuGlyph />}
+          {open ? (
+            <CloseGlyph />
+          ) : (
+            <Image
+              alt=""
+              aria-hidden="true"
+              className="object-contain"
+              height={52}
+              priority
+              src="/images/icons/mobile-menu.png"
+              width={52}
+            />
+          )}
         </button>
 
         <Link
@@ -90,7 +102,7 @@ export function SiteHeader({
           <CartLink />
         </div>
 
-        <div className="relative z-10 md:hidden">
+        <div className="relative z-10 flex h-20 w-14 items-center justify-center md:hidden">
           <CartLink />
         </div>
       </div>
@@ -146,36 +158,6 @@ export function SiteHeader({
         </div>
       </nav>
     </header>
-  );
-}
-
-function MenuGlyph() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="h-11 w-11"
-      fill="none"
-      viewBox="0 0 44 44"
-    >
-      <path
-        d="M8 13.5H36M13 22H31M8 30.5H36"
-        className="stroke-current"
-        strokeLinecap="round"
-        strokeWidth="2"
-      />
-      <path
-        d="M22 5.5L26 9.5L22 13.5L18 9.5L22 5.5Z"
-        className="stroke-current"
-        strokeLinejoin="round"
-        strokeWidth="1.6"
-      />
-      <path
-        d="M22 38.5L18 34.5L22 30.5L26 34.5L22 38.5Z"
-        className="stroke-current"
-        strokeLinejoin="round"
-        strokeWidth="1.6"
-      />
-    </svg>
   );
 }
 

@@ -119,7 +119,7 @@ function EvidenceProductCard({
       <div className="relative aspect-[4/5] overflow-visible bg-transparent">
         <Image
           alt={product.alt}
-          className="scale-[1.12] object-contain mix-blend-multiply transition-transform duration-300 group-hover:scale-[1.16] md:scale-[0.96] md:group-hover:scale-100"
+          className="scale-[1.12] object-contain transition-transform duration-300 group-hover:scale-[1.16] md:scale-[0.96] md:group-hover:scale-100"
           fill
           sizes="(min-width: 768px) 45vw, 50vw"
           src={product.image}
