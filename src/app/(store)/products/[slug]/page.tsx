@@ -31,6 +31,13 @@ const sizeRows = [
   ["2XL", "23", "29.5", "24", "11.5"],
 ];
 
+const sizeMeasurements = [
+  { label: "Shoulder", values: sizeRows.map((row) => row[1]) },
+  { label: "Height", values: sizeRows.map((row) => row[2]) },
+  { label: "Chest", values: sizeRows.map((row) => row[3]) },
+  { label: "Sleeve", values: sizeRows.map((row) => row[4]) },
+];
+
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
@@ -133,29 +140,32 @@ function NeverFoundProductPage({
             <h2 className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">
               Size Chart
             </h2>
-            <div className="mt-6 overflow-x-auto">
-              <table className="w-full min-w-[560px] border-collapse text-center font-mono text-xs font-bold uppercase">
+            <div className="mt-6">
+              <table className="w-full table-fixed border-collapse text-center font-mono text-[10px] font-bold uppercase sm:text-xs">
                 <thead>
                   <tr>
-                    {[
-                      "Size",
-                      "Shoulder (inches)",
-                      "Height (inches)",
-                      "Chest (inches)",
-                      "Sleeve (inches)",
-                    ].map((heading) => (
-                      <th className="border border-ink px-3 py-3 uppercase" key={heading}>
-                        {heading}
+                    <th className="border border-ink px-1.5 py-3 text-left uppercase sm:px-3">
+                      Measure
+                    </th>
+                    {sizeRows.map(([size]) => (
+                      <th className="border border-ink px-1.5 py-3 uppercase sm:px-3" key={size}>
+                        {size}
                       </th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {sizeRows.map((row) => (
-                    <tr key={row[0]}>
-                      {row.map((cell) => (
-                        <td className="border border-ink px-3 py-3" key={cell}>
-                          {cell}
+                  {sizeMeasurements.map((measurement) => (
+                    <tr key={measurement.label}>
+                      <th className="border border-ink px-1.5 py-3 text-left uppercase sm:px-3">
+                        {measurement.label}
+                      </th>
+                      {measurement.values.map((value, index) => (
+                        <td
+                          className="border border-ink px-1.5 py-3 sm:px-3"
+                          key={`${measurement.label}-${sizeRows[index][0]}`}
+                        >
+                          {value}
                         </td>
                       ))}
                     </tr>
@@ -241,9 +251,13 @@ function RelatedProductCard({
           unoptimized
         />
       </div>
-      <div className="mt-0.5 md:mt-1">
-        <h3 className="font-display text-xl uppercase leading-tight">{product.name}</h3>
-        <p className="mt-1 font-mono text-sm font-bold text-ink"><StorePrice amountUsd={product.price} /></p>
+      <div className="mt-0.5 flex flex-col items-center gap-1 text-center md:mt-1 md:flex-row md:items-start md:justify-between md:text-left">
+        <div>
+          <h3 className="font-display text-xl uppercase leading-none">{product.name}</h3>
+        </div>
+        <div className="shrink-0 font-mono text-xs font-bold md:pl-3 md:text-right">
+          <StorePrice amountUsd={product.price} />
+        </div>
       </div>
     </Link>
   );
