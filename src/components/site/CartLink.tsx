@@ -1,14 +1,18 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import { useCart } from "@/components/store/cart-provider";
 
-export function CartLink() {
+export function CartLink({ onClick }: { onClick: () => void }) {
+  const cart = useCart();
+  const itemCount = cart.items.reduce((total, item) => total + item.quantity, 0);
+
   return (
-    <Link
-      className="group flex h-12 min-h-12 w-9 items-center justify-center px-0 text-ink transition-colors hover:text-rust md:h-auto md:min-h-9 md:w-auto md:px-3"
-      href="/cart"
+    <button
+      className="group relative flex h-12 min-h-12 w-9 items-center justify-center px-0 text-ink transition-colors hover:text-rust md:h-auto md:min-h-9 md:w-auto md:px-3"
+      onClick={onClick}
       aria-label="Cart"
+      type="button"
     >
       <Image
         alt=""
@@ -19,6 +23,12 @@ export function CartLink() {
         src="/images/icons/mobile-cart.png"
         width={24}
       />
-    </Link>
+      {itemCount > 0 ? (
+        <span
+          aria-hidden="true"
+          className="cart-pixel-alert absolute left-1/2 top-1/2 h-1 w-1 -translate-x-1/2 -translate-y-1/2 bg-rust"
+        />
+      ) : null}
+    </button>
   );
 }

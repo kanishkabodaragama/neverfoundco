@@ -83,6 +83,32 @@ body {
   animation-name: product-gallery-previous;
 }
 
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.cart-pixel-alert {
+  animation: cart-pixel-blink 2.8s steps(2, jump-none) infinite;
+  image-rendering: pixelated;
+}
+
+@keyframes cart-pixel-blink {
+  0%,
+  58% {
+    opacity: 1;
+  }
+
+  82%,
+  100% {
+    opacity: 0.18;
+  }
+}
+
 @keyframes product-gallery-next {
   from {
     opacity: 0.72;

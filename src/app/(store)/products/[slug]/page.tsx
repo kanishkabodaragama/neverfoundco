@@ -13,16 +13,6 @@ import { mapDbProductToShopProduct, shopProducts, type ShopProduct } from "@/com
 import { SiteHeader } from "@/components/site/Header";
 import { listActiveProducts } from "@/lib/db/products";
 
-const detailBullets = [
-  "100% Cotton Fleece",
-  "450GSM Heavyweight",
-  "Pixel Embroidery Front & Back",
-  "Oversized Fit",
-  "Kangaroo Pocket",
-  "Ribbed Cuffs & Hem",
-  "Made to Last",
-];
-
 const sizeRows = [
   ["S", "17", "26.5", "19.5", "8.5"],
   ["M", "20", "27.5", "21", "9"],
@@ -110,33 +100,8 @@ function NeverFoundProductPage({
           <ProductDetailClient product={product} />
         </section>
 
-        <section className="grid w-full gap-5 border-t border-ink bg-acid px-5 py-8 md:px-8 lg:grid-cols-[1fr_0.8fr_1fr] xl:px-12">
-          <div>
-            <h2 className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">
-              Product Details
-            </h2>
-            {product.description ? (
-              <div className="mt-4 whitespace-pre-line text-sm font-semibold italic leading-relaxed text-ink/70">
-                {product.description}
-              </div>
-            ) : (
-              <ul className="mt-4 space-y-2 text-sm font-semibold italic text-ink/70">
-                {detailBullets.map((detail) => (
-                  <li className="flex gap-4" key={detail}>
-                    <span className="text-rust">◆</span>
-                    {detail}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-
-          <div className="flex flex-col items-center justify-center border border-ink py-8 text-ink">
-            <span className="font-display text-8xl leading-none">NF</span>
-            <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.28em] text-rust">NF-1999</p>
-          </div>
-
-          <div id="size-chart">
+        <section className="w-full border-t border-ink bg-acid px-5 py-8 md:px-8 xl:px-12">
+          <div id="size-chart" className="mx-auto max-w-3xl scroll-mt-32 md:scroll-mt-36">
             <h2 className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">
               Size Chart
             </h2>

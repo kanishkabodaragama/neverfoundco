@@ -3,8 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { useCart } from "@/components/store/cart-provider";
 import { CartLink } from "@/components/site/CartLink";
 import { CurrencySelector } from "@/components/site/CurrencySelector";
+import { StorePrice } from "@/components/site/StorePrice";
 
 const navItems = [
   { label: "Home", href: "/" },
@@ -33,10 +35,17 @@ export function SiteHeader({
   active?: "home" | "shop" | "about" | "contact";
 }) {
   const [open, setOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
+  const cart = useCart();
+  const cartCount = cart.items.reduce((total, item) => total + item.quantity, 0);
+  const subtotal = cart.items.reduce(
+    (total, item) => total + item.unitPrice * item.quantity,
+    0,
+  );
 
   return (
     <header className="sticky top-0 z-40 border-0 border-b border-acid bg-acid text-ink shadow-none outline-none after:absolute after:inset-x-0 after:-bottom-2 after:h-2 after:bg-acid after:content-['']">
-      <div className="relative grid min-h-28 grid-cols-[3rem_1fr_3rem] items-center px-3 py-0 md:flex md:min-h-28 md:justify-between md:px-8 md:py-3">
+      <div className="relative grid grid-cols-[3rem_1fr_3rem] items-center px-3 py-1 md:flex md:justify-between md:px-8 md:py-1.5">
         <button
           aria-expanded={open}
           aria-label={open ? "Close menu" : "Open menu"}
@@ -99,11 +108,11 @@ export function SiteHeader({
           <Link className="font-mono text-xs font-bold uppercase tracking-[0.28em] text-ink/70 hover:text-rust" href="/account/login">
             Login
           </Link>
-          <CartLink />
+          <CartLink onClick={() => setCartOpen(true)} />
         </div>
 
         <div className="relative z-10 col-start-3 flex h-12 w-9 items-center justify-center justify-self-end md:hidden">
-          <CartLink />
+          <CartLink onClick={() => setCartOpen(true)} />
         </div>
       </div>
 
@@ -157,6 +166,143 @@ export function SiteHeader({
           </Link>
         </div>
       </nav>
+
+      <div
+        aria-hidden="true"
+        className={`fixed inset-0 z-40 bg-ink/55 transition-opacity duration-300 ${
+          cartOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+        }`}
+        onClick={() => setCartOpen(false)}
+      />
+
+      <aside
+        aria-label="Shopping cart"
+        className={`fixed right-0 top-0 z-50 flex h-dvh w-[88vw] max-w-md flex-col bg-acid text-ink shadow-2xl transition-transform duration-300 ease-out ${
+          cartOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="flex min-h-20 items-center justify-between border-b border-ink/15 px-5">
+          <div>
+            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.24em] text-rust">
+              Cart
+            </p>
+            <h2 className="font-display text-3xl italic uppercase leading-none">
+              {cartCount} item{cartCount === 1 ? "" : "s"}
+            </h2>
+          </div>
+          <button
+            aria-label="Close cart"
+            className="grid h-10 w-10 place-items-center text-ink transition-opacity hover:opacity-65"
+            onClick={() => setCartOpen(false)}
+            type="button"
+          >
+            <CloseGlyph />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-5 py-5">
+          {cart.items.length > 0 ? (
+            <div className="grid gap-4">
+              {cart.items.map((item) => {
+                const itemKey = item.variantId ?? item.productId;
+
+                return (
+                  <article
+                    className="grid grid-cols-[104px_1fr] gap-4 border-b border-ink/15 pb-4"
+                    key={itemKey}
+                  >
+                    <div className="relative aspect-[4/5] bg-transparent">
+                      <Image
+                        alt={item.name}
+                        className="object-contain"
+                        fill
+                        sizes="104px"
+                        src={item.image ?? "/images/products/home-drop/never-found-logo-tee.png"}
+                        unoptimized
+                      />
+                    </div>
+                    <div className="flex min-w-0 flex-col justify-between gap-3">
+                      <div>
+                        <h3 className="font-display text-xl italic uppercase leading-none">
+                          {item.name}
+                        </h3>
+                        <div className="mt-2 space-y-0.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-ink/60">
+                          {item.gender ? <p>{item.gender}</p> : null}
+                          {item.color ? <p>Color: {item.color}</p> : null}
+                          {item.size ? <p>Size: {item.size}</p> : null}
+                        </div>
+                        <p className="mt-2 font-mono text-xs font-bold">
+                          <StorePrice amountUsd={item.unitPrice} />
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center rounded-full border border-ink font-mono text-xs font-bold">
+                          <button
+                            className="px-3 py-1.5 transition hover:bg-ink hover:text-acid"
+                            onClick={() => cart.updateQuantity(itemKey, item.quantity - 1)}
+                            type="button"
+                          >
+                            -
+                          </button>
+                          <span className="min-w-8 border-x border-ink px-2 py-1.5 text-center">
+                            {item.quantity}
+                          </span>
+                          <button
+                            className="px-3 py-1.5 transition hover:bg-ink hover:text-acid"
+                            onClick={() => cart.updateQuantity(itemKey, item.quantity + 1)}
+                            type="button"
+                          >
+                            +
+                          </button>
+                        </div>
+                        <button
+                          className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-rust"
+                          onClick={() => cart.removeItem(itemKey)}
+                          type="button"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="grid min-h-64 place-items-center text-center">
+              <div>
+                <p className="font-display text-4xl italic uppercase leading-none">
+                  Cart empty
+                </p>
+                <Link
+                  className="mt-5 inline-flex rounded-full bg-ink px-6 py-3 font-mono text-xs font-bold uppercase tracking-[0.2em] text-acid"
+                  href="/shop"
+                  onClick={() => setCartOpen(false)}
+                >
+                  Shop now
+                </Link>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="border-t border-ink/15 px-5 py-5">
+          <div className="flex items-center justify-between font-mono text-xs font-bold uppercase tracking-[0.2em]">
+            <span>Subtotal</span>
+            <span>
+              <StorePrice amountUsd={subtotal} />
+            </span>
+          </div>
+          <Link
+            className="mt-4 flex w-full items-center justify-center rounded-full bg-ink px-6 py-4 font-mono text-xs font-bold italic uppercase tracking-[0.22em] text-acid transition-colors hover:bg-rust hover:text-ink"
+            href="/checkout"
+            onClick={() => setCartOpen(false)}
+          >
+            Checkout
+          </Link>
+        </div>
+      </aside>
     </header>
   );
 }

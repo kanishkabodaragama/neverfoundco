@@ -165,7 +165,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
       name: product.name,
       slug: product.slug,
       unitPrice: displayPrice,
-      image: displayImage,
+      image: selectedVariant.image || product.image,
       gender: selectedGender,
       size: selectedSize,
       color: selectedColor,
@@ -186,7 +186,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
           >
             <ChevronUp className="h-5 w-5" />
           </button>
-          <div className="flex gap-4 overflow-x-auto md:grid md:max-h-[432px] md:overflow-hidden">
+          <div className="no-scrollbar flex gap-4 overflow-x-auto md:grid md:max-h-[432px] md:overflow-hidden">
           {visibleGallery.map((image, index) => (
             <button
               aria-label={`View product image ${effectiveGalleryStart + index + 1}`}
@@ -302,13 +302,14 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
 
           <OptionGroup label="Color">
             {availableColors.map((color) => (
-              <OptionButton
+              <ColorOptionButton
+                colorValue={product.colorSwatches[color] ?? color}
                 key={color}
                 onClick={() => selectColor(color)}
                 selected={color === selectedColor}
               >
                 {color}
-              </OptionButton>
+              </ColorOptionButton>
             ))}
           </OptionGroup>
 
@@ -354,6 +355,26 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
                   ? "Added To Cart"
                   : "Add Selected Variant"}
           </button>
+
+          <section className="pt-3 text-left">
+            <div className="flex items-center justify-between border-b border-ink/65 pb-3">
+              <h2 className="font-display text-2xl italic uppercase leading-none">
+                Description
+              </h2>
+              <span aria-hidden="true" className="font-mono text-xl leading-none">
+                ^
+              </span>
+            </div>
+            {product.description ? (
+              <p className="mt-4 whitespace-pre-line text-sm font-medium italic leading-relaxed text-ink/75">
+                {product.description}
+              </p>
+            ) : (
+              <p className="mt-4 text-sm font-medium italic leading-relaxed text-ink/75">
+                {product.shortDescription}
+              </p>
+            )}
+          </section>
         </div>
       </div>
     </div>
@@ -397,6 +418,33 @@ function OptionButton({
           : "border-ink/35 bg-transparent text-ink hover:border-ink"
       }`}
       onClick={onClick}
+      type="button"
+    >
+      {children}
+    </button>
+  );
+}
+
+function ColorOptionButton({
+  children,
+  colorValue,
+  onClick,
+  selected,
+}: {
+  children: ReactNode;
+  colorValue: string;
+  onClick: () => void;
+  selected: boolean;
+}) {
+  return (
+    <button
+      className="min-w-16 rounded-full border px-6 py-3 font-sans text-sm font-semibold transition hover:opacity-80"
+      onClick={onClick}
+      style={{
+        backgroundColor: selected ? colorValue : "transparent",
+        borderColor: colorValue,
+        color: selected ? "#f5f3ec" : colorValue,
+      }}
       type="button"
     >
       {children}
