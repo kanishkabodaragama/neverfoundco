@@ -374,7 +374,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
                 ? "Sold Out"
                 : added
                   ? "Added To Cart"
-                  : "Add Selected Variant"}
+                  : "Add To Cart"}
           </button>
 
           <section className="pt-2 text-left">

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCart } from "@/components/store/cart-provider";
 import { CartLink } from "@/components/site/CartLink";
 import { CurrencySelector } from "@/components/site/CurrencySelector";
@@ -36,21 +36,66 @@ export function SiteHeader({
 }) {
   const [open, setOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const cart = useCart();
   const cartCount = cart.items.reduce((total, item) => total + item.quantity, 0);
   const subtotal = cart.items.reduce(
     (total, item) => total + item.unitPrice * item.quantity,
     0,
   );
+  const headerHidden = hidden && !open && !cartOpen;
+
+  useEffect(() => {
+    if (open || cartOpen) {
+      return;
+    }
+
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+
+    function updateHeader() {
+      const currentScrollY = window.scrollY;
+      const scrollingDown = currentScrollY > lastScrollY + 4;
+      const scrollingUp = currentScrollY < lastScrollY - 4;
+
+      if (scrollingDown && currentScrollY > 80) {
+        setHidden(true);
+      } else if (scrollingUp || currentScrollY <= 8) {
+        setHidden(false);
+      }
+
+      lastScrollY = currentScrollY;
+      ticking = false;
+    }
+
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(updateHeader);
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [cartOpen, open]);
 
   return (
-    <header className="sticky top-0 z-40 border-0 bg-acid text-ink shadow-none outline-none after:absolute after:inset-x-0 after:-bottom-2 after:h-2 after:bg-acid after:content-['']">
-      <div className="relative grid grid-cols-[3rem_1fr_3rem] items-center px-3 py-1 md:flex md:justify-between md:px-8 md:py-1.5">
+    <header
+      className={`sticky top-0 z-40 border-0 bg-acid text-ink shadow-none outline-none transition-transform duration-300 ease-out after:absolute after:inset-x-0 after:-bottom-2 after:h-2 after:bg-acid after:content-[''] ${
+        headerHidden ? "-translate-y-full" : "translate-y-0"
+      }`}
+    >
+      <div className="relative grid grid-cols-[3rem_1fr_3rem] items-center px-3 py-0 md:flex md:justify-between md:px-8 md:py-1.5">
         <button
           aria-expanded={open}
           aria-label={open ? "Close menu" : "Open menu"}
-          className="relative z-10 col-start-1 flex h-12 w-9 items-center justify-center justify-self-start p-1 text-ink transition-opacity hover:opacity-75 md:hidden"
-          onClick={() => setOpen((value) => !value)}
+          className="relative z-10 col-start-1 flex h-10 w-9 items-center justify-center justify-self-start p-1 text-ink transition-opacity hover:opacity-75 md:hidden"
+          onClick={() => {
+            setHidden(false);
+            setOpen((value) => !value);
+          }}
           type="button"
         >
           {open ? (
@@ -70,7 +115,7 @@ export function SiteHeader({
 
         <Link
           aria-label="Never Found home"
-          className="relative col-start-2 block h-24 w-48 justify-self-center md:relative md:left-auto md:top-auto md:h-20 md:w-40 md:translate-x-0 md:translate-y-0"
+          className="relative col-start-2 block h-20 w-48 justify-self-center md:relative md:left-auto md:top-auto md:h-20 md:w-40 md:translate-x-0 md:translate-y-0"
           href="/"
         >
           <Image
@@ -108,11 +153,21 @@ export function SiteHeader({
           <Link className="font-mono text-xs font-bold uppercase tracking-[0.28em] text-ink/70 hover:text-rust" href="/account/login">
             Login
           </Link>
-          <CartLink onClick={() => setCartOpen(true)} />
+          <CartLink
+            onClick={() => {
+              setHidden(false);
+              setCartOpen(true);
+            }}
+          />
         </div>
 
-        <div className="relative z-10 col-start-3 flex h-12 w-9 items-center justify-center justify-self-end md:hidden">
-          <CartLink onClick={() => setCartOpen(true)} />
+        <div className="relative z-10 col-start-3 flex h-10 w-9 items-center justify-center justify-self-end md:hidden">
+          <CartLink
+            onClick={() => {
+              setHidden(false);
+              setCartOpen(true);
+            }}
+          />
         </div>
       </div>
 
