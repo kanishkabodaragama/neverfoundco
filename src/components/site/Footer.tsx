@@ -1,9 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CurrencySelector } from "@/components/site/CurrencySelector";
 
 const footerLinks = [
-  { label: "Search", href: "/shop" },
   { label: "Privacy Policy", href: "/privacy" },
   { label: "Refund Policy", href: "/returns" },
   { label: "Shipping Policy", href: "/returns" },
@@ -15,7 +13,7 @@ const footerLinks = [
 export function Footer() {
   return (
     <footer className="border-0 bg-acid text-ink shadow-none outline-none">
-      <div className="px-5 pb-10 pt-8 md:px-8 md:pb-12 md:pt-10">
+      <div className="px-5 pb-8 pt-7 md:px-8 md:pb-10 md:pt-9">
         <Link
           aria-label="Never Found home"
           className="relative mx-auto block h-24 w-48 md:h-20 md:w-40"
@@ -30,25 +28,29 @@ export function Footer() {
           />
         </Link>
 
-        <div className="mt-10 flex flex-col items-start gap-7 font-mono text-xs font-bold uppercase tracking-[0.08em] md:mt-12 md:flex-row md:items-end md:justify-between">
-          <div className="grid gap-5">
-            <Link
-              aria-label="Instagram"
-              className="inline-flex h-9 w-9 items-center justify-center border border-ink text-base font-black transition-colors hover:bg-ink hover:text-acid"
-              href="https://www.instagram.com/"
-              rel="noreferrer"
-              target="_blank"
-            >
-              IG
-            </Link>
-            <CurrencySelector />
-          </div>
+        <div className="mt-7 grid gap-4 font-mono text-[9px] font-bold uppercase tracking-[0.06em] md:mt-8 md:grid-cols-[auto_1fr] md:items-end md:gap-8 md:text-[10px]">
+          <Link
+            aria-label="Instagram"
+            className="inline-flex h-7 w-7 items-center justify-center text-ink transition-colors hover:text-rust"
+            href="https://www.instagram.com/"
+            rel="noreferrer"
+            target="_blank"
+          >
+            <Image
+              alt=""
+              aria-hidden="true"
+              className="h-4 w-4 object-contain"
+              height={16}
+              src="/images/icons/instagram.png"
+              width={16}
+            />
+          </Link>
 
-          <div className="grid gap-5 md:justify-items-end">
+          <div className="grid gap-3 md:justify-items-end">
             <p>&copy; {new Date().getFullYear()}, Never Found.</p>
             <nav
               aria-label="Footer navigation"
-              className="flex max-w-xl flex-wrap gap-x-5 gap-y-2 text-[11px] leading-relaxed md:justify-end md:text-xs"
+              className="grid grid-cols-3 gap-x-3 gap-y-2 leading-relaxed md:flex md:max-w-xl md:flex-wrap md:justify-end md:gap-x-5"
             >
               {footerLinks.map((item) => (
                 <Link
