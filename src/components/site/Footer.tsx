@@ -1,66 +1,66 @@
+import Image from "next/image";
 import Link from "next/link";
-import { Ticker } from "@/components/site/Ticker";
+import { CurrencySelector } from "@/components/site/CurrencySelector";
+
+const footerLinks = [
+  { label: "Search", href: "/shop" },
+  { label: "Privacy Policy", href: "/privacy" },
+  { label: "Refund Policy", href: "/returns" },
+  { label: "Shipping Policy", href: "/returns" },
+  { label: "Terms of Service", href: "/terms" },
+  { label: "Contact Us", href: "/contact" },
+  { label: "About Us", href: "/about" },
+];
 
 export function Footer() {
   return (
-    <footer className="bg-ink text-bone">
-      <Ticker />
-      <div className="px-5 py-12 md:px-8 md:py-16">
-        <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
-          <div>
-            <Link aria-label="Never Found home" className="mb-4 flex items-center gap-2" href="/">
-              <span className="font-display text-2xl leading-none tracking-tight text-acid">
-                NEVER
-              </span>
-              <span className="border border-acid px-1.5 py-0.5 font-display text-2xl leading-none tracking-tight">
-                FOUND
-              </span>
+    <footer className="border-0 bg-acid text-ink shadow-none outline-none">
+      <div className="px-5 pb-10 pt-8 md:px-8 md:pb-12 md:pt-10">
+        <Link
+          aria-label="Never Found home"
+          className="relative mx-auto block h-24 w-48 md:h-20 md:w-40"
+          href="/"
+        >
+          <Image
+            alt="Never Found"
+            className="object-contain object-center"
+            fill
+            sizes="(min-width: 768px) 160px, 192px"
+            src="/images/brand/logo-nvr-fnd.png"
+          />
+        </Link>
+
+        <div className="mt-10 flex flex-col items-start gap-7 font-mono text-xs font-bold uppercase tracking-[0.08em] md:mt-12 md:flex-row md:items-end md:justify-between">
+          <div className="grid gap-5">
+            <Link
+              aria-label="Instagram"
+              className="inline-flex h-9 w-9 items-center justify-center border border-ink text-base font-black transition-colors hover:bg-ink hover:text-acid"
+              href="https://www.instagram.com/"
+              rel="noreferrer"
+              target="_blank"
+            >
+              IG
             </Link>
-            <p className="max-w-xs font-mono text-[11px] uppercase tracking-wide text-bone/40">
-              Independent streetwear. Small runs. No restocks. Based nowhere
-              in particular.
-            </p>
+            <CurrencySelector />
           </div>
 
-          <div className="grid grid-cols-2 gap-10 font-mono text-xs uppercase tracking-[0.28em]">
-            <div className="flex flex-col gap-3 text-bone/60">
-              <span className="mb-1 text-acid/70">Shop</span>
-              <Link className="transition-colors hover:text-acid" href="/shop">
-                Current drop
-              </Link>
-              <Link className="transition-colors hover:text-acid" href="/cart">
-                Cart
-              </Link>
-              <Link className="transition-colors hover:text-acid" href="/account/login">
-                Orders
-              </Link>
-            </div>
-            <div className="flex flex-col gap-3 text-bone/60">
-              <span className="mb-1 text-acid/70">Files</span>
-              <Link className="transition-colors hover:text-acid" href="/about">
-                About Us
-              </Link>
-              <Link className="transition-colors hover:text-acid" href="/contact">
-                Contact
-              </Link>
-              <Link className="transition-colors hover:text-acid" href="/privacy">
-                Privacy
-              </Link>
-              <Link className="transition-colors hover:text-acid" href="/returns">
-                Returns
-              </Link>
-              <Link className="transition-colors hover:text-acid" href="/terms">
-                Terms
-              </Link>
-            </div>
+          <div className="grid gap-5 md:justify-items-end">
+            <p>&copy; {new Date().getFullYear()}, Never Found.</p>
+            <nav
+              aria-label="Footer navigation"
+              className="flex max-w-xl flex-wrap gap-x-5 gap-y-2 text-[11px] leading-relaxed md:justify-end md:text-xs"
+            >
+              {footerLinks.map((item) => (
+                <Link
+                  className="transition-colors hover:text-rust"
+                  href={item.href}
+                  key={item.label}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
           </div>
-        </div>
-
-        <div className="mt-12 flex flex-col-reverse items-start justify-between gap-4 border-t border-acid/10 pt-6 font-mono text-[10px] uppercase tracking-wide text-bone/30 md:flex-row md:items-center">
-          <span>&copy; {new Date().getFullYear()} Never Found. All units accounted for.</span>
-          <Link className="transition-colors hover:text-acid" href="https://neurait.com" rel="noreferrer" target="_blank">
-            Developed and maintained by Neura IT
-          </Link>
         </div>
       </div>
     </footer>

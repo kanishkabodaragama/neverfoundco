@@ -14,7 +14,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
   const [requestedGender, setSelectedGender] = useState(product.genders[0]);
   const [requestedColor, setSelectedColor] = useState(product.colors[0]);
   const [requestedSize, setSelectedSize] = useState(product.sizes[0]);
-  const [selectedImage, setSelectedImage] = useState(product.image);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [galleryStart, setGalleryStart] = useState(0);
   const [added, setAdded] = useState(false);
   const availableGenders = useMemo(
@@ -65,7 +65,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
       ) ?? null,
     [product.variants, selectedColor, selectedGender, selectedSize],
   );
-  const displayImage = selectedVariant?.image ?? selectedImage;
+  const displayImage = selectedImage ?? selectedVariant?.image ?? product.image;
   const displayPrice = selectedVariant?.price ?? product.price;
   const isAvailable = Boolean(
     selectedVariant &&
@@ -88,16 +88,19 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
 
   function selectGender(gender: MockProductDetail["genders"][number]) {
     setSelectedGender(gender);
+    setSelectedImage(null);
     setAdded(false);
   }
 
   function selectColor(color: MockProductDetail["colors"][number]) {
     setSelectedColor(color);
+    setSelectedImage(null);
     setAdded(false);
   }
 
   function selectSize(size: MockProductDetail["sizes"][number]) {
     setSelectedSize(size);
+    setSelectedImage(null);
     setAdded(false);
   }
 

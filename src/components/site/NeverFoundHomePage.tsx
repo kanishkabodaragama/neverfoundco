@@ -13,10 +13,10 @@ export function NeverFoundHomePage({
   const featuredProducts = products.filter((product) => !product.soldOut).slice(0, 4);
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-ink text-bone">
+    <div className="min-h-screen overflow-x-hidden bg-acid text-ink">
       <Header />
       <main>
-        <section className="bg-acid px-5 pb-16 pt-6 text-ink md:px-8 md:py-24">
+        <section className="bg-acid px-5 pb-12 pt-6 text-ink md:px-8 md:pb-20 md:pt-24">
           {/* <div className="mb-10 flex items-end justify-between md:mb-14">
             <h2 className="font-display text-4xl uppercase leading-none md:text-6xl">
               Current
@@ -32,75 +32,6 @@ export function NeverFoundHomePage({
             {featuredProducts.map((product) => (
               <EvidenceProductCard key={product.id} product={product} />
             ))}
-          </div>
-
-          <div className="mt-14 text-center">
-            <Link
-              className="inline-block bg-ink px-8 py-4 font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid transition-colors hover:bg-rust hover:text-ink"
-              href="/shop"
-            >
-              View full case file
-            </Link>
-          </div>
-        </section>
-
-        <section className="bg-ink px-5 py-16 md:px-8 md:py-28">
-          <div className="mb-6 font-mono text-[11px] uppercase tracking-[0.28em] text-acid">
-            Evidence log / 01
-          </div>
-
-          <p className="text-stroke font-display text-[12vw] uppercase leading-[0.95] md:max-w-4xl md:text-6xl lg:text-7xl">
-            We do not restock. We do not archive. Wear it before it disappears.
-          </p>
-
-          <div className="mt-10 grid max-w-3xl grid-cols-2 gap-6 border-t border-acid/15 pt-8 md:grid-cols-4 md:gap-10">
-            {[
-              ["50", "units per drop"],
-              ["0", "restocks, ever"],
-              ["1", "drop a month"],
-              ["∞", "ways to wear it"],
-            ].map(([num, label]) => (
-              <div key={label}>
-                <div className="font-display text-3xl leading-none text-acid md:text-4xl">
-                  {num}
-                </div>
-                <div className="mt-2 font-mono text-[10px] uppercase tracking-wide text-bone/60 md:text-xs">
-                  {label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="bg-ink px-5 py-16 md:px-8 md:py-24">
-          <div className="border border-acid/30 p-6 md:p-12">
-            <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.28em] text-acid">
-              Status: next drop pending
-            </div>
-            <h2 className="max-w-2xl font-display text-4xl uppercase leading-[0.9] md:text-6xl">
-              Get found first. Get notified before it is gone.
-            </h2>
-
-            <form className="mt-8 flex max-w-lg flex-col gap-3 sm:flex-row">
-              <label htmlFor="home-email" className="sr-only">
-                Email address
-              </label>
-              <input
-                className="flex-1 border border-bone/30 bg-transparent px-4 py-4 font-mono text-sm text-bone outline-none placeholder:text-bone/40 focus:border-acid"
-                id="home-email"
-                placeholder="your@email.com"
-                type="email"
-              />
-              <button
-                className="whitespace-nowrap bg-acid px-6 py-4 font-mono text-xs font-bold uppercase tracking-[0.28em] text-ink transition-colors hover:bg-bone"
-                type="button"
-              >
-                Notify me
-              </button>
-            </form>
-            <p className="mt-3 font-mono text-[10px] uppercase tracking-wide text-bone/40">
-              No spam. Just drop alerts. Unsubscribe anytime.
-            </p>
           </div>
         </section>
       </main>
