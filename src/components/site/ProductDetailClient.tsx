@@ -285,37 +285,44 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
 
         <div className="my-4 h-px w-full bg-ink/15" />
 
-        <div className="w-full space-y-4">
-          <OptionGroup label={`Gender: ${selectedGender}`}>
-            {availableGenders.map((gender) => (
+        <div className="w-full space-y-5">
+          {availableGenders.length > 1 ? (
+            <OptionGroup label="Gender">
+              {availableGenders.map((gender) => (
+                <OptionButton
+                  key={gender}
+                  onClick={() => selectGender(gender)}
+                  selected={gender === selectedGender}
+                >
+                  {gender}
+                </OptionButton>
+              ))}
+            </OptionGroup>
+          ) : null}
+
+          <OptionGroup label="Color">
+            {availableColors.map((color) => (
               <OptionButton
-                key={gender}
-                onClick={() => selectGender(gender)}
-                selected={gender === selectedGender}
+                key={color}
+                onClick={() => selectColor(color)}
+                selected={color === selectedColor}
               >
-                {gender}
+                {color}
               </OptionButton>
             ))}
           </OptionGroup>
 
-          <OptionGroup label={`Color: ${selectedColor}`}>
-            {availableColors.map((color) => (
-              <button
-                aria-label={`Select ${color}`}
-                className={`h-8 w-8 border ${
-                  selectedColor === color
-                    ? "border-2 border-rust"
-                    : "border-ink/20"
-                }`}
-                style={{ backgroundColor: getColorValue(color, product.colorSwatches) }}
-                key={color}
-                onClick={() => selectColor(color)}
-                type="button"
-              />
-            ))}
-          </OptionGroup>
-
-          <OptionGroup label={`Size: ${selectedSize}`}>
+          <OptionGroup
+            label="Size"
+            action={
+              <a
+                className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] underline decoration-ink/60 underline-offset-4 transition-colors hover:text-rust"
+                href="#size-chart"
+              >
+                Size Guide
+              </a>
+            }
+          >
             {availableSizes.map((size) => (
               <OptionButton
                 key={size}
@@ -334,7 +341,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
           ) : null}
 
           <button
-            className="flex w-full items-center justify-center gap-3 bg-ink px-6 py-4 font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid transition-colors hover:bg-rust hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-2 flex w-full items-center justify-center gap-3 rounded-full bg-ink px-6 py-4 font-mono text-xs font-bold italic uppercase tracking-[0.22em] text-bone transition-colors hover:bg-rust hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
             disabled={!isAvailable}
             onClick={addSelectedVariant}
             type="button"
@@ -353,21 +360,22 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
   );
 }
 
-function getColorValue(color: string, swatches: Record<string, string>) {
-  return swatches[color] ?? color;
-}
-
 function OptionGroup({
+  action,
   children,
   label,
 }: {
+  action?: ReactNode;
   children: ReactNode;
   label: string;
 }) {
   return (
-    <div className="text-center lg:text-left">
-      <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em]">{label}</p>
-      <div className="mt-2 flex flex-wrap justify-center gap-2 lg:justify-start">{children}</div>
+    <div className="text-left">
+      <div className="flex items-center justify-between gap-4">
+        <p className="font-mono text-[11px] font-bold uppercase tracking-[0.18em]">{label}</p>
+        {action}
+      </div>
+      <div className="mt-2 flex flex-wrap justify-start gap-2">{children}</div>
     </div>
   );
 }
@@ -383,8 +391,10 @@ function OptionButton({
 }) {
   return (
     <button
-      className={`min-w-14 border px-4 py-2.5 font-mono text-xs font-bold uppercase tracking-[0.16em] transition hover:border-rust hover:text-rust ${
-        selected ? "border-rust text-rust" : "border-ink"
+      className={`min-w-16 rounded-full border px-6 py-3 font-sans text-sm font-semibold transition ${
+        selected
+          ? "border-ink bg-ink text-bone"
+          : "border-ink/35 bg-transparent text-ink hover:border-ink"
       }`}
       onClick={onClick}
       type="button"
