@@ -7,7 +7,8 @@ export const revalidate = 0;
 
 export default async function HomePage() {
   const dbProducts = await listActiveProducts();
-  const products = dbProducts.length ? dbProducts.map(mapDbProductToShopProduct) : shopProducts;
+  const products = (dbProducts.length ? dbProducts.map(mapDbProductToShopProduct) : shopProducts)
+    .filter((product) => !product.soldOut);
 
   return <NeverFoundHomePage products={products} />;
 }

@@ -16,7 +16,8 @@ export const revalidate = 0;
 
 export default async function ShopPage() {
   const dbProducts = await listActiveProducts();
-  const products = dbProducts.length ? dbProducts.map(mapDbProductToShopProduct) : shopProducts;
+  const products = (dbProducts.length ? dbProducts.map(mapDbProductToShopProduct) : shopProducts)
+    .filter((product) => !product.soldOut);
 
   return (
     <div className="min-h-screen w-full bg-acid text-ink">

@@ -177,6 +177,8 @@ export function ShopCatalog() {
 
   const filteredProducts = useMemo(() => {
     const filtered = shopProducts.filter((product) => {
+      if (product.soldOut) return false;
+
       const matchesCategory =
         selectedCategory === "All" || product.category === selectedCategory;
       const matchesSize =

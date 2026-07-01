@@ -10,7 +10,7 @@ export function NeverFoundHomePage({
 }: {
   products?: ShopProduct[];
 }) {
-  const featuredProducts = products.slice(0, 4);
+  const featuredProducts = products.filter((product) => !product.soldOut).slice(0, 4);
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-ink text-bone">

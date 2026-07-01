@@ -79,7 +79,7 @@ function NeverFoundProductPage({
   relatedProducts: ShopProduct[];
 }) {
   const related = relatedProducts
-    .filter((item) => (item.slug ?? item.id) !== product.slug)
+    .filter((item) => !item.soldOut && (item.slug ?? item.id) !== product.slug)
     .slice(0, 4);
 
   return (
