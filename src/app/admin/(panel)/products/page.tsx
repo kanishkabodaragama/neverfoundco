@@ -4,6 +4,7 @@ import { Filter, MoreHorizontal, Plus, Search } from "lucide-react";
 import { AdminAlert } from "@/components/admin/admin-alert";
 import { CsvDownloadButton } from "@/components/admin/csv-download-button";
 import { requireAdmin } from "@/lib/admin-auth";
+import { formatColomboDateKey } from "@/lib/date-time";
 import { listAdminProducts } from "@/lib/db/products";
 import { formatCurrency } from "@/lib/utils";
 
@@ -25,7 +26,7 @@ export default async function AdminProductsPage({
     sale_price: product.sale_price ? Number(product.sale_price).toFixed(2) : "",
     stock: product.stock_quantity,
     status: product.is_active ? "Active" : "Draft",
-    updated: new Date(product.updated_at).toISOString().slice(0, 10),
+    updated: formatColomboDateKey(product.updated_at),
   }));
 
   return (
@@ -135,7 +136,7 @@ export default async function AdminProductsPage({
                     {product.is_active ? "Active" : "Draft"}
                   </span>
                 </td>
-                <td>{new Date(product.updated_at).toISOString().slice(0, 10)}</td>
+                <td>{formatColomboDateKey(product.updated_at)}</td>
                 <td className="text-right">
                   <details className="relative z-20 inline-block">
                     <summary className="admin-secondary-action flex h-9 w-9 cursor-pointer items-center justify-center marker:content-['']">

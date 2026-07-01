@@ -1,5 +1,6 @@
 import { CsvDownloadButton } from "@/components/admin/csv-download-button";
 import { requireAdmin } from "@/lib/admin-auth";
+import { formatColomboDateTime } from "@/lib/date-time";
 import { listAdminOrders } from "@/lib/db/admin";
 import { formatCurrency } from "@/lib/utils";
 
@@ -31,7 +32,7 @@ export default async function AdminCustomersPage() {
     phone: customer.phone,
     orders: customer.orders,
     spent: customer.spent.toFixed(2),
-    latest_order: new Date(customer.lastOrderAt).toLocaleString("en-US"),
+    latest_order: formatColomboDateTime(customer.lastOrderAt),
   }));
 
   return (
@@ -76,7 +77,7 @@ export default async function AdminCustomersPage() {
                 <td>{customer.phone}</td>
                 <td>{customer.orders}</td>
                 <td>{formatCurrency(customer.spent)}</td>
-                <td>{new Date(customer.lastOrderAt).toLocaleString("en-US")}</td>
+                <td>{formatColomboDateTime(customer.lastOrderAt)}</td>
               </tr>
             ))}
             {!customers.length ? (

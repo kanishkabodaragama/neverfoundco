@@ -1,5 +1,6 @@
 "use client";
 
+import { formatColomboDateTime } from "@/lib/date-time";
 import { Download } from "lucide-react";
 
 type CsvColumn = {
@@ -25,7 +26,7 @@ export function CsvDownloadButton({
   function downloadCsv() {
     const lines = [
       [title],
-      [`Generated at ${new Date().toLocaleString()}`],
+      [`Generated at ${formatColomboDateTime(new Date())}`],
       ...meta.map((line) => [line]),
       [],
       columns.map((column) => column.label),

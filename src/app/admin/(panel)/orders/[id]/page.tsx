@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { AdminAlert } from "@/components/admin/admin-alert";
 import { requireAdmin } from "@/lib/admin-auth";
+import { formatColomboDateTime } from "@/lib/date-time";
 import { getAdminOrder } from "@/lib/db/admin";
 import { formatCurrency } from "@/lib/utils";
 
@@ -27,7 +28,7 @@ export default async function AdminOrderDetailPage({
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{order.order_number}</h1>
-          <p className="admin-muted mt-2 text-sm">{new Date(order.created_at).toLocaleString("en-US")}</p>
+          <p className="admin-muted mt-2 text-sm">{formatColomboDateTime(order.created_at)}</p>
         </div>
         <Link className="admin-secondary-action flex items-center gap-2 px-3 py-2.5" href="/admin/orders">
           <ArrowLeft className="h-4 w-4" />

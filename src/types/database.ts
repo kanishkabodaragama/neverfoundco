@@ -97,6 +97,10 @@ export type Database = {
           total: number;
           payment_status: string;
           order_status: string;
+          payhere_amount_lkr: number | null;
+          payhere_exchange_rate: number | null;
+          payhere_exchange_source: string | null;
+          payhere_exchange_updated_at: string | null;
           payhere_payment_id: string | null;
           payhere_order_id: string | null;
           payhere_method: string | null;

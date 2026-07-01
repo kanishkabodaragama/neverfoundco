@@ -1,5 +1,6 @@
 import { requireAdmin } from "@/lib/admin-auth";
 import { CsvDownloadButton } from "@/components/admin/csv-download-button";
+import { formatColomboDate, formatColomboDateTime } from "@/lib/date-time";
 import { getReportData } from "@/lib/db/reports";
 import { formatCurrency } from "@/lib/utils";
 
@@ -23,7 +24,7 @@ export default async function AdminReportsPage({
   }));
   const orderRows = report.orders.map((order) => ({
     order: order.order_number,
-    date: new Date(order.created_at).toLocaleString("en-LK"),
+    date: formatColomboDateTime(order.created_at),
     customer: order.customer_name,
     email: order.customer_email,
     total: Number(order.total).toFixed(2),
@@ -120,7 +121,7 @@ export default async function AdminReportsPage({
               {report.orders.map((order) => (
                 <tr key={order.id}>
                   <td>{order.order_number}</td>
-                  <td>{new Date(order.created_at).toLocaleDateString("en-LK")}</td>
+                  <td>{formatColomboDate(order.created_at)}</td>
                   <td>{order.customer_name}</td>
                   <td>{formatCurrency(Number(order.total))}</td>
                   <td>{order.payment_status}</td>

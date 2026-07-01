@@ -1,4 +1,5 @@
 import type { AdminCoupon } from "@/lib/db/admin";
+import { formatColomboDateTimeLocalInput } from "@/lib/date-time";
 import type { ProductWithImages } from "@/lib/db/products";
 import { formatCurrency } from "@/lib/utils";
 
@@ -6,7 +7,7 @@ function toDateTimeLocal(value?: string | null) {
   if (!value) return "";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";
-  return date.toISOString().slice(0, 16);
+  return formatColomboDateTimeLocalInput(date);
 }
 
 export function CouponForm({

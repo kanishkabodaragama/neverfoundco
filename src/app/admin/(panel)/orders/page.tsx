@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { CsvDownloadButton } from "@/components/admin/csv-download-button";
 import { requireAdmin } from "@/lib/admin-auth";
+import { formatColomboDate, formatColomboTime } from "@/lib/date-time";
 import { listAdminOrders } from "@/lib/db/admin";
 import { cn, formatCurrency } from "@/lib/utils";
 import { Filter, MoreHorizontal, Search } from "lucide-react";
@@ -22,8 +23,8 @@ export default async function AdminOrdersPage({
   });
   const orderRows = orders.map((order) => ({
     order: order.order_number,
-    date: formatOrderDate(order.created_at),
-    time: formatOrderTime(order.created_at),
+    date: formatColomboDate(order.created_at),
+    time: formatColomboTime(order.created_at),
     customer: order.customer_name,
     email: order.customer_email,
     total: Number(order.total).toFixed(2),
@@ -105,10 +106,10 @@ export default async function AdminOrdersPage({
                   </Link>
                 </td>
                 <td className="px-4 py-4">
-                  {formatOrderDate(order.created_at)}
+                  {formatColomboDate(order.created_at)}
                 </td>
                 <td className="px-4 py-4 font-mono text-xs uppercase text-[#81796f] dark:text-[#b9afa4]">
-                  {formatOrderTime(order.created_at)}
+                  {formatColomboTime(order.created_at)}
                 </td>
                 <td className="px-4 py-4">
                   {order.customer_name}
@@ -173,21 +174,6 @@ function Select({
       {children}
     </select>
   );
-}
-
-function formatOrderDate(value: string) {
-  return new Date(value).toLocaleDateString("en-LK", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}
-
-function formatOrderTime(value: string) {
-  return new Date(value).toLocaleTimeString("en-LK", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 }
 
 const statusBadgeClasses: Record<string, string> = {

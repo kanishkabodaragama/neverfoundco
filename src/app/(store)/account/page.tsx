@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
+import { formatColomboDateTime } from "@/lib/date-time";
 import { listCustomerOrders } from "@/lib/db/orders";
 import { formatMoney } from "@/lib/utils";
 
@@ -41,7 +42,7 @@ export default async function AccountPage() {
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <h2 className="font-display text-3xl uppercase leading-none">{order.order_number}</h2>
-                  <p className="mt-2 font-mono text-xs font-bold uppercase tracking-wide text-ink/60">{new Date(order.created_at).toLocaleString("en-US")}</p>
+                  <p className="mt-2 font-mono text-xs font-bold uppercase tracking-wide text-ink/60">{formatColomboDateTime(order.created_at)}</p>
                 </div>
                 <div className="flex flex-wrap gap-2 font-mono text-[10px] font-bold uppercase tracking-wide">
                   <span className="border border-ink/15 px-3 py-2">Payment: {order.payment_status}</span>

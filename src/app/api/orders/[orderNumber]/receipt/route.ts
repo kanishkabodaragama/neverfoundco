@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { formatColomboDateTime } from "@/lib/date-time";
 import { listCustomerOrders } from "@/lib/db/orders";
 
 export async function GET(
@@ -24,7 +25,7 @@ export async function GET(
   const lines = [
     "Never Found Co Receipt",
     `Order: ${order.order_number}`,
-    `Date: ${new Date(order.created_at).toLocaleString("en-US")}`,
+    `Date: ${formatColomboDateTime(order.created_at)}`,
     `Payment: ${order.payment_status}`,
     `Status: ${order.order_status}`,
     "",

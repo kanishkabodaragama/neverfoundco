@@ -3,6 +3,7 @@ import { AdminAlert } from "@/components/admin/admin-alert";
 import { CsvDownloadButton } from "@/components/admin/csv-download-button";
 import { AdminModal } from "@/components/admin/admin-modal";
 import { requireAdmin } from "@/lib/admin-auth";
+import { formatColomboDateKey } from "@/lib/date-time";
 import { listVariantOptions } from "@/lib/db/variant-options";
 
 export const dynamic = "force-dynamic";
@@ -31,9 +32,7 @@ export default async function AdminVariantsPage({
     type: option.option_type,
     value: option.name,
     color: option.color_value ?? "",
-    created: option.created_at
-      ? new Date(option.created_at).toISOString().slice(0, 10)
-      : "",
+    created: option.created_at ? formatColomboDateKey(option.created_at) : "",
   }));
 
   return (
@@ -114,7 +113,7 @@ export default async function AdminVariantsPage({
                       </span>
                     </td>
                   ) : null}
-                  <td>{option.created_at ? new Date(option.created_at).toISOString().slice(0, 10) : "-"}</td>
+                  <td>{option.created_at ? formatColomboDateKey(option.created_at) : "-"}</td>
                   <td className="text-right">
                     <details className="relative z-20 inline-block">
                       <summary className="admin-secondary-action inline-flex h-9 w-9 cursor-pointer list-none items-center justify-center marker:content-['']">

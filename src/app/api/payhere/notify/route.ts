@@ -11,12 +11,13 @@ function mapPaymentStatus(statusCode: string) {
 
 export async function POST(request: Request) {
   const formData = await request.formData();
-  const merchantId = String(formData.get("merchant_id") ?? "");
-  const orderId = String(formData.get("order_id") ?? "");
-  const payhereAmount = String(formData.get("payhere_amount") ?? "");
-  const payhereCurrency = String(formData.get("payhere_currency") ?? "");
-  const statusCode = String(formData.get("status_code") ?? "");
-  const md5sig = String(formData.get("md5sig") ?? "");
+  const merchantId = getPayHereValue(formData, "merchant_id");
+  const orderId = getPayHereValue(formData, "order_id");
+  const payhereAmount = getPayHereValue(formData, "payhere_amount");
+  const payhereCurrency = getPayHereValue(formData, "payhere_currency");
+  const statusCode = getPayHereValue(formData, "status_code");
+  const md5sig = getPayHereValue(formData, "md5sig");
+  const parsedPayHereAmount = parsePayHereAmount(payhereAmount);
 
   const isValid = verifyPayHereNotificationSignature({
     merchantId,
@@ -31,8 +32,26 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
-  const paymentStatus = mapPaymentStatus(statusCode);
+  if (parsedPayHereAmount === null) {
+    return NextResponse.json({ error: "Invalid payment amount" }, { status: 400 });
+  }
+
   const supabase = getSupabaseAdminClient();
+  const { data: order, error: orderError } = await supabase
+    .from("orders")
+    .select("id, payhere_amount_lkr")
+    .eq("order_number", orderId)
+    .maybeSingle();
+
+  if (orderError) {
+    return NextResponse.json({ error: orderError.message }, { status: 500 });
+  }
+
+  if (!order || !amountsMatch(parsedPayHereAmount, order.payhere_amount_lkr)) {
+    return NextResponse.json({ error: "Invalid payment amount" }, { status: 400 });
+  }
+
+  const paymentStatus = mapPaymentStatus(statusCode);
   const { error } = await supabase
     .from("orders")
     .update({
@@ -41,9 +60,9 @@ export async function POST(request: Request) {
       payhere_payment_id: String(formData.get("payment_id") ?? ""),
       payhere_order_id: orderId,
       payhere_method: String(formData.get("method") ?? ""),
+      payhere_amount_lkr: order.payhere_amount_lkr ?? parsedPayHereAmount,
     })
-    .eq("order_number", orderId)
-    .eq("total", Number(payhereAmount));
+    .eq("id", order.id);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -52,3 +71,21 @@ export async function POST(request: Request) {
   return NextResponse.json({ received: true });
 }
 
+function getPayHereValue(formData: FormData, key: string) {
+  return String(formData.get(key) ?? "").trim();
+}
+
+function parsePayHereAmount(payhereAmount: string) {
+  const normalized = payhereAmount.replace(/,/g, "");
+  const parsedPayHereAmount = Number(normalized);
+
+  if (!Number.isFinite(parsedPayHereAmount)) return null;
+
+  return parsedPayHereAmount;
+}
+
+function amountsMatch(parsedPayHereAmount: number, quotedAmount: number | null) {
+  if (quotedAmount === null) return true;
+
+  return Math.abs(parsedPayHereAmount - Number(quotedAmount)) < 0.01;
+}

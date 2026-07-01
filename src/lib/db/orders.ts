@@ -2,6 +2,7 @@ import type { CheckoutInput } from "@/lib/validation/checkout";
 import { getCouponDiscount } from "@/lib/db/coupons";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getShippingFeeForAddress } from "@/lib/db/shipping";
+import type { PayHereQuote } from "@/lib/payhere";
 import { toMoney } from "@/lib/utils";
 import { randomUUID } from "node:crypto";
 
@@ -145,6 +146,21 @@ async function incrementCouponUsage(couponCode: string) {
     .from("coupons")
     .update({ used_count: Number(coupon.used_count ?? 0) + 1 })
     .eq("id", coupon.id);
+}
+
+export async function updateOrderPayHereQuote(orderId: string, quote: PayHereQuote) {
+  const supabase = getSupabaseAdminClient();
+  const { error } = await supabase
+    .from("orders")
+    .update({
+      payhere_amount_lkr: quote.amountLkr,
+      payhere_exchange_rate: quote.usdToLkrRate,
+      payhere_exchange_source: quote.rateSource,
+      payhere_exchange_updated_at: quote.rateUpdatedAt,
+    })
+    .eq("id", orderId);
+
+  if (error) throw error;
 }
 
 export async function getPublicOrderStatus(orderNumber: string) {

@@ -5,6 +5,7 @@ import { CsvDownloadButton } from "@/components/admin/csv-download-button";
 import { AdminModal } from "@/components/admin/admin-modal";
 import { CouponForm } from "@/components/admin/coupon-form";
 import { requireAdmin } from "@/lib/admin-auth";
+import { formatColomboDate } from "@/lib/date-time";
 import { listAdminCoupons } from "@/lib/db/admin";
 import { listAdminProducts } from "@/lib/db/products";
 import { formatCurrency } from "@/lib/utils";
@@ -173,5 +174,5 @@ export default async function AdminCouponsPage({
 
 function formatDate(value: string | null) {
   if (!value) return "Open";
-  return new Date(value).toLocaleDateString("en-LK");
+  return formatColomboDate(value);
 }

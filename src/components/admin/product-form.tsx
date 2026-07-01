@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { cropImageFilesToSquare, setInputFiles } from "@/components/admin/image-cropper";
 import { UploadButton, UploadThumb, type UploadPreview } from "@/components/admin/upload-thumbnail";
+import { formatColomboDateTimeLocalInput } from "@/lib/date-time";
 import type { ProductCategory } from "@/lib/db/categories";
 import type { ProductWithImages } from "@/lib/db/products";
 import type { VariantOption } from "@/lib/db/variant-options";
@@ -1048,5 +1049,7 @@ function optionNames<T extends string>(
 
 function toDateTimeLocal(value: string | null | undefined) {
   if (!value) return "";
-  return new Date(value).toISOString().slice(0, 16);
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return formatColomboDateTimeLocalInput(date);
 }
