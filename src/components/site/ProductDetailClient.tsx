@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { useMemo, useState } from "react";
-import type { ReactNode } from "react";
+import { useMemo, useRef, useState } from "react";
+import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import { useCart } from "@/components/store/cart-provider";
 import { StorePrice } from "@/components/site/StorePrice";
 import type { MockProductDetail } from "@/components/site/product-detail-data";
@@ -15,8 +15,10 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
   const [requestedColor, setSelectedColor] = useState(product.colors[0]);
   const [requestedSize, setSelectedSize] = useState(product.sizes[0]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [imageMotion, setImageMotion] = useState<"next" | "previous">("next");
   const [galleryStart, setGalleryStart] = useState(0);
   const [added, setAdded] = useState(false);
+  const dragStart = useRef<{ x: number; y: number } | null>(null);
   const availableGenders = useMemo(
     () => uniqueVariantValues(product.variants.map((variant) => variant.gender)),
     [product.variants],
@@ -65,20 +67,30 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
       ) ?? null,
     [product.variants, selectedColor, selectedGender, selectedSize],
   );
+  const galleryImages = useMemo(
+    () =>
+      [
+        product.image,
+        ...product.gallery,
+        ...product.variants.map((variant) => variant.image),
+      ].filter((image, index, list): image is string => Boolean(image) && list.indexOf(image) === index),
+    [product.gallery, product.image, product.variants],
+  );
   const displayImage = selectedImage ?? selectedVariant?.image ?? product.image;
   const displayPrice = selectedVariant?.price ?? product.price;
   const isAvailable = Boolean(
     selectedVariant &&
       (product.preorderEnabled || !product.stockTrackingEnabled || selectedVariant.stock > 0),
   );
-  const maxGalleryStart = Math.max(0, product.gallery.length - 4);
-  const displayImageIndex = product.gallery.indexOf(displayImage);
+  const maxGalleryStart = Math.max(0, galleryImages.length - 4);
+  const displayImageIndex = galleryImages.indexOf(displayImage);
+  const activeGalleryIndex = Math.max(0, displayImageIndex);
   const effectiveGalleryStart =
     displayImageIndex >= 0 &&
     (displayImageIndex < galleryStart || displayImageIndex >= galleryStart + 4)
       ? Math.min(Math.max(0, displayImageIndex), maxGalleryStart)
       : galleryStart;
-  const visibleGallery = product.gallery.slice(effectiveGalleryStart, effectiveGalleryStart + 4);
+  const visibleGallery = galleryImages.slice(effectiveGalleryStart, effectiveGalleryStart + 4);
 
   function moveGallery(direction: -1 | 1) {
     setGalleryStart(
@@ -86,21 +98,61 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
     );
   }
 
+  function showGalleryImage(index: number, direction: "next" | "previous") {
+    const image = galleryImages[index];
+    if (!image) return;
+
+    setImageMotion(direction);
+    setSelectedImage(image);
+    setGalleryStart(Math.min(maxGalleryStart, Math.max(0, index)));
+  }
+
+  function selectGalleryImage(image: string, index: number) {
+    setImageMotion(index >= activeGalleryIndex ? "next" : "previous");
+    setSelectedImage(image);
+  }
+
+  function slideGallery(direction: -1 | 1) {
+    if (galleryImages.length < 2) return;
+
+    const nextIndex =
+      (activeGalleryIndex + direction + galleryImages.length) % galleryImages.length;
+    showGalleryImage(nextIndex, direction > 0 ? "next" : "previous");
+  }
+
+  function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
+    dragStart.current = { x: event.clientX, y: event.clientY };
+  }
+
+  function handlePointerUp(event: ReactPointerEvent<HTMLDivElement>) {
+    if (!dragStart.current) return;
+
+    const deltaX = event.clientX - dragStart.current.x;
+    const deltaY = event.clientY - dragStart.current.y;
+    dragStart.current = null;
+
+    if (Math.abs(deltaX) < 42 || Math.abs(deltaX) < Math.abs(deltaY)) return;
+    slideGallery(deltaX < 0 ? 1 : -1);
+  }
+
   function selectGender(gender: MockProductDetail["genders"][number]) {
     setSelectedGender(gender);
     setSelectedImage(null);
+    setImageMotion("next");
     setAdded(false);
   }
 
   function selectColor(color: MockProductDetail["colors"][number]) {
     setSelectedColor(color);
     setSelectedImage(null);
+    setImageMotion("next");
     setAdded(false);
   }
 
   function selectSize(size: MockProductDetail["sizes"][number]) {
     setSelectedSize(size);
     setSelectedImage(null);
+    setImageMotion("next");
     setAdded(false);
   }
 
@@ -139,10 +191,10 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
             <button
               aria-label={`View product image ${effectiveGalleryStart + index + 1}`}
               className={`relative h-24 w-24 shrink-0 bg-transparent ${
-                image === displayImage ? "border-2 border-rust" : "border border-ink/15"
+                image === displayImage ? "border-2 border-rust" : "border border-transparent"
               }`}
               key={`${image}-${effectiveGalleryStart + index}`}
-              onClick={() => setSelectedImage(image)}
+              onClick={() => selectGalleryImage(image, effectiveGalleryStart + index)}
               type="button"
             >
               <Image
@@ -167,16 +219,53 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
           </button>
         </div>
 
-        <div className="relative order-1 min-h-[430px] bg-transparent md:order-2 lg:min-h-[610px]">
-          <Image
-            alt={product.alt}
-            className="scale-[1.03] object-contain p-3 md:scale-[0.98] md:p-4"
-            fill
-            priority
-            sizes="(min-width: 1024px) 50vw, 100vw"
-            src={displayImage}
-            unoptimized
-          />
+        <div
+          className="relative order-1 min-h-[430px] touch-pan-y overflow-hidden bg-transparent md:order-2 lg:min-h-[610px]"
+          onPointerCancel={() => {
+            dragStart.current = null;
+          }}
+          onPointerDown={handlePointerDown}
+          onPointerLeave={() => {
+            dragStart.current = null;
+          }}
+          onPointerUp={handlePointerUp}
+        >
+          {galleryImages.length > 1 ? (
+            <>
+              <button
+                aria-label="Previous product image"
+                className="absolute left-1 top-1/2 z-10 grid h-9 w-9 -translate-y-1/2 place-items-center bg-acid/80 font-mono text-xl font-bold text-ink transition-colors hover:bg-ink hover:text-acid md:left-3"
+                onClick={() => slideGallery(-1)}
+                type="button"
+              >
+                ‹
+              </button>
+              <button
+                aria-label="Next product image"
+                className="absolute right-1 top-1/2 z-10 grid h-9 w-9 -translate-y-1/2 place-items-center bg-acid/80 font-mono text-xl font-bold text-ink transition-colors hover:bg-ink hover:text-acid md:right-3"
+                onClick={() => slideGallery(1)}
+                type="button"
+              >
+                ›
+              </button>
+            </>
+          ) : null}
+          <div
+            className={`product-gallery-frame absolute inset-0 ${
+              imageMotion === "previous" ? "product-gallery-image--previous" : ""
+            }`}
+            key={displayImage}
+          >
+            <Image
+              alt={product.alt}
+              className="scale-[1.03] object-contain p-3 md:scale-[0.98] md:p-4"
+              fill
+              priority
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              src={displayImage}
+              unoptimized
+            />
+          </div>
         </div>
       </div>
 

@@ -12,26 +12,26 @@ const footerLinks = [
 
 export function Footer() {
   return (
-    <footer className="border-0 bg-acid text-ink shadow-none outline-none">
+    <footer className="border-0 bg-ink text-bone shadow-none outline-none">
       <div className="px-5 pb-8 pt-7 md:px-8 md:pb-10 md:pt-9">
         <Link
           aria-label="Never Found home"
-          className="relative mx-auto block h-24 w-48 md:h-20 md:w-40"
+          className="relative mx-auto block h-12 w-24 md:h-10 md:w-20"
           href="/"
         >
           <Image
             alt="Never Found"
             className="object-contain object-center"
             fill
-            sizes="(min-width: 768px) 160px, 192px"
-            src="/images/brand/logo-nvr-fnd.png"
+            sizes="(min-width: 768px) 80px, 96px"
+            src="/images/brand/footer-logo-white.png"
           />
         </Link>
 
         <div className="mt-7 grid gap-4 font-mono text-[9px] font-bold uppercase tracking-[0.06em] md:mt-8 md:grid-cols-[auto_1fr] md:items-end md:gap-8 md:text-[10px]">
           <Link
             aria-label="Instagram"
-            className="inline-flex h-7 w-7 items-center justify-center text-ink transition-colors hover:text-rust"
+            className="inline-flex h-7 w-7 items-center justify-center text-bone transition-opacity hover:opacity-70"
             href="https://www.instagram.com/"
             rel="noreferrer"
             target="_blank"
@@ -39,7 +39,7 @@ export function Footer() {
             <Image
               alt=""
               aria-hidden="true"
-              className="h-4 w-4 object-contain"
+              className="h-4 w-4 object-contain invert"
               height={16}
               src="/images/icons/instagram.png"
               width={16}
@@ -54,7 +54,7 @@ export function Footer() {
             >
               {footerLinks.map((item) => (
                 <Link
-                  className="transition-colors hover:text-rust"
+                  className="transition-colors hover:text-acid"
                   href={item.href}
                   key={item.label}
                 >
