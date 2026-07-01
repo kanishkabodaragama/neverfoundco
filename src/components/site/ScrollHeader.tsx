@@ -34,7 +34,7 @@ export function ScrollHeader({ children }: { children: ReactNode }) {
 
   return (
     <header
-      className={`sticky top-0 z-50 bg-ink text-bone transition-transform duration-300 ease-out ${
+      className={`sticky top-0 z-50 border-0 bg-acid text-ink shadow-none outline-none transition-transform duration-300 ease-out after:absolute after:inset-x-0 after:-bottom-px after:h-px after:bg-acid after:content-[''] ${
         hidden ? "-translate-y-full" : "translate-y-0"
       }`}
     >

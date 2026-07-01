@@ -52,7 +52,7 @@ export default function RootLayout({
         body.variable,
       )}
     >
-      <body className="min-h-full bg-ink text-bone">
+      <body className="min-h-full bg-acid text-ink">
         <div className="grain" />
         <CurrencyProvider>
           <CartProvider>{children}</CartProvider>
