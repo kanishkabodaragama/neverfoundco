@@ -51,10 +51,10 @@ export function SiteHeader({
               alt=""
               aria-hidden="true"
               className="object-contain"
-              height={30}
+              height={34}
               priority
               src="/images/icons/mobile-menu.png"
-              width={30}
+              width={34}
             />
           )}
         </button>

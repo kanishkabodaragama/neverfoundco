@@ -13,38 +13,12 @@ export function CartLink() {
       <Image
         alt=""
         aria-hidden="true"
-        className="block object-contain transition-opacity group-hover:opacity-75 md:hidden"
-        height={23}
+        className="block h-[23px] w-[23px] object-contain transition-opacity group-hover:opacity-75 md:h-6 md:w-6"
+        height={24}
         priority
         src="/images/icons/mobile-cart.png"
-        width={23}
+        width={24}
       />
-      <svg
-        aria-hidden="true"
-        className="hidden h-10 w-9 md:block md:h-5 md:w-5"
-        fill="none"
-        viewBox="0 0 36 44"
-      >
-        <path
-          d="M8.5 15.5H27.5L31 39.5H5L8.5 15.5Z"
-          className="stroke-current"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-        />
-        <path
-          d="M12 15.5C12 8.25 15 4.5 18 4.5C21 4.5 24 8.25 24 15.5"
-          className="stroke-current"
-          strokeLinecap="round"
-          strokeWidth="2"
-        />
-        <path
-          d="M12.5 27.5H23.5M18 22V33"
-          className="stroke-current opacity-70 transition-opacity group-hover:opacity-100"
-          strokeLinecap="round"
-          strokeWidth="1.6"
-        />
-      </svg>
     </Link>
   );
 }
