@@ -28,7 +28,7 @@ export function ProductCard({ product }: { product: DropProduct }) {
           {product.soldOut ? "Sold out" : product.stockLabel}
         </span>
       </Link>
-      <div className="mt-2 text-[0.8rem] font-black uppercase leading-tight md:mt-1">
+      <div className="mt-0.5 text-[0.8rem] font-black uppercase leading-tight md:mt-1">
         <h3>
           <Link className="hover:text-[#d9532f]" href={`/products/${product.slug}`}>
             {product.name}

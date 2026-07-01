@@ -241,7 +241,7 @@ function RelatedProductCard({
           unoptimized
         />
       </div>
-      <div className="mt-2 md:mt-1">
+      <div className="mt-0.5 md:mt-1">
         <h3 className="font-display text-xl uppercase leading-tight">{product.name}</h3>
         <p className="mt-1 font-mono text-sm font-bold text-ink"><StorePrice amountUsd={product.price} /></p>
       </div>

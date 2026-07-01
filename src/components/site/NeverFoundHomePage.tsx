@@ -132,7 +132,7 @@ function EvidenceProductCard({
         ) : null}
       </div>
 
-      <div className="mt-2 flex flex-col items-center gap-1 text-center md:mt-1 md:flex-row md:items-start md:justify-between md:text-left">
+      <div className="mt-0.5 flex flex-col items-center gap-1 text-center md:mt-1 md:flex-row md:items-start md:justify-between md:text-left">
         <div>
           <h3 className="font-display text-base uppercase leading-tight sm:text-xl">{product.name}</h3>
         </div>
