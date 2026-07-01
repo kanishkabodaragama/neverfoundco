@@ -35,7 +35,7 @@ export function SiteHeader({
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 border-0 bg-acid text-ink shadow-none outline-none after:absolute after:inset-x-0 after:-bottom-px after:h-px after:bg-acid after:content-['']">
+    <header className="sticky top-0 z-40 border-0 border-b border-acid bg-acid text-ink shadow-none outline-none after:absolute after:inset-x-0 after:-bottom-2 after:h-2 after:bg-acid after:content-['']">
       <div className="relative grid min-h-28 grid-cols-[3rem_1fr_3rem] items-center px-3 py-0 md:flex md:min-h-28 md:justify-between md:px-8 md:py-3">
         <button
           aria-expanded={open}
