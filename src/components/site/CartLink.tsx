@@ -14,10 +14,10 @@ export function CartLink() {
         alt=""
         aria-hidden="true"
         className="block object-contain transition-opacity group-hover:opacity-75 md:hidden"
-        height={30}
+        height={26}
         priority
         src="/images/icons/mobile-cart.png"
-        width={30}
+        width={26}
       />
       <svg
         aria-hidden="true"
