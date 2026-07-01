@@ -110,17 +110,17 @@ function NeverFoundProductPage({
           <ProductDetailClient product={product} />
         </section>
 
-        <section className="grid w-full gap-8 border-t border-ink bg-acid px-5 py-12 md:px-8 lg:grid-cols-[1fr_0.8fr_1fr] xl:px-12">
+        <section className="grid w-full gap-5 border-t border-ink bg-acid px-5 py-8 md:px-8 lg:grid-cols-[1fr_0.8fr_1fr] xl:px-12">
           <div>
             <h2 className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">
               Product Details
             </h2>
             {product.description ? (
-              <div className="mt-6 whitespace-pre-line text-sm font-semibold leading-relaxed text-ink/70">
+              <div className="mt-4 whitespace-pre-line text-sm font-semibold italic leading-relaxed text-ink/70">
                 {product.description}
               </div>
             ) : (
-              <ul className="mt-6 space-y-3 text-sm font-semibold text-ink/70">
+              <ul className="mt-4 space-y-2 text-sm font-semibold italic text-ink/70">
                 {detailBullets.map((detail) => (
                   <li className="flex gap-4" key={detail}>
                     <span className="text-rust">◆</span>

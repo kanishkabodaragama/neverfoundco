@@ -13,22 +13,22 @@ const footerLinks = [
 export function Footer() {
   return (
     <footer className="border-0 bg-ink text-bone shadow-none outline-none">
-      <div className="px-5 pb-8 pt-7 md:px-8 md:pb-10 md:pt-9">
+      <div className="px-5 pb-4 pt-4 md:px-8 md:pb-6 md:pt-6">
         <Link
           aria-label="Never Found home"
-          className="relative mx-auto block h-12 w-24 md:h-10 md:w-20"
+          className="relative mx-auto block h-[72px] w-36 md:h-[60px] md:w-[120px]"
           href="/"
         >
           <Image
             alt="Never Found"
             className="object-contain object-center"
             fill
-            sizes="(min-width: 768px) 80px, 96px"
+            sizes="(min-width: 768px) 120px, 144px"
             src="/images/brand/footer-logo-white.png"
           />
         </Link>
 
-        <div className="mt-7 grid gap-4 font-mono text-[9px] font-bold uppercase tracking-[0.06em] md:mt-8 md:grid-cols-[auto_1fr] md:items-end md:gap-8 md:text-[10px]">
+        <div className="mt-3 grid gap-3 font-mono text-[9px] font-bold uppercase tracking-[0.06em] md:mt-5 md:grid-cols-[auto_1fr] md:items-end md:gap-8 md:text-[10px]">
           <Link
             aria-label="Instagram"
             className="inline-flex h-7 w-7 items-center justify-center text-bone transition-opacity hover:opacity-70"

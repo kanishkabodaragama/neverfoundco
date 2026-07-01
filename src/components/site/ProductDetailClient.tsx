@@ -14,7 +14,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
   const [requestedGender, setSelectedGender] = useState(product.genders[0]);
   const [requestedColor, setSelectedColor] = useState(product.colors[0]);
   const [requestedSize, setSelectedSize] = useState(product.sizes[0]);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState(product.image);
   const [imageMotion, setImageMotion] = useState<"next" | "previous">("next");
   const [galleryStart, setGalleryStart] = useState(0);
   const [added, setAdded] = useState(false);
@@ -76,7 +76,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
       ].filter((image, index, list): image is string => Boolean(image) && list.indexOf(image) === index),
     [product.gallery, product.image, product.variants],
   );
-  const displayImage = selectedImage ?? selectedVariant?.image ?? product.image;
+  const displayImage = selectedImage;
   const displayPrice = selectedVariant?.price ?? product.price;
   const isAvailable = Boolean(
     selectedVariant &&
@@ -137,21 +137,21 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
 
   function selectGender(gender: MockProductDetail["genders"][number]) {
     setSelectedGender(gender);
-    setSelectedImage(null);
+    setSelectedImage(product.image);
     setImageMotion("next");
     setAdded(false);
   }
 
   function selectColor(color: MockProductDetail["colors"][number]) {
     setSelectedColor(color);
-    setSelectedImage(null);
+    setSelectedImage(product.image);
     setImageMotion("next");
     setAdded(false);
   }
 
   function selectSize(size: MockProductDetail["sizes"][number]) {
     setSelectedSize(size);
-    setSelectedImage(null);
+    setSelectedImage(product.image);
     setImageMotion("next");
     setAdded(false);
   }
@@ -179,7 +179,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
         <div className="order-2 grid gap-3 md:order-1">
           <button
             aria-label="Previous product images"
-            className="hidden h-9 w-24 place-items-center border border-ink/20 bg-transparent disabled:cursor-not-allowed disabled:opacity-35 md:grid"
+            className="hidden h-9 w-24 place-items-center bg-transparent text-ink transition-opacity hover:opacity-65 disabled:cursor-not-allowed disabled:opacity-25 md:grid"
             disabled={effectiveGalleryStart === 0}
             onClick={() => moveGallery(-1)}
             type="button"
@@ -210,7 +210,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
           </div>
           <button
             aria-label="Next product images"
-            className="hidden h-9 w-24 place-items-center border border-ink/20 bg-transparent disabled:cursor-not-allowed disabled:opacity-35 md:grid"
+            className="hidden h-9 w-24 place-items-center bg-transparent text-ink transition-opacity hover:opacity-65 disabled:cursor-not-allowed disabled:opacity-25 md:grid"
             disabled={effectiveGalleryStart >= maxGalleryStart}
             onClick={() => moveGallery(1)}
             type="button"
@@ -234,7 +234,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
             <>
               <button
                 aria-label="Previous product image"
-                className="absolute left-1 top-1/2 z-10 grid h-9 w-9 -translate-y-1/2 place-items-center bg-acid/80 font-mono text-xl font-bold text-ink transition-colors hover:bg-ink hover:text-acid md:left-3"
+                className="absolute left-1 top-1/2 z-10 grid h-9 w-9 -translate-y-1/2 place-items-center bg-transparent font-mono text-4xl font-bold leading-none text-ink transition-opacity hover:opacity-60 md:left-3"
                 onClick={() => slideGallery(-1)}
                 type="button"
               >
@@ -242,7 +242,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
               </button>
               <button
                 aria-label="Next product image"
-                className="absolute right-1 top-1/2 z-10 grid h-9 w-9 -translate-y-1/2 place-items-center bg-acid/80 font-mono text-xl font-bold text-ink transition-colors hover:bg-ink hover:text-acid md:right-3"
+                className="absolute right-1 top-1/2 z-10 grid h-9 w-9 -translate-y-1/2 place-items-center bg-transparent font-mono text-4xl font-bold leading-none text-ink transition-opacity hover:opacity-60 md:right-3"
                 onClick={() => slideGallery(1)}
                 type="button"
               >
@@ -269,23 +269,23 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
         </div>
       </div>
 
-      <div className="flex flex-col items-center justify-center text-center lg:items-start lg:text-left">
-        <span className="w-fit bg-acid px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-ink">
+      <div className="flex flex-col items-center justify-start text-center lg:items-start lg:text-left">
+        <span className="w-fit bg-transparent px-0 py-0 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-ink/65">
           {product.stockLabel}
         </span>
-        <h1 className="mt-6 max-w-xl font-display text-5xl uppercase leading-none md:text-7xl">
+        <h1 className="mt-3 max-w-xl font-display text-4xl italic uppercase leading-none md:text-6xl">
           {product.name}
         </h1>
-        <p className="mt-5 font-mono text-2xl font-bold uppercase text-rust">
+        <p className="mt-3 font-mono text-xl font-bold uppercase text-ink md:text-2xl">
           <StorePrice amountUsd={displayPrice} />
         </p>
-        <p className="mt-6 max-w-md whitespace-pre-line text-sm font-semibold leading-relaxed text-ink/70">
+        <p className="mt-3 max-w-md whitespace-pre-line text-sm font-semibold italic leading-relaxed text-ink/70">
           {product.shortDescription}
         </p>
 
-        <div className="my-7 h-px w-full bg-acid" />
+        <div className="my-4 h-px w-full bg-ink/15" />
 
-        <div className="w-full space-y-6">
+        <div className="w-full space-y-4">
           <OptionGroup label={`Gender: ${selectedGender}`}>
             {availableGenders.map((gender) => (
               <OptionButton
@@ -302,7 +302,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
             {availableColors.map((color) => (
               <button
                 aria-label={`Select ${color}`}
-                className={`h-10 w-10 border ${
+                className={`h-8 w-8 border ${
                   selectedColor === color
                     ? "border-2 border-rust"
                     : "border-ink/20"
@@ -366,8 +366,8 @@ function OptionGroup({
 }) {
   return (
     <div className="text-center lg:text-left">
-      <p className="font-mono text-[11px] font-bold uppercase tracking-[0.28em]">{label}</p>
-      <div className="mt-4 flex flex-wrap justify-center gap-3 lg:justify-start">{children}</div>
+      <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em]">{label}</p>
+      <div className="mt-2 flex flex-wrap justify-center gap-2 lg:justify-start">{children}</div>
     </div>
   );
 }
@@ -383,7 +383,7 @@ function OptionButton({
 }) {
   return (
     <button
-      className={`min-w-16 border px-5 py-3 font-mono text-xs font-bold uppercase tracking-[0.2em] transition hover:border-rust hover:text-rust ${
+      className={`min-w-14 border px-4 py-2.5 font-mono text-xs font-bold uppercase tracking-[0.16em] transition hover:border-rust hover:text-rust ${
         selected ? "border-rust text-rust" : "border-ink"
       }`}
       onClick={onClick}
