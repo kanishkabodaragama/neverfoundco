@@ -100,7 +100,7 @@ function NeverFoundProductPage({
           <ProductDetailClient product={product} />
         </section>
 
-        <section className="w-full border-t border-ink bg-acid px-5 py-8 md:px-8 xl:px-12">
+        <section className="w-full bg-acid px-5 py-8 md:px-8 xl:px-12">
           <div id="size-chart" className="mx-auto max-w-3xl scroll-mt-32 md:scroll-mt-36">
             <h2 className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">
               Size Chart

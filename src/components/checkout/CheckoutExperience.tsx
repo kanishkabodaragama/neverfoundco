@@ -481,7 +481,7 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
               value={format(total)}
             />
           </div>
-          <p className="mt-4 border-t border-ink/20 pt-4 text-xs font-bold leading-relaxed text-ink/65">
+          <p className="mt-4 text-xs font-bold leading-relaxed text-ink/65">
             Converted using live exchange data from {rateSource}. Actual bank
             buying and selling rates may differ slightly.
           </p>

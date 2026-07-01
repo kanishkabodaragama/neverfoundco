@@ -44,7 +44,7 @@ export function SiteHeader({
   );
 
   return (
-    <header className="sticky top-0 z-40 border-0 border-b border-acid bg-acid text-ink shadow-none outline-none after:absolute after:inset-x-0 after:-bottom-2 after:h-2 after:bg-acid after:content-['']">
+    <header className="sticky top-0 z-40 border-0 bg-acid text-ink shadow-none outline-none after:absolute after:inset-x-0 after:-bottom-2 after:h-2 after:bg-acid after:content-['']">
       <div className="relative grid grid-cols-[3rem_1fr_3rem] items-center px-3 py-1 md:flex md:justify-between md:px-8 md:py-1.5">
         <button
           aria-expanded={open}
@@ -130,7 +130,7 @@ export function SiteHeader({
         }`}
         aria-label="Mobile navigation"
       >
-        <div className="flex min-h-28 items-center justify-between border-b border-ink/15 px-5">
+        <div className="flex min-h-28 items-center justify-between px-5">
           <span className="text-xs font-bold text-ink/55">Menu</span>
           <button
             aria-label="Close menu"
@@ -145,7 +145,7 @@ export function SiteHeader({
         <div className="flex flex-col">
           {navItems.map((item) => (
             <Link
-              className="border-b border-ink/10 px-5 py-5 text-ink/75 active:bg-ink active:text-acid"
+              className="px-5 py-5 text-ink/75 active:bg-ink active:text-acid"
               href={item.href}
               key={item.label}
               onClick={() => setOpen(false)}
@@ -155,7 +155,7 @@ export function SiteHeader({
           ))}
         </div>
 
-        <div className="mt-auto grid gap-4 border-t border-ink/15 px-5 py-5">
+        <div className="mt-auto grid gap-4 px-5 py-5">
           <CurrencySelector />
           <Link
             className="bg-ink px-5 py-4 text-center font-bold text-acid"
@@ -181,7 +181,7 @@ export function SiteHeader({
           cartOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="flex min-h-20 items-center justify-between border-b border-ink/15 px-5">
+        <div className="flex min-h-20 items-center justify-between px-5">
           <div>
             <p className="font-mono text-[10px] font-bold uppercase tracking-[0.24em] text-rust">
               Cart
@@ -200,15 +200,15 @@ export function SiteHeader({
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-5 py-5">
+        <div className="flex-1 overflow-y-auto px-4 py-4">
           {cart.items.length > 0 ? (
-            <div className="grid gap-4">
+            <div className="grid gap-3">
               {cart.items.map((item) => {
                 const itemKey = item.variantId ?? item.productId;
 
                 return (
                   <article
-                    className="grid grid-cols-[104px_1fr] gap-4 border-b border-ink/15 pb-4"
+                    className="grid grid-cols-[72px_1fr] items-start gap-3 pb-3"
                     key={itemKey}
                   >
                     <div className="relative aspect-[4/5] bg-transparent">
@@ -216,40 +216,40 @@ export function SiteHeader({
                         alt={item.name}
                         className="object-contain"
                         fill
-                        sizes="104px"
+                        sizes="72px"
                         src={item.image ?? "/images/products/home-drop/never-found-logo-tee.png"}
                         unoptimized
                       />
                     </div>
-                    <div className="flex min-w-0 flex-col justify-between gap-3">
+                    <div className="flex min-w-0 flex-col gap-2">
                       <div>
-                        <h3 className="font-display text-xl italic uppercase leading-none">
+                        <h3 className="line-clamp-2 font-display text-base italic uppercase leading-none">
                           {item.name}
                         </h3>
-                        <div className="mt-2 space-y-0.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-ink/60">
+                        <div className="mt-1 space-y-0.5 font-mono text-[9px] font-bold uppercase tracking-[0.12em] text-ink/60">
                           {item.gender ? <p>{item.gender}</p> : null}
                           {item.color ? <p>Color: {item.color}</p> : null}
                           {item.size ? <p>Size: {item.size}</p> : null}
                         </div>
-                        <p className="mt-2 font-mono text-xs font-bold">
+                        <p className="mt-1 font-mono text-[11px] font-bold">
                           <StorePrice amountUsd={item.unitPrice} />
                         </p>
                       </div>
 
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center rounded-full border border-ink font-mono text-xs font-bold">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center rounded-full border border-ink font-mono text-[10px] font-bold">
                           <button
-                            className="px-3 py-1.5 transition hover:bg-ink hover:text-acid"
+                            className="px-2.5 py-1 transition hover:bg-ink hover:text-acid"
                             onClick={() => cart.updateQuantity(itemKey, item.quantity - 1)}
                             type="button"
                           >
                             -
                           </button>
-                          <span className="min-w-8 border-x border-ink px-2 py-1.5 text-center">
+                          <span className="min-w-7 border-x border-ink px-2 py-1 text-center">
                             {item.quantity}
                           </span>
                           <button
-                            className="px-3 py-1.5 transition hover:bg-ink hover:text-acid"
+                            className="px-2.5 py-1 transition hover:bg-ink hover:text-acid"
                             onClick={() => cart.updateQuantity(itemKey, item.quantity + 1)}
                             type="button"
                           >
@@ -257,7 +257,7 @@ export function SiteHeader({
                           </button>
                         </div>
                         <button
-                          className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-rust"
+                          className="font-mono text-[9px] font-bold uppercase tracking-[0.12em] text-rust"
                           onClick={() => cart.removeItem(itemKey)}
                           type="button"
                         >
@@ -287,7 +287,7 @@ export function SiteHeader({
           )}
         </div>
 
-        <div className="border-t border-ink/15 px-5 py-5">
+        <div className="px-5 py-5">
           <div className="flex items-center justify-between font-mono text-xs font-bold uppercase tracking-[0.2em]">
             <span>Subtotal</span>
             <span>

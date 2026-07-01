@@ -27,7 +27,7 @@ export function CartView() {
       {cart.items.map((item) => (
         <div
           key={item.variantId ?? item.productId}
-          className="flex flex-wrap items-center justify-between gap-4 border-b py-4"
+          className="flex flex-wrap items-center justify-between gap-4 py-4"
         >
           <div>
             <Link className="font-medium underline" href={`/products/${item.slug}`}>

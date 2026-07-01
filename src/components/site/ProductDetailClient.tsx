@@ -135,23 +135,46 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
     slideGallery(deltaX < 0 ? 1 : -1);
   }
 
+  function selectVariantImage(
+    nextSelection: Partial<{
+      color: string;
+      gender: string;
+      size: string;
+    }>,
+  ) {
+    const nextGender = nextSelection.gender ?? selectedGender;
+    const nextColor = nextSelection.color ?? selectedColor;
+    const nextSize = nextSelection.size ?? selectedSize;
+    const nextVariant = product.variants.find(
+      (variant) =>
+        getVariantCombinationKey(variant) ===
+        getVariantCombinationKey({
+          gender: nextGender,
+          color: nextColor,
+          size: nextSize,
+        }),
+    );
+
+    setSelectedImage(nextVariant?.image || product.image);
+  }
+
   function selectGender(gender: MockProductDetail["genders"][number]) {
     setSelectedGender(gender);
-    setSelectedImage(product.image);
+    selectVariantImage({ gender });
     setImageMotion("next");
     setAdded(false);
   }
 
   function selectColor(color: MockProductDetail["colors"][number]) {
     setSelectedColor(color);
-    setSelectedImage(product.image);
+    selectVariantImage({ color });
     setImageMotion("next");
     setAdded(false);
   }
 
   function selectSize(size: MockProductDetail["sizes"][number]) {
     setSelectedSize(size);
-    setSelectedImage(product.image);
+    selectVariantImage({ size });
     setImageMotion("next");
     setAdded(false);
   }
@@ -283,8 +306,6 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
           {product.shortDescription}
         </p>
 
-        <div className="my-4 h-px w-full bg-ink/15" />
-
         <div className="w-full space-y-5">
           {availableGenders.length > 1 ? (
             <OptionGroup label="Gender">
@@ -356,21 +377,16 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
                   : "Add Selected Variant"}
           </button>
 
-          <section className="pt-3 text-left">
-            <div className="flex items-center justify-between border-b border-ink/65 pb-3">
-              <h2 className="font-display text-2xl italic uppercase leading-none">
-                Description
-              </h2>
-              <span aria-hidden="true" className="font-mono text-xl leading-none">
-                ^
-              </span>
-            </div>
+          <section className="pt-2 text-left">
+            <h2 className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">
+              Description
+            </h2>
             {product.description ? (
-              <p className="mt-4 whitespace-pre-line text-sm font-medium italic leading-relaxed text-ink/75">
+              <p className="mt-3 whitespace-pre-line text-sm font-medium italic leading-relaxed text-ink/75">
                 {product.description}
               </p>
             ) : (
-              <p className="mt-4 text-sm font-medium italic leading-relaxed text-ink/75">
+              <p className="mt-3 text-sm font-medium italic leading-relaxed text-ink/75">
                 {product.shortDescription}
               </p>
             )}

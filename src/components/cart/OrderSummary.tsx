@@ -33,7 +33,6 @@ export function OrderSummary({
             <span>Shipping</span>
             <span><StorePrice amountUsd={shipping} /></span>
           </div>
-          <div className="h-px bg-ink/20" />
           <div className="flex items-end justify-between gap-4">
             <span className="text-xl font-black">Total</span>
             <span className="text-xl font-black text-rust">

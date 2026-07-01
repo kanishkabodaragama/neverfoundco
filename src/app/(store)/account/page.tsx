@@ -48,7 +48,7 @@ export default async function AccountPage() {
                   <span className="border border-rust px-3 py-2 text-rust">Order: {order.order_status}</span>
                 </div>
               </div>
-              <div className="mt-5 divide-y divide-ink/10">
+              <div className="mt-5">
                 {order.order_items.map((item) => (
                   <div className="grid grid-cols-[1fr_auto] gap-4 py-3 text-sm font-semibold text-ink/70" key={item.id}>
                     <span>{item.quantity} x {item.product_name}</span>
@@ -56,7 +56,7 @@ export default async function AccountPage() {
                   </div>
                 ))}
               </div>
-              <div className="mt-5 flex flex-wrap items-center justify-between gap-4 border-t border-ink/10 pt-4">
+              <div className="mt-5 flex flex-wrap items-center justify-between gap-4 pt-4">
                 <p className="font-mono text-sm font-bold uppercase">{formatMoney(Number(order.total), "USD")}</p>
                 <a className="bg-ink px-4 py-3 font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid transition-colors hover:bg-rust hover:text-ink" href={`/api/orders/${order.order_number}/receipt`}>
                   Download receipt
