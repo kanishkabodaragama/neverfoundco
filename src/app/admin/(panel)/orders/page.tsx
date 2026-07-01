@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { CsvDownloadButton } from "@/components/admin/csv-download-button";
 import { requireAdmin } from "@/lib/admin-auth";
 import { listAdminOrders } from "@/lib/db/admin";
-import { formatCurrency } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import { Filter, MoreHorizontal, Search } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -22,7 +22,8 @@ export default async function AdminOrdersPage({
   });
   const orderRows = orders.map((order) => ({
     order: order.order_number,
-    date: new Date(order.created_at).toLocaleString("en-LK"),
+    date: formatOrderDate(order.created_at),
+    time: formatOrderTime(order.created_at),
     customer: order.customer_name,
     email: order.customer_email,
     total: Number(order.total).toFixed(2),
@@ -66,6 +67,7 @@ export default async function AdminOrdersPage({
             columns={[
               { key: "order", label: "Order" },
               { key: "date", label: "Date" },
+              { key: "time", label: "Time" },
               { key: "customer", label: "Customer" },
               { key: "email", label: "Email" },
               { key: "total", label: "Total" },
@@ -80,11 +82,12 @@ export default async function AdminOrdersPage({
           />
         </form>
         <div className="overflow-x-visible">
-        <table className="admin-table min-w-[980px]">
+        <table className="admin-table min-w-[1060px]">
           <thead>
             <tr>
               <th className="px-4 py-4">Order</th>
               <th className="px-4 py-4">Date</th>
+              <th className="px-4 py-4">Time</th>
               <th className="px-4 py-4">Customer</th>
               <th className="px-4 py-4">Total</th>
               <th className="px-4 py-4">Payment</th>
@@ -102,7 +105,10 @@ export default async function AdminOrdersPage({
                   </Link>
                 </td>
                 <td className="px-4 py-4">
-                  {new Date(order.created_at).toLocaleDateString("en-LK")}
+                  {formatOrderDate(order.created_at)}
+                </td>
+                <td className="px-4 py-4 font-mono text-xs uppercase text-[#81796f] dark:text-[#b9afa4]">
+                  {formatOrderTime(order.created_at)}
                 </td>
                 <td className="px-4 py-4">
                   {order.customer_name}
@@ -169,9 +175,43 @@ function Select({
   );
 }
 
+function formatOrderDate(value: string) {
+  return new Date(value).toLocaleDateString("en-LK", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+function formatOrderTime(value: string) {
+  return new Date(value).toLocaleTimeString("en-LK", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+const statusBadgeClasses: Record<string, string> = {
+  pending:
+    "border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-400/35 dark:bg-amber-400/12 dark:text-amber-200",
+  processing:
+    "border-sky-300 bg-sky-50 text-sky-700 dark:border-sky-400/35 dark:bg-sky-400/12 dark:text-sky-200",
+  shipped:
+    "border-indigo-300 bg-indigo-50 text-indigo-700 dark:border-indigo-400/35 dark:bg-indigo-400/12 dark:text-indigo-200",
+  completed:
+    "border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-400/35 dark:bg-emerald-400/12 dark:text-emerald-200",
+  cancelled:
+    "border-rose-300 bg-rose-50 text-rose-700 dark:border-rose-400/35 dark:bg-rose-400/12 dark:text-rose-200",
+};
+
 function StatusBadge({ value }: { value: string }) {
   return (
-    <span className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold uppercase text-red-300">
+    <span
+      className={cn(
+        "inline-flex rounded-md border px-3 py-2 text-xs font-semibold uppercase",
+        statusBadgeClasses[value] ??
+          "border-[#d8d0c6] bg-[#f6f3ef] text-[#5f564d] dark:border-white/15 dark:bg-white/8 dark:text-[#f8f4ee]",
+      )}
+    >
       {value}
     </span>
   );
