@@ -30,17 +30,15 @@ export function ShopProductCard({ product }: { product: ShopProduct }) {
   }
 
   return (
-    <article
-      className={`group relative mx-2 space-y-2 sm:mx-0 md:space-y-0 ${product.soldOut ? "opacity-75" : ""}`}
-    >
+    <article className="group relative mx-2 space-y-2 sm:mx-0 md:space-y-0">
       <Link
         aria-label={`View ${product.name}`}
-        className="relative block aspect-[4/5] overflow-visible bg-transparent transition-transform duration-300 group-hover:-rotate-1"
+        className="relative block aspect-[4/5] overflow-hidden bg-transparent transition-transform duration-300 group-hover:-rotate-1"
         href={`/products/${product.slug ?? product.id}`}
       >
         <Image
           alt={product.alt}
-          className="scale-[1.06] object-contain p-3 transition-transform duration-300 group-hover:scale-[1.1] md:scale-[0.94] md:p-4 md:group-hover:scale-[0.98]"
+          className="object-contain p-5 transition-transform duration-300 group-hover:scale-[1.03] sm:p-6 md:p-7"
           fill
           sizes="(min-width: 1280px) 22vw, (min-width: 768px) 31vw, 90vw"
           src={product.image}
@@ -56,7 +54,7 @@ export function ShopProductCard({ product }: { product: ShopProduct }) {
           {product.soldOut ? "Sold out" : product.stockLabel}
         </span>
       </Link>
-      <div className="flex flex-col items-center justify-between gap-2 text-center text-ink sm:flex-row sm:items-start sm:gap-3 sm:text-left md:-mt-4 lg:-mt-6">
+      <div className="mt-2 flex flex-col items-center justify-between gap-2 text-center text-ink sm:flex-row sm:items-start sm:gap-3 sm:text-left md:mt-1">
         <div>
           <h3 className="font-display text-xl uppercase leading-tight">
             <Link className="hover:text-[#d9532f]" href={`/products/${product.slug ?? product.id}`}>

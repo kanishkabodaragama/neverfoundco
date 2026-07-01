@@ -116,10 +116,10 @@ function EvidenceProductCard({
 }) {
   return (
     <Link className="group block" href={`/products/${product.slug ?? product.id}`}>
-      <div className="relative aspect-[4/5] overflow-visible bg-transparent">
+      <div className="relative aspect-[4/5] overflow-hidden bg-transparent">
         <Image
           alt={product.alt}
-          className="scale-[1.12] object-contain transition-transform duration-300 group-hover:scale-[1.16] md:scale-[0.96] md:group-hover:scale-100"
+          className="object-contain p-5 transition-transform duration-300 group-hover:scale-[1.03] sm:p-6 md:p-7"
           fill
           sizes="(min-width: 768px) 45vw, 50vw"
           src={product.image}
@@ -132,7 +132,7 @@ function EvidenceProductCard({
         ) : null}
       </div>
 
-      <div className="mt-1 flex flex-col items-center gap-1 text-center sm:mt-2 md:-mt-5 md:flex-row md:items-start md:justify-between md:text-left lg:-mt-7">
+      <div className="mt-2 flex flex-col items-center gap-1 text-center md:mt-1 md:flex-row md:items-start md:justify-between md:text-left">
         <div>
           <h3 className="font-display text-base uppercase leading-tight sm:text-xl">{product.name}</h3>
         </div>

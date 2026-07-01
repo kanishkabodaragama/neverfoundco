@@ -28,7 +28,7 @@ export default function AboutPage() {
               everyone else does.
             </p>
             <Link
-              className="w-fit bg-ink px-6 py-4 font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid transition-colors hover:bg-bone hover:text-ink"
+              className="w-fit bg-ink px-6 py-4 font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid transition-colors hover:bg-rust hover:text-ink"
               href="/shop"
             >
               Shop current file

@@ -40,7 +40,7 @@ export function SiteHeader({
         <button
           aria-expanded={open}
           aria-label={open ? "Close menu" : "Open menu"}
-          className="relative z-10 col-start-1 flex h-14 w-10 items-center justify-center justify-self-start p-1 text-ink transition-opacity hover:opacity-75 md:hidden"
+          className="relative z-10 col-start-1 flex h-12 w-9 items-center justify-center justify-self-start p-1 text-ink transition-opacity hover:opacity-75 md:hidden"
           onClick={() => setOpen((value) => !value)}
           type="button"
         >
@@ -51,10 +51,10 @@ export function SiteHeader({
               alt=""
               aria-hidden="true"
               className="object-contain"
-              height={36}
+              height={30}
               priority
               src="/images/icons/mobile-menu.png"
-              width={36}
+              width={30}
             />
           )}
         </button>
@@ -102,7 +102,7 @@ export function SiteHeader({
           <CartLink />
         </div>
 
-        <div className="relative z-10 col-start-3 flex h-14 w-10 items-center justify-center justify-self-end md:hidden">
+        <div className="relative z-10 col-start-3 flex h-12 w-9 items-center justify-center justify-self-end md:hidden">
           <CartLink />
         </div>
       </div>
@@ -125,7 +125,7 @@ export function SiteHeader({
           <span className="text-xs font-bold text-ink/55">Menu</span>
           <button
             aria-label="Close menu"
-            className="flex h-10 w-10 items-center justify-center text-ink"
+            className="flex h-9 w-9 items-center justify-center text-ink"
             onClick={() => setOpen(false)}
             type="button"
           >
@@ -165,7 +165,7 @@ function CloseGlyph() {
   return (
     <svg
       aria-hidden="true"
-      className="h-9 w-9"
+      className="h-8 w-8"
       fill="none"
       viewBox="0 0 44 44"
     >

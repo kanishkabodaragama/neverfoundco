@@ -38,7 +38,7 @@ export default async function ShopPage() {
           </p>
         </section>
         <section className="w-full bg-acid px-5 py-12 text-ink md:px-8 md:py-16 xl:px-12">
-          <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-x-7 gap-y-12 sm:grid-cols-2 md:gap-x-9 md:gap-y-14 lg:grid-cols-4 xl:gap-x-12">
             {products.map((product) => (
               <ShopProductCard key={product.id} product={product} />
             ))}

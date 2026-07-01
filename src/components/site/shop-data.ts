@@ -74,8 +74,8 @@ export const shopProducts: ShopProduct[] = [
     color: "White",
     genders: ["Unisex"],
     stockLabel: "LIMITED DROP",
-    image: "/images/products/home-drop/never-found-tiger-lounge-tee.jpg",
-    gallery: ["/images/products/home-drop/never-found-tiger-lounge-tee.jpg"],
+    image: "/images/products/home-drop/never-found-tiger-lounge-tee.png",
+    gallery: ["/images/products/home-drop/never-found-tiger-lounge-tee.png"],
     alt: "White Never Found graphic t-shirt with a colorful back print",
     variants: buildVariants({
       productId: "never-found-tiger-lounge-tee",
@@ -83,7 +83,7 @@ export const shopProducts: ShopProduct[] = [
       sizes: ["S", "M", "L", "XL"],
       colors: ["White"],
       imageByColor: {
-        White: "/images/products/home-drop/never-found-tiger-lounge-tee.jpg",
+        White: "/images/products/home-drop/never-found-tiger-lounge-tee.png",
       },
     }),
   },
@@ -98,8 +98,8 @@ export const shopProducts: ShopProduct[] = [
     color: "White",
     genders: ["Unisex"],
     stockLabel: "LIMITED DROP",
-    image: "/images/products/home-drop/never-found-pink-smoke-tee.jpg",
-    gallery: ["/images/products/home-drop/never-found-pink-smoke-tee.jpg"],
+    image: "/images/products/home-drop/never-found-pink-smoke-tee.png",
+    gallery: ["/images/products/home-drop/never-found-pink-smoke-tee.png"],
     alt: "White Never Found graphic t-shirt with a pink smoke back print",
     variants: buildVariants({
       productId: "never-found-pink-smoke-tee",
@@ -107,7 +107,7 @@ export const shopProducts: ShopProduct[] = [
       sizes: ["S", "M", "L", "XL"],
       colors: ["White"],
       imageByColor: {
-        White: "/images/products/home-drop/never-found-pink-smoke-tee.jpg",
+        White: "/images/products/home-drop/never-found-pink-smoke-tee.png",
       },
     }),
   },
@@ -122,8 +122,8 @@ export const shopProducts: ShopProduct[] = [
     color: "White",
     genders: ["Unisex"],
     stockLabel: "LIMITED DROP",
-    image: "/images/products/home-drop/never-found-summer-burn-tee.jpg",
-    gallery: ["/images/products/home-drop/never-found-summer-burn-tee.jpg"],
+    image: "/images/products/home-drop/never-found-summer-burn-tee.png",
+    gallery: ["/images/products/home-drop/never-found-summer-burn-tee.png"],
     alt: "White Never Found graphic t-shirt with a bright summer back print",
     variants: buildVariants({
       productId: "never-found-summer-burn-tee",
@@ -131,7 +131,7 @@ export const shopProducts: ShopProduct[] = [
       sizes: ["S", "M", "L", "XL"],
       colors: ["White"],
       imageByColor: {
-        White: "/images/products/home-drop/never-found-summer-burn-tee.jpg",
+        White: "/images/products/home-drop/never-found-summer-burn-tee.png",
       },
     }),
   },
@@ -146,8 +146,8 @@ export const shopProducts: ShopProduct[] = [
     color: "White",
     genders: ["Unisex"],
     stockLabel: "LIMITED DROP",
-    image: "/images/products/home-drop/never-found-logo-tee.jpg",
-    gallery: ["/images/products/home-drop/never-found-logo-tee.jpg"],
+    image: "/images/products/home-drop/never-found-logo-tee.png",
+    gallery: ["/images/products/home-drop/never-found-logo-tee.png"],
     alt: "White Never Found logo t-shirt",
     variants: buildVariants({
       productId: "never-found-logo-tee",
@@ -155,7 +155,7 @@ export const shopProducts: ShopProduct[] = [
       sizes: ["S", "M", "L", "XL"],
       colors: ["White"],
       imageByColor: {
-        White: "/images/products/home-drop/never-found-logo-tee.jpg",
+        White: "/images/products/home-drop/never-found-logo-tee.png",
       },
     }),
   },

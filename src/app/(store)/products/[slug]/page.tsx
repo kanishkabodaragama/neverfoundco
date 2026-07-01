@@ -176,7 +176,7 @@ function NeverFoundProductPage({
               View all
             </Link>
           </div>
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-10 grid gap-x-7 gap-y-12 sm:grid-cols-2 md:gap-x-9 md:gap-y-14 xl:grid-cols-4 xl:gap-x-12">
             {related.map((item) => (
               <RelatedProductCard key={item.id} product={item} />
             ))}
@@ -200,7 +200,7 @@ function NeverFoundProductPage({
             type="email"
           />
           <button
-            className="bg-ink px-9 py-4 font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid transition-colors hover:bg-bone hover:text-ink"
+            className="bg-ink px-9 py-4 font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid transition-colors hover:bg-rust hover:text-ink"
             type="button"
           >
             Join
@@ -222,7 +222,7 @@ function RelatedProductCard({
       className="group mx-2 block text-center text-ink sm:mx-0 sm:text-left"
       href={`/products/${product.slug ?? product.id}`}
     >
-      <div className="relative aspect-[4/5] overflow-visible bg-transparent transition-transform duration-300 group-hover:-rotate-1">
+      <div className="relative aspect-[4/5] overflow-hidden bg-transparent transition-transform duration-300 group-hover:-rotate-1">
         <span
           className={`absolute top-3 z-10 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.28em] ${
             product.soldOut
@@ -234,14 +234,14 @@ function RelatedProductCard({
         </span>
         <Image
           alt={product.alt}
-          className="scale-[1.06] object-contain p-3 transition-transform duration-300 group-hover:scale-[1.1] md:scale-[0.94] md:p-4 md:group-hover:scale-[0.98]"
+          className="object-contain p-5 transition-transform duration-300 group-hover:scale-[1.03] sm:p-6 md:p-7"
           fill
           sizes="(min-width: 1280px) 300px, (min-width: 640px) 44vw, 90vw"
           src={product.image}
           unoptimized
         />
       </div>
-      <div className="mt-1 md:-mt-4 lg:-mt-6">
+      <div className="mt-2 md:mt-1">
         <h3 className="font-display text-xl uppercase leading-tight">{product.name}</h3>
         <p className="mt-1 font-mono text-sm font-bold text-ink"><StorePrice amountUsd={product.price} /></p>
       </div>
