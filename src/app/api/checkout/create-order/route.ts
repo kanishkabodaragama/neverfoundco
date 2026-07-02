@@ -6,6 +6,7 @@ import {
 } from "@/lib/db/orders";
 import { getCheckoutPaymentTimeoutMinutes } from "@/lib/db/site-settings";
 import { resolvePublicAppOrigin } from "@/lib/app-origin";
+import { sendOrderPlacedEmails } from "@/lib/email/order-emails";
 import { createPayHerePayload } from "@/lib/payhere";
 import { checkoutSchema } from "@/lib/validation/checkout";
 
@@ -31,6 +32,7 @@ export async function POST(request: Request) {
       items: items.map((item) => item.product_name).join(", "),
     });
     await updateOrderPayHereQuote(order.id, quote);
+    await sendOrderPlacedEmails(order.id, request);
 
     return NextResponse.json({
       orderNumber: order.order_number,

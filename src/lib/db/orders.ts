@@ -3,6 +3,7 @@ import { getCouponDiscount } from "@/lib/db/coupons";
 import { getCheckoutPaymentTimeoutMinutes } from "@/lib/db/site-settings";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getShippingFeeForAddress } from "@/lib/db/shipping";
+import { sendOrderCancelledEmails } from "@/lib/email/order-emails";
 import type { PayHereQuote } from "@/lib/payhere";
 import { toMoney } from "@/lib/utils";
 import { randomUUID } from "node:crypto";
@@ -143,7 +144,7 @@ export async function cancelExpiredPendingOrders(timeoutMinutes?: number) {
   const minutes = timeoutMinutes ?? (await getCheckoutPaymentTimeoutMinutes());
   const cutoff = new Date(Date.now() - minutes * 60 * 1000).toISOString();
   const supabase = getSupabaseAdminClient();
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("orders")
     .update({
       payment_status: "cancelled",
@@ -151,16 +152,21 @@ export async function cancelExpiredPendingOrders(timeoutMinutes?: number) {
     })
     .eq("payment_status", "pending")
     .eq("order_status", "pending")
-    .lt("created_at", cutoff);
+    .lt("created_at", cutoff)
+    .select("id");
 
   if (error) throw error;
+
+  await Promise.all(
+    (data ?? []).map((order) => sendOrderCancelledEmails(order.id)),
+  );
 }
 
 export async function cancelExpiredPendingOrder(orderNumber: string) {
   const timeoutMinutes = await getCheckoutPaymentTimeoutMinutes();
   const cutoff = new Date(Date.now() - timeoutMinutes * 60 * 1000).toISOString();
   const supabase = getSupabaseAdminClient();
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("orders")
     .update({
       payment_status: "cancelled",
@@ -169,9 +175,14 @@ export async function cancelExpiredPendingOrder(orderNumber: string) {
     .eq("order_number", orderNumber)
     .eq("payment_status", "pending")
     .eq("order_status", "pending")
-    .lt("created_at", cutoff);
+    .lt("created_at", cutoff)
+    .select("id");
 
   if (error) throw error;
+
+  await Promise.all(
+    (data ?? []).map((order) => sendOrderCancelledEmails(order.id)),
+  );
 }
 
 export function getOrderPaymentExpiresAt(createdAt: string, timeoutMinutes: number) {

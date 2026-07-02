@@ -24,7 +24,9 @@ SUPABASE_SERVICE_ROLE_KEY=
 PAYHERE_MERCHANT_ID=
 PAYHERE_MERCHANT_SECRET=
 PAYHERE_SANDBOX=true
+PAYHERE_APP_URL=
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+RESEND_API_KEY=
 ```
 
 Admin login is disabled until `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `NEXT_PUBLIC_APP_URL` are configured. Product/order/coupon/shipping mutations also need `SUPABASE_SERVICE_ROLE_KEY`.
@@ -65,6 +67,20 @@ The admin panel manages:
 Checkout creates a pending order through `/api/checkout/create-order`, then posts a signed payload to PayHere. PayHere notifications post back to `/api/payhere/notify` and update payment/order status after signature verification.
 
 For local sandbox testing, keep `PAYHERE_SANDBOX=true` and set `NEXT_PUBLIC_APP_URL` to the public URL PayHere can reach when testing callbacks.
+
+## Order Email Setup
+
+Order emails are sent through Resend and always use
+`Never Found Orders <orders@neverfoundco.com>` as the sender. Set
+`RESEND_API_KEY` in Netlify and verify `neverfoundco.com` in Resend so
+`orders@neverfoundco.com` is allowed as a sender.
+
+Customers receive order placed, cancelled, and admin status update emails. New
+order and status admin copies go to `neverfoundclothing@gmail.com`. Customer
+replies go back to `orders@neverfoundco.com` through the `Reply-To` header.
+
+Resend stores delivery logs in the Resend dashboard. Customer replies go to the
+`orders@neverfoundco.com` inbox because the emails use that `Reply-To` address.
 
 ## Verification
 
