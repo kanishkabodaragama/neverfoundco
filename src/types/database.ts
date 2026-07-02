@@ -96,7 +96,11 @@ export type Database = {
           shipping_fee: number;
           total: number;
           payment_status: string;
+          refund_amount: number | null;
+          refund_status: string;
+          refunded_at: string | null;
           order_status: string;
+          stock_deducted_at: string | null;
           payhere_amount_lkr: number | null;
           payhere_exchange_rate: number | null;
           payhere_exchange_source: string | null;
@@ -115,6 +119,7 @@ export type Database = {
           id: string;
           order_id: string;
           product_id: string | null;
+          variant_id: string | null;
           product_name: string;
           quantity: number;
           unit_price: number;

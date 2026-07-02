@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { AdminAlert } from "@/components/admin/admin-alert";
+import { RefundStatusForm } from "@/components/admin/refund-status-form";
 import { requireAdmin } from "@/lib/admin-auth";
 import { formatColomboDateTime } from "@/lib/date-time";
 import { getAdminOrder } from "@/lib/db/admin";
@@ -48,6 +49,13 @@ export default async function AdminOrderDetailPage({
         <button className="admin-action px-4 py-2.5" type="submit">Update status</button>
       </form>
 
+      <RefundStatusForm
+        action={`/api/admin/orders/${order.id}/refund`}
+        orderTotal={Number(order.total)}
+        refundAmount={order.refund_amount === null ? null : Number(order.refund_amount)}
+        refundStatus={order.refund_status}
+      />
+
       <div className="grid gap-5 xl:grid-cols-[0.8fr_1.2fr]">
         <section className="admin-card space-y-5 p-5">
           <h2 className="font-semibold">Customer</h2>
@@ -64,6 +72,15 @@ export default async function AdminOrderDetailPage({
           <div className="grid grid-cols-2 gap-3">
             <Status label="Payment" value={order.payment_status} />
             <Status label="Order" value={order.order_status} />
+            <Status label="Refund" value={formatRefundStatus(order.refund_status)} />
+            <Status
+              label="Refund amount"
+              value={
+                order.refund_amount
+                  ? formatCurrency(Number(order.refund_amount))
+                  : "None"
+              }
+            />
           </div>
         </section>
 
@@ -90,6 +107,12 @@ export default async function AdminOrderDetailPage({
       </div>
     </div>
   );
+}
+
+function formatRefundStatus(value: string) {
+  if (value === "partial_refund") return "Partial refund";
+  if (value === "full_refund") return "Full refund";
+  return "Not refunded";
 }
 
 function Status({ label, value }: { label: string; value: string }) {

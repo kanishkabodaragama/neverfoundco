@@ -68,6 +68,7 @@ export async function createPendingOrder(input: CheckoutInput) {
 
     return {
       product_id: product.id,
+      variant_id: variant?.id ?? null,
       product_name:
         optionLabel.filter(Boolean).length > 0
           ? `${product.name}${variantLabel}`
@@ -226,6 +227,17 @@ export async function updateOrderPayHereQuote(orderId: string, quote: PayHereQuo
     );
     return;
   }
+
+  if (error) throw error;
+}
+
+export async function deductPaidOrderStock(orderId: string) {
+  const supabase = getSupabaseAdminClient();
+  const rpc = supabase.rpc as unknown as (
+    fn: "deduct_order_stock",
+    args: { p_order_id: string },
+  ) => Promise<{ error: { message?: string } | null }>;
+  const { error } = await rpc("deduct_order_stock", { p_order_id: orderId });
 
   if (error) throw error;
 }

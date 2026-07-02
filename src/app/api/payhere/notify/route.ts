@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   cancelExpiredPendingOrder,
+  deductPaidOrderStock,
   isMissingPayHereQuoteColumnError,
 } from "@/lib/db/orders";
 import { verifyPayHereNotificationSignature } from "@/lib/payhere";
@@ -100,6 +101,18 @@ export async function POST(request: Request) {
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  if (paymentStatus === "paid") {
+    try {
+      await deductPaidOrderStock(order.id);
+    } catch (stockError) {
+      console.error("Paid order stock deduction failed", stockError);
+      return NextResponse.json(
+        { error: "Payment saved, but stock deduction failed" },
+        { status: 500 },
+      );
+    }
   }
 
   return NextResponse.json({ received: true });

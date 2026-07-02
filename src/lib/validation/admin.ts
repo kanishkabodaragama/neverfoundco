@@ -121,3 +121,39 @@ export const orderStatusSchema = z.object({
     "cancelled",
   ]),
 });
+
+export const refundStatusSchema = z
+  .object({
+    refund_status: z.enum(["not_refunded", "partial_refund", "full_refund"]),
+    refund_amount: z.coerce.number().nonnegative().optional().nullable(),
+    order_total: z.coerce.number().nonnegative(),
+  })
+  .superRefine((value, context) => {
+    if (value.refund_status === "partial_refund") {
+      if (!value.refund_amount || value.refund_amount <= 0) {
+        context.addIssue({
+          code: "custom",
+          message: "Enter a refund amount for a partial refund.",
+          path: ["refund_amount"],
+        });
+      }
+
+      if (value.refund_amount && value.refund_amount > value.order_total) {
+        context.addIssue({
+          code: "custom",
+          message: "Refund amount cannot be more than the order total.",
+          path: ["refund_amount"],
+        });
+      }
+    }
+  })
+  .transform((value) => ({
+    refund_status: value.refund_status,
+    refund_amount:
+      value.refund_status === "full_refund"
+        ? value.order_total
+        : value.refund_status === "partial_refund"
+          ? (value.refund_amount ?? 0)
+          : null,
+    refunded_at: value.refund_status === "not_refunded" ? null : new Date().toISOString(),
+  }));

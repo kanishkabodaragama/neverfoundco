@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import { useCart } from "@/components/store/cart-provider";
 import { StorePrice } from "@/components/site/StorePrice";
@@ -16,10 +16,13 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
   const [requestedColor, setSelectedColor] = useState(product.colors[0]);
   const [requestedSize, setSelectedSize] = useState(product.sizes[0]);
   const [selectedImage, setSelectedImage] = useState(product.image);
-  const [imageMotion, setImageMotion] = useState<"next" | "previous">("next");
   const [galleryStart, setGalleryStart] = useState(0);
   const [added, setAdded] = useState(false);
   const dragStart = useRef<{ x: number; y: number } | null>(null);
+  const galleryViewport = useRef<HTMLDivElement | null>(null);
+  const mobileThumbnailStrip = useRef<HTMLDivElement | null>(null);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
   const availableGenders = useMemo(
     () => uniqueVariantValues(product.variants.map((variant) => variant.gender)),
     [product.variants],
@@ -92,6 +95,24 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
       ? Math.min(Math.max(0, displayImageIndex), maxGalleryStart)
       : galleryStart;
   const visibleGallery = galleryImages.slice(effectiveGalleryStart, effectiveGalleryStart + 4);
+  const previousGalleryImage =
+    galleryImages[
+      (activeGalleryIndex - 1 + galleryImages.length) % galleryImages.length
+    ];
+  const nextGalleryImage =
+    galleryImages[(activeGalleryIndex + 1) % galleryImages.length];
+
+  useEffect(() => {
+    const thumbnail = mobileThumbnailStrip.current?.querySelector(
+      `[data-gallery-index="${activeGalleryIndex}"]`,
+    );
+
+    thumbnail?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "center",
+    });
+  }, [activeGalleryIndex]);
 
   function moveGallery(direction: -1 | 1) {
     setGalleryStart(
@@ -99,18 +120,21 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
     );
   }
 
-  function showGalleryImage(index: number, direction: "next" | "previous") {
+  function showGalleryImage(index: number) {
     const image = galleryImages[index];
     if (!image) return;
 
-    setImageMotion(direction);
     setSelectedImage(image);
     setGalleryStart(Math.min(maxGalleryStart, Math.max(0, index)));
+    setDragOffset(0);
+    setIsDragging(false);
   }
 
   function selectGalleryImage(image: string, index: number) {
-    setImageMotion(index >= activeGalleryIndex ? "next" : "previous");
     setSelectedImage(image);
+    setGalleryStart(Math.min(maxGalleryStart, Math.max(0, index)));
+    setDragOffset(0);
+    setIsDragging(false);
   }
 
   function slideGallery(direction: -1 | 1) {
@@ -118,11 +142,27 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
 
     const nextIndex =
       (activeGalleryIndex + direction + galleryImages.length) % galleryImages.length;
-    showGalleryImage(nextIndex, direction > 0 ? "next" : "previous");
+    showGalleryImage(nextIndex);
   }
 
   function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
     dragStart.current = { x: event.clientX, y: event.clientY };
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setIsDragging(true);
+    setDragOffset(0);
+  }
+
+  function handlePointerMove(event: ReactPointerEvent<HTMLDivElement>) {
+    if (!dragStart.current) return;
+
+    const deltaX = event.clientX - dragStart.current.x;
+    const deltaY = event.clientY - dragStart.current.y;
+
+    if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 12) {
+      return;
+    }
+
+    setDragOffset(deltaX);
   }
 
   function handlePointerUp(event: ReactPointerEvent<HTMLDivElement>) {
@@ -131,8 +171,16 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
     const deltaX = event.clientX - dragStart.current.x;
     const deltaY = event.clientY - dragStart.current.y;
     dragStart.current = null;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    setIsDragging(false);
 
-    if (Math.abs(deltaX) < 42 || Math.abs(deltaX) < Math.abs(deltaY)) return;
+    if (Math.abs(deltaX) < 42 || Math.abs(deltaX) < Math.abs(deltaY)) {
+      setDragOffset(0);
+      return;
+    }
+
     slideGallery(deltaX < 0 ? 1 : -1);
   }
 
@@ -157,26 +205,25 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
     );
 
     setSelectedImage(nextVariant?.image || product.image);
+    setDragOffset(0);
+    setIsDragging(false);
   }
 
   function selectGender(gender: MockProductDetail["genders"][number]) {
     setSelectedGender(gender);
     selectVariantImage({ gender });
-    setImageMotion("next");
     setAdded(false);
   }
 
   function selectColor(color: MockProductDetail["colors"][number]) {
     setSelectedColor(color);
     selectVariantImage({ color });
-    setImageMotion("next");
     setAdded(false);
   }
 
   function selectSize(size: MockProductDetail["sizes"][number]) {
     setSelectedSize(size);
     selectVariantImage({ size });
-    setImageMotion("next");
     setAdded(false);
   }
 
@@ -210,27 +257,32 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
           >
             <ChevronUp className="h-5 w-5" />
           </button>
-          <div className="no-scrollbar flex gap-4 overflow-x-auto md:grid md:max-h-[432px] md:overflow-hidden">
-          {visibleGallery.map((image, index) => (
-            <button
-              aria-label={`View product image ${effectiveGalleryStart + index + 1}`}
-              className={`relative h-24 w-24 shrink-0 bg-transparent ${
-                image === displayImage ? "border-2 border-rust" : "border border-transparent"
-              }`}
-              key={`${image}-${effectiveGalleryStart + index}`}
-              onClick={() => selectGalleryImage(image, effectiveGalleryStart + index)}
-              type="button"
-            >
-              <Image
-                alt={`${product.name} thumbnail ${index + 1}`}
-                className="object-contain p-2"
-                fill
-                sizes="96px"
-                src={image}
-                unoptimized
+          <div
+            className="no-scrollbar flex scroll-px-16 gap-4 overflow-x-auto scroll-smooth md:hidden"
+            ref={mobileThumbnailStrip}
+          >
+            {galleryImages.map((image, index) => (
+              <GalleryThumb
+                image={image}
+                index={index}
+                isSelected={image === displayImage}
+                key={`${image}-${index}`}
+                onClick={() => selectGalleryImage(image, index)}
+                productName={product.name}
               />
-            </button>
-          ))}
+            ))}
+          </div>
+          <div className="hidden gap-4 md:grid md:max-h-[432px] md:overflow-hidden">
+            {visibleGallery.map((image, index) => (
+              <GalleryThumb
+                image={image}
+                index={effectiveGalleryStart + index}
+                isSelected={image === displayImage}
+                key={`${image}-${effectiveGalleryStart + index}`}
+                onClick={() => selectGalleryImage(image, effectiveGalleryStart + index)}
+                productName={product.name}
+              />
+            ))}
           </div>
           <button
             aria-label="Next product images"
@@ -247,12 +299,13 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
           className="relative order-1 min-h-[430px] touch-pan-y overflow-hidden bg-transparent md:order-2 lg:min-h-[610px]"
           onPointerCancel={() => {
             dragStart.current = null;
+            setIsDragging(false);
+            setDragOffset(0);
           }}
           onPointerDown={handlePointerDown}
-          onPointerLeave={() => {
-            dragStart.current = null;
-          }}
+          onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
+          ref={galleryViewport}
         >
           {galleryImages.length > 1 ? (
             <>
@@ -274,26 +327,36 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
               </button>
             </>
           ) : null}
-          <div
-            className={`product-gallery-frame absolute inset-0 ${
-              imageMotion === "previous" ? "product-gallery-image--previous" : ""
-            }`}
-            key={displayImage}
-          >
-            <Image
+          {galleryImages.length > 1 ? (
+            <GallerySlide
               alt={product.alt}
-              className="scale-[1.03] object-contain p-3 md:scale-[0.98] md:p-4"
-              fill
-              priority
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              src={displayImage}
-              unoptimized
+              dragOffset={dragOffset}
+              image={previousGalleryImage}
+              isDragging={isDragging}
+              position={-100}
             />
-          </div>
+          ) : null}
+          <GallerySlide
+            alt={product.alt}
+            dragOffset={dragOffset}
+            image={displayImage}
+            isDragging={isDragging}
+            position={0}
+            priority
+          />
+          {galleryImages.length > 1 ? (
+            <GallerySlide
+              alt={product.alt}
+              dragOffset={dragOffset}
+              image={nextGalleryImage}
+              isDragging={isDragging}
+              position={100}
+            />
+          ) : null}
         </div>
       </div>
 
-      <div className="flex flex-col items-center justify-start text-center lg:items-start lg:text-left">
+      <div className="flex flex-col items-start justify-start text-left">
         <span className="w-fit bg-transparent px-0 py-0 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-ink/65">
           {product.stockLabel}
         </span>
@@ -394,6 +457,77 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
           </section>
         </div>
       </div>
+    </div>
+  );
+}
+
+function GalleryThumb({
+  image,
+  index,
+  isSelected,
+  onClick,
+  productName,
+}: {
+  image: string;
+  index: number;
+  isSelected: boolean;
+  onClick: () => void;
+  productName: string;
+}) {
+  return (
+    <button
+      aria-label={`View product image ${index + 1}`}
+      className={`relative h-24 w-24 shrink-0 bg-transparent ${
+        isSelected ? "border-2 border-rust" : "border border-transparent"
+      }`}
+      data-gallery-index={index}
+      onClick={onClick}
+      type="button"
+    >
+      <Image
+        alt={`${productName} thumbnail ${index + 1}`}
+        className="object-contain p-2"
+        fill
+        sizes="96px"
+        src={image}
+        unoptimized
+      />
+    </button>
+  );
+}
+
+function GallerySlide({
+  alt,
+  dragOffset,
+  image,
+  isDragging,
+  position,
+  priority,
+}: {
+  alt: string;
+  dragOffset: number;
+  image: string;
+  isDragging: boolean;
+  position: -100 | 0 | 100;
+  priority?: boolean;
+}) {
+  return (
+    <div
+      className="absolute inset-0 will-change-transform"
+      style={{
+        transform: `translate3d(calc(${position}% + ${dragOffset}px), 0, 0)`,
+        transition: isDragging ? "none" : "transform 260ms cubic-bezier(0.22, 1, 0.36, 1)",
+      }}
+    >
+      <Image
+        alt={alt}
+        className="scale-[1.03] object-contain p-3 md:scale-[0.98] md:p-4"
+        fill
+        priority={priority}
+        sizes="(min-width: 1024px) 50vw, 100vw"
+        src={image}
+        unoptimized
+      />
     </div>
   );
 }
