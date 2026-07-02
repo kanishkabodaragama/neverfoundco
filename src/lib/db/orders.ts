@@ -1,5 +1,6 @@
 import type { CheckoutInput } from "@/lib/validation/checkout";
 import { getCouponDiscount } from "@/lib/db/coupons";
+import { getCheckoutPaymentTimeoutMinutes } from "@/lib/db/site-settings";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getShippingFeeForAddress } from "@/lib/db/shipping";
 import type { PayHereQuote } from "@/lib/payhere";
@@ -14,6 +15,8 @@ function createOrderNumber() {
 }
 
 export async function createPendingOrder(input: CheckoutInput) {
+  await cancelExpiredPendingOrders();
+
   const supabase = getSupabaseAdminClient();
   const productIds = input.items.map((item) => item.productId);
   const variantIds = input.items
@@ -57,13 +60,17 @@ export async function createPendingOrder(input: CheckoutInput) {
 
     const unitPrice = Number(variant?.sale_price ?? variant?.price ?? product.sale_price ?? product.price);
     const unitCost = Number(variant?.unit_cost ?? product.unit_cost ?? 0);
-    const variantLabel = variant
-      ? ` (${[variant.gender, variant.color, variant.size].filter(Boolean).join(" / ")})`
-      : "";
+    const optionLabel = variant
+      ? [variant.gender, variant.color, variant.size]
+      : [item.gender, item.color, item.size];
+    const variantLabel = ` (${optionLabel.filter(Boolean).join(" / ")})`;
 
     return {
       product_id: product.id,
-      product_name: `${product.name}${variantLabel}`,
+      product_name:
+        optionLabel.filter(Boolean).length > 0
+          ? `${product.name}${variantLabel}`
+          : product.name,
       quantity: item.quantity,
       unit_price: toMoney(unitPrice),
       unit_cost: toMoney(unitCost),
@@ -132,6 +139,47 @@ export async function createPendingOrder(input: CheckoutInput) {
   };
 }
 
+export async function cancelExpiredPendingOrders(timeoutMinutes?: number) {
+  const minutes = timeoutMinutes ?? (await getCheckoutPaymentTimeoutMinutes());
+  const cutoff = new Date(Date.now() - minutes * 60 * 1000).toISOString();
+  const supabase = getSupabaseAdminClient();
+  const { error } = await supabase
+    .from("orders")
+    .update({
+      payment_status: "cancelled",
+      order_status: "cancelled",
+    })
+    .eq("payment_status", "pending")
+    .eq("order_status", "pending")
+    .lt("created_at", cutoff);
+
+  if (error) throw error;
+}
+
+export async function cancelExpiredPendingOrder(orderNumber: string) {
+  const timeoutMinutes = await getCheckoutPaymentTimeoutMinutes();
+  const cutoff = new Date(Date.now() - timeoutMinutes * 60 * 1000).toISOString();
+  const supabase = getSupabaseAdminClient();
+  const { error } = await supabase
+    .from("orders")
+    .update({
+      payment_status: "cancelled",
+      order_status: "cancelled",
+    })
+    .eq("order_number", orderNumber)
+    .eq("payment_status", "pending")
+    .eq("order_status", "pending")
+    .lt("created_at", cutoff);
+
+  if (error) throw error;
+}
+
+export function getOrderPaymentExpiresAt(createdAt: string, timeoutMinutes: number) {
+  return new Date(
+    new Date(createdAt).getTime() + timeoutMinutes * 60 * 1000,
+  ).toISOString();
+}
+
 async function incrementCouponUsage(couponCode: string) {
   const supabase = getSupabaseAdminClient();
   const { data: coupon } = await supabase
@@ -160,10 +208,29 @@ export async function updateOrderPayHereQuote(orderId: string, quote: PayHereQuo
     })
     .eq("id", orderId);
 
+  if (error && isMissingPayHereQuoteColumnError(error)) {
+    console.warn(
+      "Skipping PayHere quote persistence because the orders table is missing quote columns.",
+      error.message,
+    );
+    return;
+  }
+
   if (error) throw error;
 }
 
+export function isMissingPayHereQuoteColumnError(error: { message?: string }) {
+  return Boolean(
+    error.message?.includes("payhere_amount_lkr") ||
+      error.message?.includes("payhere_exchange_rate") ||
+      error.message?.includes("payhere_exchange_source") ||
+      error.message?.includes("payhere_exchange_updated_at"),
+  );
+}
+
 export async function getPublicOrderStatus(orderNumber: string) {
+  await cancelExpiredPendingOrder(orderNumber);
+
   const supabase = getSupabaseAdminClient();
   const { data, error } = await supabase
     .from("orders")
@@ -190,6 +257,8 @@ export async function getLatestOrderForCustomer(email: string) {
 }
 
 export async function listCustomerOrders(email: string) {
+  await cancelExpiredPendingOrders();
+
   const supabase = getSupabaseAdminClient();
   const { data, error } = await supabase
     .from("orders")

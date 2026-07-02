@@ -1,4 +1,5 @@
 import { hasSupabaseServerEnv } from "@/lib/env";
+import { cancelExpiredPendingOrders } from "@/lib/db/orders";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { Database } from "@/types/database";
 
@@ -17,6 +18,8 @@ export async function listAdminOrders(filters?: {
   search?: string;
 }) {
   if (!hasSupabaseServerEnv()) return [];
+
+  await cancelExpiredPendingOrders();
 
   const supabase = getSupabaseAdminClient();
   let query = supabase
@@ -47,6 +50,8 @@ export async function listAdminOrders(filters?: {
 
 export async function getAdminOrder(id: string) {
   if (!hasSupabaseServerEnv()) return null;
+
+  await cancelExpiredPendingOrders();
 
   const supabase = getSupabaseAdminClient();
   const { data, error } = await supabase

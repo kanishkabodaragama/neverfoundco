@@ -5,6 +5,7 @@ import type { FormEvent, ReactNode } from "react";
 import { useCart } from "@/components/store/cart-provider";
 import { useStoreCurrency } from "@/components/store/currency-provider";
 import type { ShippingCountry } from "@/lib/db/shipping";
+import { isUuid } from "@/lib/ids";
 import type { PayHereCheckoutPayload } from "@/types/commerce";
 
 type CheckoutItem = {
@@ -14,7 +15,13 @@ type CheckoutItem = {
   quantity: number;
 };
 
-export function CheckoutExperience({ countries }: { countries: ShippingCountry[] }) {
+export function CheckoutExperience({
+  countries,
+  paymentTimeoutMinutes,
+}: {
+  countries: ShippingCountry[];
+  paymentTimeoutMinutes: number;
+}) {
   const cart = useCart();
   const { format, rateSource } = useStoreCurrency();
   const initialCountry = getInitialCountry(countries);
@@ -180,11 +187,30 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
           .map(([, label]) => label)
           .join(", ")}.`,
       );
+      setIsSubmitting(false);
       return;
     }
 
     if (!shippingRegion || shippingFee === null) {
       setMessage("Please wait until the shipping fee is calculated.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    const orderItems = cart.items
+      .filter((item) => isUuid(item.productId))
+      .map((item) => ({
+        productId: item.productId,
+        variantId: isUuid(item.variantId) ? item.variantId : undefined,
+        gender: item.gender,
+        color: item.color,
+        size: item.size,
+        quantity: item.quantity,
+      }));
+
+    if (orderItems.length === 0) {
+      setMessage("Your cart has old items. Please re-add the current products.");
+      setIsSubmitting(false);
       return;
     }
 
@@ -205,15 +231,15 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
           district: shippingRegion,
           postalCode,
           couponCode: cart.couponCode || undefined,
-          items: cart.items.map((item) => ({
-            productId: item.productId,
-            variantId: item.variantId,
-            quantity: item.quantity,
-          })),
+          items: orderItems,
         }),
       });
       const result = (await response.json()) as
-        | { payhere: PayHereCheckoutPayload }
+        | {
+            expiresAt: string;
+            payhere: PayHereCheckoutPayload;
+            paymentTimeoutMinutes: number;
+          }
         | { error: string };
 
       if (!response.ok || "error" in result) {
@@ -397,25 +423,34 @@ export function CheckoutExperience({ countries }: { countries: ShippingCountry[]
         ) : null}
 
         <Panel title="Payment Option">
-          <label className="block cursor-pointer border border-ink p-5 text-ink transition hover:translate-x-0.5">
+          <label className="group block cursor-pointer border-2 border-ink bg-ink p-5 text-bone shadow-[6px_6px_0_#ff4d1c] transition hover:translate-x-0.5">
             <span className="flex items-start gap-4">
               <input
-                className="mt-1 h-5 w-5 accent-acid"
+                className="peer sr-only"
                 defaultChecked
                 name="payment"
                 type="radio"
                 value="payhere"
               />
+              <span
+                aria-hidden="true"
+                className="mt-1 grid h-6 w-6 shrink-0 place-items-center rounded-full border-2 border-acid bg-transparent"
+              >
+                <span className="h-3 w-3 rounded-full bg-acid" />
+              </span>
               <span>
                 <span className="block font-display text-3xl uppercase leading-none">
                   PayHere
                 </span>
-                <span className="mt-2 block font-mono text-xs font-bold uppercase tracking-[0.28em] text-rust">
+                <span className="mt-2 block font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid">
                   Visa / MasterCard card payments
                 </span>
-                <span className="mt-3 block max-w-xl text-sm font-semibold leading-relaxed text-ink/70">
+                <span className="mt-3 block max-w-xl text-sm font-semibold leading-relaxed text-bone/75">
                   Orders are created on the server, then redirected to PayHere
                   with a verified checkout hash.
+                </span>
+                <span className="mt-4 block w-fit border border-acid px-3 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-acid">
+                  Complete payment within {paymentTimeoutMinutes} min
                 </span>
               </span>
             </span>

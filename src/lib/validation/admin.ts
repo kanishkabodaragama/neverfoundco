@@ -49,6 +49,14 @@ export const shippingSettingsSchema = z.object({
   default_shipping_fee: z.coerce.number().nonnegative(),
 });
 
+export const checkoutSettingsSchema = z.object({
+  checkout_payment_timeout_minutes: z.coerce
+    .number()
+    .int()
+    .min(1, "Payment timeout must be at least 1 minute.")
+    .max(120, "Payment timeout cannot be more than 120 minutes."),
+});
+
 export const shippingCountrySchema = z.object({
   country_name: z.string().min(2),
   country_code: z.string().min(2).max(3).transform((value) => value.toUpperCase()),

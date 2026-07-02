@@ -3,6 +3,9 @@ import { z } from "zod";
 export const cartItemSchema = z.object({
   productId: z.string().uuid(),
   variantId: z.string().uuid().optional(),
+  gender: z.string().optional(),
+  color: z.string().optional(),
+  size: z.string().optional(),
   quantity: z.number().int().min(1).max(99),
 });
 

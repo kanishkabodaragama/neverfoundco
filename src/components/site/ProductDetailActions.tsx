@@ -28,7 +28,7 @@ export function ProductDetailActions({
   return (
     <div className="grid gap-3">
       <button
-        className="flex w-full items-center justify-center gap-3 bg-ink px-6 py-4 font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid transition-colors hover:bg-rust hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex w-full items-center justify-center gap-3 bg-ink px-6 py-4 font-sans text-sm font-black italic uppercase tracking-normal text-acid transition-colors hover:bg-rust hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
         disabled={soldOut}
         onClick={handleAddToCart}
         type="button"

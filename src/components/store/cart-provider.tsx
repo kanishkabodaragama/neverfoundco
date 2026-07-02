@@ -8,6 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { isUuid } from "@/lib/ids";
 
 type CartItem = {
   productId: string;
@@ -131,13 +132,23 @@ export function useCart() {
   return context;
 }
 
-function getCartItemKey(item: Pick<CartItem, "productId" | "variantId">) {
-  return item.variantId ?? item.productId;
+function getCartItemKey(
+  item: Pick<CartItem, "productId" | "variantId" | "gender" | "size" | "color">,
+) {
+  return (
+    item.variantId ??
+    [item.productId, item.gender, item.size, item.color]
+      .filter(Boolean)
+      .join(":")
+  );
 }
 
 function normalizeStoredCartItems(items: CartItem[]) {
-  return items.map((item) => ({
-    ...item,
-    unitPrice: item.unitPrice > 1000 ? 100 : item.unitPrice,
-  }));
+  return items
+    .filter((item) => isUuid(item.productId))
+    .map((item) => ({
+      ...item,
+      variantId: isUuid(item.variantId) ? item.variantId : undefined,
+      unitPrice: item.unitPrice > 1000 ? 100 : item.unitPrice,
+    }));
 }

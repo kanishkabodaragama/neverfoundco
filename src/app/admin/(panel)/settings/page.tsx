@@ -1,12 +1,16 @@
 import { CheckCircle2, CreditCard } from "lucide-react";
 import { requireAdmin } from "@/lib/admin-auth";
 import { listPaymentGateways } from "@/lib/db/payment-gateways";
+import { getCheckoutPaymentTimeoutMinutes } from "@/lib/db/site-settings";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminSettingsPage() {
   await requireAdmin();
-  const gateways = await listPaymentGateways();
+  const [gateways, checkoutPaymentTimeoutMinutes] = await Promise.all([
+    listPaymentGateways(),
+    getCheckoutPaymentTimeoutMinutes(),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -66,6 +70,44 @@ export default async function AdminSettingsPage() {
             <p className="admin-muted p-4 text-sm">No payment gateways have been seeded yet.</p>
           ) : null}
         </div>
+      </section>
+
+      <section className="admin-card overflow-hidden">
+        <div className="border-b border-[#ece7df] p-4">
+          <h2 className="flex items-center gap-2 font-semibold">
+            <CreditCard className="h-4 w-4" />
+            Checkout timing
+          </h2>
+          <p className="admin-muted mt-1 text-sm">
+            Set how long customers have to complete PayHere payment before a
+            pending order is cancelled.
+          </p>
+        </div>
+        <form
+          action="/api/admin/checkout-settings"
+          className="grid gap-4 p-4 sm:max-w-sm"
+          method="post"
+        >
+          <label className="grid gap-2 text-sm font-semibold">
+            Payment window in minutes
+            <input
+              className="admin-input"
+              defaultValue={checkoutPaymentTimeoutMinutes}
+              max={120}
+              min={1}
+              name="checkout_payment_timeout_minutes"
+              step={1}
+              type="number"
+            />
+          </label>
+          <p className="admin-muted text-xs">
+            Default is 15 minutes. Pending unpaid orders older than this window
+            are cancelled automatically when order/payment endpoints run.
+          </p>
+          <button className="admin-action w-fit px-4 py-2.5" type="submit">
+            Save timing
+          </button>
+        </form>
       </section>
     </div>
   );

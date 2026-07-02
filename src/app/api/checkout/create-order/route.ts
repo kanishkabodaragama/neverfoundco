@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { createPendingOrder, updateOrderPayHereQuote } from "@/lib/db/orders";
+import {
+  createPendingOrder,
+  getOrderPaymentExpiresAt,
+  updateOrderPayHereQuote,
+} from "@/lib/db/orders";
+import { getCheckoutPaymentTimeoutMinutes } from "@/lib/db/site-settings";
 import { createPayHerePayload } from "@/lib/payhere";
 import { checkoutSchema } from "@/lib/validation/checkout";
 
@@ -7,6 +12,7 @@ export async function POST(request: Request) {
   try {
     const payload = checkoutSchema.parse(await request.json());
     const { order, items } = await createPendingOrder(payload);
+    const paymentTimeoutMinutes = await getCheckoutPaymentTimeoutMinutes();
     const [firstName, ...rest] = order.customer_name.trim().split(" ");
     const { payhere, quote } = await createPayHerePayload({
       orderNumber: order.order_number,
@@ -25,12 +31,30 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       orderNumber: order.order_number,
+      expiresAt: getOrderPaymentExpiresAt(order.created_at, paymentTimeoutMinutes),
+      paymentTimeoutMinutes,
       payhere,
     });
   } catch (error) {
+    console.error("Checkout order creation failed", error);
+
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Checkout failed." },
+      { error: getErrorMessage(error) },
       { status: 400 },
     );
   }
+}
+
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) return error.message;
+
+  if (error && typeof error === "object" && "message" in error) {
+    const message = (error as { message?: unknown }).message;
+
+    if (typeof message === "string" && message.trim()) {
+      return message;
+    }
+  }
+
+  return "Checkout failed.";
 }

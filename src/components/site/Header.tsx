@@ -180,27 +180,34 @@ export function SiteHeader({
       />
 
       <nav
-        className={`fixed left-0 top-0 z-50 flex h-dvh w-[82vw] max-w-sm flex-col bg-acid font-mono text-sm uppercase tracking-[0.28em] shadow-2xl transition-transform duration-300 ease-out md:hidden ${
-          open ? "translate-x-0" : "-translate-x-full"
+        className={`fixed top-0 z-50 flex h-dvh w-[82vw] max-w-sm flex-col bg-ink font-mono text-sm uppercase tracking-[0.16em] text-bone shadow-2xl transition-[left] duration-300 ease-out md:hidden ${
+          open ? "left-0 pointer-events-auto" : "left-[-100vw] pointer-events-none"
         }`}
         aria-label="Mobile navigation"
       >
         <div className="flex min-h-28 items-center justify-between px-5">
-          <span className="text-xs font-bold text-ink/55">Menu</span>
+          <span className="text-xs font-bold text-bone/55">Menu</span>
           <button
             aria-label="Close menu"
-            className="flex h-9 w-9 items-center justify-center text-ink"
+            className="relative flex h-11 w-11 items-center justify-center transition-opacity hover:opacity-70"
             onClick={() => setOpen(false)}
             type="button"
           >
-            <CloseGlyph />
+            <Image
+              alt=""
+              aria-hidden="true"
+              className="object-contain invert"
+              fill
+              sizes="44px"
+              src="/images/icons/menu-close.png"
+            />
           </button>
         </div>
 
-        <div className="flex flex-col">
+        <div className="flex flex-col pt-4">
           {navItems.map((item) => (
             <Link
-              className="px-5 py-5 text-ink/75 active:bg-ink active:text-acid"
+              className="px-5 py-4 font-display text-5xl italic uppercase leading-none tracking-normal text-bone transition-colors hover:bg-bone hover:text-ink active:bg-acid active:text-ink"
               href={item.href}
               key={item.label}
               onClick={() => setOpen(false)}
@@ -211,9 +218,9 @@ export function SiteHeader({
         </div>
 
         <div className="mt-auto grid gap-4 px-5 py-5">
-          <CurrencySelector />
+          <CurrencySelector tone="dark" />
           <Link
-            className="bg-ink px-5 py-4 text-center font-bold text-acid"
+            className="bg-acid px-5 py-4 text-center font-bold text-ink transition-colors hover:bg-rust"
             href="/account/login"
             onClick={() => setOpen(false)}
           >

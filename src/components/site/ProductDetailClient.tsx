@@ -7,6 +7,7 @@ import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import { useCart } from "@/components/store/cart-provider";
 import { StorePrice } from "@/components/site/StorePrice";
 import type { MockProductDetail } from "@/components/site/product-detail-data";
+import { isUuid } from "@/lib/ids";
 import { getVariantCombinationKey, uniqueVariantValues } from "@/lib/product-variants";
 
 export function ProductDetailClient({ product }: { product: MockProductDetail }) {
@@ -184,7 +185,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
 
     cart.addItem({
       productId: product.id,
-      variantId: selectedVariant.id,
+      variantId: isUuid(selectedVariant.id) ? selectedVariant.id : undefined,
       name: product.name,
       slug: product.slug,
       unitPrice: displayPrice,
@@ -363,7 +364,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
           ) : null}
 
           <button
-            className="mt-2 flex w-full items-center justify-center gap-3 rounded-full bg-ink px-6 py-4 font-mono text-xs font-bold italic uppercase tracking-[0.22em] text-bone transition-colors hover:bg-rust hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-2 flex w-full items-center justify-center gap-3 rounded-full bg-ink px-6 py-4 font-sans text-sm font-black italic uppercase tracking-normal text-bone transition-colors hover:bg-rust hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
             disabled={!isAvailable}
             onClick={addSelectedVariant}
             type="button"
