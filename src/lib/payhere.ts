@@ -53,6 +53,7 @@ export type PayHereQuote = {
 export async function createPayHerePayload(input: {
   orderNumber: string;
   amountUsd: number;
+  publicOrigin: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -64,6 +65,7 @@ export async function createPayHerePayload(input: {
   const env = getPayHereEnv();
   const rate = await getUsdToLkrRate();
   const amountLkr = convertUsdToLkr(input.amountUsd, rate.rate);
+  const publicOrigin = input.publicOrigin.replace(/\/+$/, "");
   const actionUrl = isPayHereSandbox()
     ? "https://sandbox.payhere.lk/pay/checkout"
     : "https://www.payhere.lk/pay/checkout";
@@ -80,9 +82,9 @@ export async function createPayHerePayload(input: {
       actionUrl,
       fields: {
         merchant_id: env.PAYHERE_MERCHANT_ID,
-        return_url: `${env.NEXT_PUBLIC_APP_URL}/checkout?order=${input.orderNumber}`,
-        cancel_url: `${env.NEXT_PUBLIC_APP_URL}/checkout?order=${input.orderNumber}`,
-        notify_url: `${env.NEXT_PUBLIC_APP_URL}/api/payhere/notify`,
+        return_url: `${publicOrigin}/checkout?order=${input.orderNumber}`,
+        cancel_url: `${publicOrigin}/checkout?order=${input.orderNumber}`,
+        notify_url: `${publicOrigin}/api/payhere/notify`,
         order_id: input.orderNumber,
         items: input.items,
         currency: CURRENCY,

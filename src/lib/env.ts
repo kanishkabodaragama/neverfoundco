@@ -11,7 +11,6 @@ const payHereEnvSchema = z.object({
   PAYHERE_MERCHANT_ID: z.string().min(1),
   PAYHERE_MERCHANT_SECRET: z.string().min(1),
   PAYHERE_SANDBOX: z.string().default("true"),
-  NEXT_PUBLIC_APP_URL: z.string().url(),
 });
 
 const publicEnvSchema = z.object({
@@ -42,7 +41,6 @@ export function getPayHereEnv() {
     PAYHERE_MERCHANT_ID: process.env.PAYHERE_MERCHANT_ID,
     PAYHERE_MERCHANT_SECRET: process.env.PAYHERE_MERCHANT_SECRET,
     PAYHERE_SANDBOX: process.env.PAYHERE_SANDBOX ?? "true",
-    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   });
 }
 

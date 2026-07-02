@@ -5,6 +5,7 @@ import {
   updateOrderPayHereQuote,
 } from "@/lib/db/orders";
 import { getCheckoutPaymentTimeoutMinutes } from "@/lib/db/site-settings";
+import { resolvePublicAppOrigin } from "@/lib/app-origin";
 import { createPayHerePayload } from "@/lib/payhere";
 import { checkoutSchema } from "@/lib/validation/checkout";
 
@@ -13,10 +14,12 @@ export async function POST(request: Request) {
     const payload = checkoutSchema.parse(await request.json());
     const { order, items } = await createPendingOrder(payload);
     const paymentTimeoutMinutes = await getCheckoutPaymentTimeoutMinutes();
+    const publicOrigin = resolvePublicAppOrigin(request);
     const [firstName, ...rest] = order.customer_name.trim().split(" ");
     const { payhere, quote } = await createPayHerePayload({
       orderNumber: order.order_number,
       amountUsd: Number(order.total),
+      publicOrigin,
       firstName,
       lastName: rest.join(" ") || firstName,
       email: order.customer_email,
