@@ -18,38 +18,60 @@ const mobileNavItems = [
   {
     label: "Home",
     href: "/",
-    textClass: "text-[clamp(5.4rem,23vw,8.2rem)]",
-    wordClass: "scale-x-[1.24]",
+    textClass: "text-[190px]",
+    wordClass: "scale-x-[1.02]",
     colorClass: "text-acid",
+  },
+  {
+    label: "Contact Us",
+    href: "/contact",
+    textClass: "text-[100px]",
+    wordClass: "scale-x-[0.98]",
+    colorClass: "text-bone",
   },
   {
     label: "About Us",
     href: "/about",
-    textClass: "text-[clamp(3.8rem,16vw,5.8rem)]",
-    wordClass: "scale-x-[1.08]",
+    textClass: "text-[120px]",
+    wordClass: "scale-x-[1.02]",
     colorClass: "text-acid",
-  },
-  {
-    label: "Contact",
-    href: "/contact",
-    textClass: "text-[clamp(4.4rem,18.5vw,6.7rem)]",
-    wordClass: "scale-x-[1.05]",
-    colorClass: "text-bone",
   },
   {
     label: "Login",
     href: "/account/login",
-    textClass: "text-[clamp(5.1rem,21.5vw,7.8rem)]",
-    wordClass: "scale-x-[1.26]",
+    textClass: "text-[190px]",
+    wordClass: "scale-x-[1]",
     colorClass: "text-bone",
   },
 ];
 
-const mobileMenuLogoLayers = {
-  bottom:
-    "pointer-events-none absolute left-1/2 top-[67%] z-0 h-auto w-[145%] -translate-x-1/2 rotate-[5deg] object-contain opacity-80",
-  top:
-    "pointer-events-none absolute left-1/2 top-[-3.5rem] z-0 h-auto w-[145%] -translate-x-1/2 rotate-[-6deg] object-contain opacity-80",
+type MobileMenuLogoControl = {
+  xPercent: number;
+  widthVw: number;
+  rotateDeg: number;
+  opacity: number;
+  topPx?: number;
+  bottomPx?: number;
+};
+
+// Manual red logo controls for the mobile sliding menu:
+// widthVw = scale, xPercent = horizontal position, topPx/bottomPx = vertical position,
+// rotateDeg = rotation, opacity = transparency from 0 to 1.
+const mobileMenuLogoControls: Record<"top" | "bottom", MobileMenuLogoControl> = {
+  top: {
+    xPercent: 50,
+    widthVw: 155,
+    topPx: -110,
+    rotateDeg: 10,
+    opacity: 0.82,
+  },
+  bottom: {
+    xPercent: 50,
+    widthVw: 155,
+    bottomPx: -195,
+    rotateDeg: 5,
+    opacity: 0.82,
+  },
 };
 
 function isActiveNavItem(
@@ -61,6 +83,30 @@ function isActiveNavItem(
   }
 
   return href.includes(active);
+}
+
+function MobileMenuRedLogo({ position }: { position: "top" | "bottom" }) {
+  const controls = mobileMenuLogoControls[position];
+
+  return (
+    <Image
+      alt=""
+      aria-hidden="true"
+      className="pointer-events-none absolute z-0 h-auto max-w-none object-contain"
+      height={800}
+      priority={false}
+      src="/images/brand/neverfound-red-menu-source.png"
+      style={{
+        bottom: controls.bottomPx,
+        left: `${controls.xPercent}%`,
+        opacity: controls.opacity,
+        top: controls.topPx,
+        transform: `translateX(-50%) rotate(${controls.rotateDeg}deg)`,
+        width: `${controls.widthVw}vw`,
+      }}
+      width={1600}
+    />
+  );
 }
 
 export function Header() {
@@ -119,9 +165,41 @@ export function SiteHeader({
     };
   }, [cartOpen, open]);
 
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const scrollY = window.scrollY;
+    const { body, documentElement } = document;
+    const originalBodyOverflow = body.style.overflow;
+    const originalBodyPosition = body.style.position;
+    const originalBodyTop = body.style.top;
+    const originalBodyWidth = body.style.width;
+    const originalHtmlOverscrollBehavior = documentElement.style.overscrollBehavior;
+
+    body.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.width = "100%";
+    documentElement.style.overscrollBehavior = "none";
+
+    return () => {
+      body.style.overflow = originalBodyOverflow;
+      body.style.position = originalBodyPosition;
+      body.style.top = originalBodyTop;
+      body.style.width = originalBodyWidth;
+      documentElement.style.overscrollBehavior = originalHtmlOverscrollBehavior;
+      window.scrollTo(0, scrollY);
+    };
+  }, [open]);
+
   return (
+    <>
     <header
-      className={`sticky top-0 z-40 border-0 bg-acid text-ink shadow-none outline-none transition-transform duration-300 ease-out after:absolute after:inset-x-0 after:-bottom-2 after:h-2 after:bg-acid after:content-[''] ${
+      className={`sticky top-0 border-0 bg-acid text-ink shadow-none outline-none transition-transform duration-300 ease-out after:absolute after:inset-x-0 after:-bottom-2 after:h-2 after:bg-acid after:content-[''] ${
+        open || cartOpen ? "z-40" : "z-40"
+      } ${
         headerHidden ? "-translate-y-full" : open || cartOpen ? "" : "translate-y-0"
       }`}
     >
@@ -208,9 +286,10 @@ export function SiteHeader({
           />
         </div>
       </div>
+    </header>
 
       <div
-        className={`fixed inset-0 z-40 bg-ink/55 transition-opacity duration-300 md:hidden ${
+        className={`fixed inset-0 z-[9998] bg-ink/55 transition-opacity duration-300 md:hidden ${
           open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
         }`}
         aria-hidden="true"
@@ -218,46 +297,50 @@ export function SiteHeader({
       />
 
       <nav
-        className={`fixed inset-0 z-50 overflow-hidden bg-ink font-mono text-sm uppercase tracking-[0.16em] text-bone shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.65,0,0.35,1)] md:hidden ${
-          open ? "translate-x-0 pointer-events-auto" : "translate-x-full pointer-events-none"
+        className={`fixed inset-0 z-[9999] h-dvh overflow-hidden overscroll-none bg-ink font-mono text-sm uppercase tracking-[0.16em] text-bone shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.65,0,0.35,1)] md:hidden ${
+          open ? "translate-x-0 pointer-events-auto" : "-translate-x-full pointer-events-none"
         }`}
         aria-label="Mobile navigation"
       >
+        <MobileMenuRedLogo position="top" />
+        <MobileMenuRedLogo position="bottom" />
         <Image
           alt=""
           aria-hidden="true"
-          className={mobileMenuLogoLayers.top}
-          height={220}
+          className="pointer-events-none absolute inset-0 z-[1] object-cover opacity-[0.17] mix-blend-screen"
+          fill
           priority={false}
-          src="/images/brand/neverfound-red.png"
-          width={500}
+          sizes="100vw"
+          src="/images/textures/main-background.jpg"
         />
-        <div className="relative z-10 flex h-full flex-col px-8 pt-8">
+        <div className="absolute inset-0 z-[2] bg-black/35" />
+
+        <div className="relative z-10 flex h-full flex-col px-6 pt-8">
           <div className="flex items-center justify-between">
-            <span className="font-display text-3xl uppercase leading-none tracking-normal text-bone/70">
+            <span className="font-display text-[20px] uppercase leading-none tracking-normal text-bone">
               Menu
             </span>
             <button
               aria-label="Close menu"
-              className="relative flex h-11 w-11 items-center justify-center text-bone transition-opacity hover:opacity-70"
+              className="relative flex h-8 w-8 items-center justify-center text-bone transition-opacity hover:opacity-70"
               onClick={() => setOpen(false)}
               type="button"
             >
-              <Image
-                alt=""
+              <span
                 aria-hidden="true"
-                className="object-contain invert"
-                fill
-                sizes="44px"
-                src="/images/icons/menu-close.png"
+                className="absolute h-px w-8 rotate-45 bg-current"
+              />
+              <span
+                aria-hidden="true"
+                className="absolute h-px w-8 -rotate-45 bg-current"
               />
             </button>
           </div>
 
-          <div className="relative mt-16 flex flex-1 flex-col items-start gap-3 pb-40">
+          <div className="relative mt-9 flex flex-1 flex-col items-start gap-4 pb-60">
             {mobileNavItems.map((item) => (
               <Link
-                className={`w-[min(72vw,21rem)] whitespace-nowrap font-display italic uppercase leading-[0.9] tracking-normal transition-colors hover:text-rust active:text-rust ${item.textClass} ${item.colorClass}`}
+                className={`w-[calc(100vw-3rem)] whitespace-nowrap font-display italic uppercase leading-[0.86] tracking-normal transition-colors hover:text-rust active:text-rust ${item.textClass} ${item.colorClass}`}
                 href={item.href}
                 key={item.label}
                 onClick={() => setOpen(false)}
@@ -267,15 +350,6 @@ export function SiteHeader({
                 </span>
               </Link>
             ))}
-            <Image
-              alt=""
-              aria-hidden="true"
-              className={mobileMenuLogoLayers.bottom}
-              height={220}
-              priority={false}
-              src="/images/brand/neverfound-red.png"
-              width={500}
-            />
           </div>
 
           <div className="pb-5">
@@ -286,7 +360,7 @@ export function SiteHeader({
 
       <div
         aria-hidden="true"
-        className={`fixed inset-0 z-40 bg-ink/55 transition-opacity duration-300 ${
+        className={`fixed inset-0 z-[9998] bg-ink/55 transition-opacity duration-300 ${
           cartOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
         }`}
         onClick={() => setCartOpen(false)}
@@ -294,7 +368,7 @@ export function SiteHeader({
 
       <aside
         aria-label="Shopping cart"
-        className={`fixed right-0 top-0 z-50 flex h-dvh w-[88vw] max-w-md flex-col bg-acid text-ink shadow-2xl transition-transform duration-300 ease-out ${
+        className={`fixed right-0 top-0 z-[9999] flex h-dvh w-[88vw] max-w-md flex-col bg-acid text-ink shadow-2xl transition-transform duration-300 ease-out ${
           cartOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -420,7 +494,7 @@ export function SiteHeader({
           </Link>
         </div>
       </aside>
-    </header>
+    </>
   );
 }
 
