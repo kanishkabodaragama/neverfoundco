@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
+import { StoreArtSurface } from "@/components/site/StoreArtSurface";
 import { formatColomboDateTime } from "@/lib/date-time";
 import { listCustomerOrders } from "@/lib/db/orders";
 import { formatMoney } from "@/lib/utils";
@@ -22,7 +23,8 @@ export default async function AccountPage() {
   return (
     <div className="min-h-screen bg-acid text-ink">
       <Header />
-      <main className="px-5 py-10 md:px-8 xl:px-12">
+      <StoreArtSurface>
+      <div className="px-5 py-10 md:px-8 xl:px-12">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">Customer file</p>
@@ -71,7 +73,8 @@ export default async function AccountPage() {
             </p>
           ) : null}
         </div>
-      </main>
+      </div>
+      </StoreArtSurface>
       <Footer />
     </div>
   );

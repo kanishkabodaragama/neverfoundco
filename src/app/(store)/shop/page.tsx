@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Footer } from "@/components/site/Footer";
 import { SiteHeader } from "@/components/site/Header";
 import { ShopProductCard } from "@/components/site/ShopProductCard";
+import { StoreArtSurface } from "@/components/site/StoreArtSurface";
 import { mapDbProductToShopProduct, shopProducts } from "@/components/site/shop-data";
 import { listActiveProducts } from "@/lib/db/products";
 
@@ -22,7 +23,7 @@ export default async function ShopPage() {
   return (
     <div className="min-h-screen w-full bg-acid text-ink">
       <SiteHeader active="shop" />
-      <main>
+      <StoreArtSurface>
         <section className="w-full bg-acid px-5 py-12 text-ink md:px-8 md:py-16 xl:px-12">
           <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.28em]">
             <span>Evidence room / drops</span>
@@ -45,7 +46,7 @@ export default async function ShopPage() {
             ))}
           </div>
         </section>
-      </main>
+      </StoreArtSurface>
       <Footer />
     </div>
   );

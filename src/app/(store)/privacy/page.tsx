@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
+import { StoreArtSurface } from "@/components/site/StoreArtSurface";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -38,7 +39,8 @@ export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-acid text-ink">
       <Header />
-      <main className="w-full px-5 py-8 md:px-8 xl:px-12">
+      <StoreArtSurface>
+      <div className="w-full px-5 py-8 md:px-8 xl:px-12">
         <p className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">Policy file</p>
         <h1 className="mt-4 font-display text-5xl uppercase leading-none md:text-7xl">
           Privacy Policy
@@ -59,7 +61,8 @@ export default function PrivacyPage() {
         <p className="mt-8 max-w-2xl font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-rust">
           Last updated: June 25, 2026
         </p>
-      </main>
+      </div>
+      </StoreArtSurface>
       <Footer />
     </div>
   );

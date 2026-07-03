@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { CheckoutExperience } from "@/components/checkout/CheckoutExperience";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
+import { StoreArtSurface } from "@/components/site/StoreArtSurface";
 import { listCheckoutCountries } from "@/lib/db/shipping";
 import { getCheckoutPaymentTimeoutMinutes } from "@/lib/db/site-settings";
 
@@ -23,12 +24,12 @@ export default async function CheckoutPage() {
   return (
     <div className="min-h-screen w-full bg-acid text-ink">
       <Header />
-      <main>
+      <StoreArtSurface>
         <CheckoutExperience
           countries={countries}
           paymentTimeoutMinutes={paymentTimeoutMinutes}
         />
-      </main>
+      </StoreArtSurface>
       <Footer />
     </div>
   );

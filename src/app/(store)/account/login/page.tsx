@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
+import { StoreArtSurface } from "@/components/site/StoreArtSurface";
 
 export const metadata: Metadata = {
   title: "Customer Login",
@@ -16,7 +17,8 @@ export default async function CustomerLoginPage({
   return (
     <div className="min-h-screen bg-acid text-ink">
       <Header />
-      <main className="mx-auto grid min-h-[70vh] w-full max-w-xl place-items-center px-5 py-12">
+      <StoreArtSurface>
+      <div className="mx-auto grid min-h-[70vh] w-full max-w-xl place-items-center px-5 py-12">
         <form action="/api/account/login" className="w-full border border-ink bg-transparent p-6" method="post">
           <p className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">Customer file</p>
           <h1 className="mt-4 font-display text-5xl uppercase leading-none">Order login</h1>
@@ -38,7 +40,8 @@ export default async function CustomerLoginPage({
           </button>
           {error ? <p className="mt-4 font-mono text-xs font-bold uppercase tracking-wide text-rust">{error}</p> : null}
         </form>
-      </main>
+      </div>
+      </StoreArtSurface>
       <Footer />
     </div>
   );

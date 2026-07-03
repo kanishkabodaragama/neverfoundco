@@ -3,6 +3,7 @@ import { ContactForm } from "@/components/contact/ContactForm";
 import { ContactInfo } from "@/components/contact/ContactInfo";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
+import { StoreArtSurface } from "@/components/site/StoreArtSurface";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -14,7 +15,7 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen w-full bg-acid text-ink">
       <Header />
-      <main>
+      <StoreArtSurface>
         <section className="w-full bg-acid px-5 py-12 text-ink md:px-8 md:py-20 xl:px-12">
           <p className="font-mono text-[11px] uppercase tracking-[0.28em]">Support file</p>
           <h1 className="mt-7 font-display text-[18vw] uppercase leading-[0.82] md:text-8xl lg:text-9xl">
@@ -47,7 +48,7 @@ export default function ContactPage() {
           <ContactForm />
           <ContactInfo />
         </section>
-      </main>
+      </StoreArtSurface>
       <Footer />
     </div>
   );

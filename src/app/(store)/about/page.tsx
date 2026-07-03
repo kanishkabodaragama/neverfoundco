@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
+import { StoreArtSurface } from "@/components/site/StoreArtSurface";
 
 export const metadata: Metadata = {
   title: "About Us",
@@ -13,7 +14,7 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen w-full bg-acid text-ink">
       <Header />
-      <main>
+      <StoreArtSurface>
         <section className="w-full bg-acid px-5 py-12 text-ink md:px-8 md:py-20 xl:px-12">
           <div className="font-mono text-[11px] uppercase tracking-[0.28em]">
             About Never Found
@@ -85,7 +86,7 @@ export default function AboutPage() {
             </p>
           </div>
         </section>
-      </main>
+      </StoreArtSurface>
       <Footer />
     </div>
   );

@@ -18,22 +18,22 @@ const mobileNavItems = [
   {
     label: "Home",
     href: "/",
-    textClass: "text-[clamp(4.4rem,18vw,6.8rem)] text-acid",
+    textClass: "text-[clamp(5.9rem,24vw,8.6rem)] text-acid",
   },
   {
     label: "About Us",
     href: "/about",
-    textClass: "text-[clamp(3.7rem,14.5vw,5.2rem)] text-bone",
+    textClass: "text-[clamp(3.95rem,15.7vw,5.7rem)] text-bone",
   },
   {
     label: "Contact",
     href: "/contact",
-    textClass: "text-[clamp(4.1rem,16vw,5.9rem)] text-acid",
+    textClass: "text-[clamp(4.55rem,18vw,6.5rem)] text-acid",
   },
   {
     label: "Login",
     href: "/account/login",
-    textClass: "text-[clamp(4.4rem,18vw,6.8rem)] text-bone",
+    textClass: "text-[clamp(5.45rem,22vw,7.9rem)] text-bone",
   },
 ];
 
@@ -203,12 +203,39 @@ export function SiteHeader({
       />
 
       <nav
-        className={`fixed top-0 z-50 flex h-dvh w-[82vw] max-w-sm flex-col bg-ink font-mono text-sm uppercase tracking-[0.16em] text-bone shadow-2xl transition-[left] duration-300 ease-out md:hidden ${
+        className={`fixed top-0 z-50 flex h-dvh w-[82vw] max-w-sm flex-col overflow-hidden bg-ink font-mono text-sm uppercase tracking-[0.16em] text-bone shadow-2xl transition-[left] duration-300 ease-out md:hidden ${
           open ? "left-0 pointer-events-auto" : "left-[-100vw] pointer-events-none"
         }`}
         aria-label="Mobile navigation"
       >
-        <div className="flex min-h-28 items-center justify-between px-5">
+        <Image
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/2 top-8 z-0 h-auto w-[120%] -translate-x-1/2 object-contain opacity-75"
+          height={220}
+          priority={false}
+          src="/images/brand/neverfound-red.png"
+          width={500}
+        />
+        <Image
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-16 left-1/2 z-0 h-auto w-[120%] -translate-x-1/2 object-contain opacity-75"
+          height={220}
+          priority={false}
+          src="/images/brand/neverfound-red.png"
+          width={500}
+        />
+        <Image
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-[1] object-cover opacity-[0.17]"
+          fill
+          priority={false}
+          sizes="82vw"
+          src="/images/textures/main-background.jpg"
+        />
+        <div className="relative z-10 flex min-h-28 items-center justify-between px-5">
           <span className="text-xs font-bold text-bone/55">Menu</span>
           <button
             aria-label="Close menu"
@@ -227,25 +254,21 @@ export function SiteHeader({
           </button>
         </div>
 
-        <div className="flex flex-col items-start pl-8 pt-2">
+        <div className="relative z-10 flex flex-col items-start pl-8 pt-2">
           {mobileNavItems.map((item) => (
             <Link
               aria-label={item.label}
-              className={`flex w-[min(58vw,17rem)] justify-between whitespace-nowrap py-0.5 font-display italic uppercase leading-[0.84] tracking-normal transition-colors hover:text-rust active:text-rust ${item.textClass}`}
+              className={`w-[min(58vw,17rem)] whitespace-nowrap py-0.5 text-left font-display italic uppercase leading-[0.84] tracking-normal transition-colors hover:text-rust active:text-rust ${item.textClass}`}
               href={item.href}
               key={item.label}
               onClick={() => setOpen(false)}
             >
-              {item.label.replace(/\s+/g, "").split("").map((letter, index) => (
-                <span aria-hidden="true" key={`${item.label}-${letter}-${index}`}>
-                  {letter}
-                </span>
-              ))}
+              <span className="inline-block">{item.label}</span>
             </Link>
           ))}
         </div>
 
-        <div className="mt-auto grid gap-4 px-5 py-5">
+        <div className="relative z-10 mt-auto grid gap-4 px-5 py-5">
           <CurrencySelector tone="dark" />
         </div>
       </nav>

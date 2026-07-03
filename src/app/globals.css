@@ -76,6 +76,14 @@ body {
   outline-offset: 3px;
 }
 
+.store-art-surface section.bg-acid {
+  background-color: transparent;
+}
+
+.store-art-surface > .relative {
+  min-height: inherit;
+}
+
 .product-gallery-frame {
   animation: product-gallery-next 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }

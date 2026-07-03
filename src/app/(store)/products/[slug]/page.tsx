@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Footer } from "@/components/site/Footer";
 import { ProductDetailClient } from "@/components/site/ProductDetailClient";
+import { StoreArtSurface } from "@/components/site/StoreArtSurface";
 import { StorePrice } from "@/components/site/StorePrice";
 import {
   getProductDetailBySlug,
@@ -82,7 +83,7 @@ function NeverFoundProductPage({
   return (
     <div className="min-h-screen w-full bg-acid text-ink">
       <SiteHeader active="shop" />
-      <main>
+      <StoreArtSurface productTexture>
         <section className="bg-acid px-5 py-8 md:px-8 md:py-10 xl:px-12">
           <nav
             aria-label="Breadcrumb"
@@ -181,7 +182,7 @@ function NeverFoundProductPage({
             Join
           </button>
         </section>
-      </main>
+      </StoreArtSurface>
       <Footer />
     </div>
   );

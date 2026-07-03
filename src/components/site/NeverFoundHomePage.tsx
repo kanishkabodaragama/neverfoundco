@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
+import { NvrFndGallery } from "@/components/site/NvrFndGallery";
+import { StoreArtSurface } from "@/components/site/StoreArtSurface";
 import { StorePrice } from "@/components/site/StorePrice";
 import { shopProducts, type ShopProduct } from "@/components/site/shop-data";
 
@@ -15,7 +17,7 @@ export function NeverFoundHomePage({
   return (
     <div className="flex min-h-screen flex-col overflow-x-hidden bg-ink text-ink">
       <Header />
-      <main className="flex-1 bg-acid">
+      <StoreArtSurface>
         <section className="bg-acid px-5 pb-12 pt-6 text-ink md:px-8 md:pb-20 md:pt-24">
           {/* <div className="mb-10 flex items-end justify-between md:mb-14">
             <h2 className="font-display text-4xl uppercase leading-none md:text-6xl">
@@ -34,7 +36,8 @@ export function NeverFoundHomePage({
             ))}
           </div>
         </section>
-      </main>
+        <NvrFndGallery />
+      </StoreArtSurface>
       <Footer />
     </div>
   );
