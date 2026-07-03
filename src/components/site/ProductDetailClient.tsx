@@ -313,9 +313,9 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
           ) : null}
 
           <OptionGroup label="Quantity">
-            <div className="relative w-40">
+            <div className="relative w-36">
               <select
-                className="h-14 w-full appearance-none rounded-full border-2 border-ink bg-transparent px-6 font-sans text-base text-ink"
+                className="h-11 w-full appearance-none rounded-full border-2 border-ink bg-transparent px-5 font-sans text-sm text-ink"
                 onChange={(event) => {
                   setQuantity(clampQuantity(Number(event.target.value)));
                   setAdded(false);
@@ -333,12 +333,12 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
                   </option>
                 ))}
               </select>
-              <ChevronDown className="pointer-events-none absolute right-6 top-1/2 h-4 w-4 -translate-y-1/2" />
+              <ChevronDown className="pointer-events-none absolute right-5 top-1/2 h-4 w-4 -translate-y-1/2" />
             </div>
           </OptionGroup>
 
           <button
-            className="mt-1 flex h-16 w-full items-center justify-center gap-3 rounded-full bg-ink px-6 font-sans text-sm font-black italic uppercase tracking-[0.08em] text-bone transition-colors hover:bg-rust hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-1 flex h-12 w-full items-center justify-center gap-3 rounded-full bg-ink px-6 py-2 font-sans text-xs font-black italic uppercase tracking-[0.08em] text-bone transition-colors hover:bg-rust hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
             disabled={!isAvailable}
             onClick={addSelectedVariant}
             type="button"
@@ -434,7 +434,7 @@ function OptionButton({
 }) {
   return (
     <button
-      className={`min-w-20 rounded-full border-2 px-6 py-3 font-sans text-base font-medium transition ${
+      className={`min-w-[4.5rem] rounded-full border-2 px-5 py-2 font-sans text-sm font-medium transition ${
         selected
           ? "border-ink bg-ink text-bone"
           : "border-ink/35 bg-transparent text-ink hover:border-ink"
@@ -460,7 +460,7 @@ function ColorOptionButton({
 }) {
   return (
     <button
-      className="min-w-24 rounded-full border-2 px-6 py-3 font-sans text-base font-medium transition hover:opacity-80"
+      className="min-w-20 rounded-full border-2 px-5 py-2 font-sans text-sm font-medium transition hover:opacity-80"
       onClick={onClick}
       style={{
         backgroundColor: selected ? colorValue : "transparent",
