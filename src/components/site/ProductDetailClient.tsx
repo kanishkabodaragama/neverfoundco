@@ -1,9 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, Ruler } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
+import type { ReactNode, UIEvent } from "react";
 import { useCart } from "@/components/store/cart-provider";
 import { StorePrice } from "@/components/site/StorePrice";
 import type { MockProductDetail } from "@/components/site/product-detail-data";
@@ -16,13 +16,10 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
   const [requestedColor, setSelectedColor] = useState(product.colors[0]);
   const [requestedSize, setSelectedSize] = useState(product.sizes[0]);
   const [selectedImage, setSelectedImage] = useState(product.image);
-  const [galleryStart, setGalleryStart] = useState(0);
   const [added, setAdded] = useState(false);
-  const dragStart = useRef<{ x: number; y: number } | null>(null);
-  const galleryViewport = useRef<HTMLDivElement | null>(null);
+  const [quantity, setQuantity] = useState(1);
+  const carouselRef = useRef<HTMLDivElement | null>(null);
   const mobileThumbnailStrip = useRef<HTMLDivElement | null>(null);
-  const [dragOffset, setDragOffset] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
   const availableGenders = useMemo(
     () => uniqueVariantValues(product.variants.map((variant) => variant.gender)),
     [product.variants],
@@ -86,21 +83,15 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
     selectedVariant &&
       (product.preorderEnabled || !product.stockTrackingEnabled || selectedVariant.stock > 0),
   );
-  const maxGalleryStart = Math.max(0, galleryImages.length - 4);
   const displayImageIndex = galleryImages.indexOf(displayImage);
   const activeGalleryIndex = Math.max(0, displayImageIndex);
-  const effectiveGalleryStart =
-    displayImageIndex >= 0 &&
-    (displayImageIndex < galleryStart || displayImageIndex >= galleryStart + 4)
-      ? Math.min(Math.max(0, displayImageIndex), maxGalleryStart)
-      : galleryStart;
-  const visibleGallery = galleryImages.slice(effectiveGalleryStart, effectiveGalleryStart + 4);
-  const previousGalleryImage =
-    galleryImages[
-      (activeGalleryIndex - 1 + galleryImages.length) % galleryImages.length
-    ];
-  const nextGalleryImage =
-    galleryImages[(activeGalleryIndex + 1) % galleryImages.length];
+  const shortDescription = product.shortDescription?.trim();
+  const description = product.description?.trim();
+  const maxQuantity =
+    product.preorderEnabled || !product.stockTrackingEnabled
+      ? 20
+      : Math.max(1, selectedVariant?.stock ?? 1);
+  const selectedQuantity = Math.min(quantity, maxQuantity);
 
   useEffect(() => {
     const thumbnail = mobileThumbnailStrip.current?.querySelector(
@@ -114,74 +105,32 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
     });
   }, [activeGalleryIndex]);
 
-  function moveGallery(direction: -1 | 1) {
-    setGalleryStart(
-      Math.min(maxGalleryStart, Math.max(0, effectiveGalleryStart + direction)),
-    );
-  }
-
-  function showGalleryImage(index: number) {
+  function scrollCarouselTo(index: number, behavior: ScrollBehavior = "smooth") {
     const image = galleryImages[index];
     if (!image) return;
 
     setSelectedImage(image);
-    setGalleryStart(Math.min(maxGalleryStart, Math.max(0, index)));
-    setDragOffset(0);
-    setIsDragging(false);
+    carouselRef.current?.scrollTo({
+      left: carouselRef.current.clientWidth * index,
+      behavior,
+    });
   }
 
   function selectGalleryImage(image: string, index: number) {
     setSelectedImage(image);
-    setGalleryStart(Math.min(maxGalleryStart, Math.max(0, index)));
-    setDragOffset(0);
-    setIsDragging(false);
+    scrollCarouselTo(index);
   }
 
-  function slideGallery(direction: -1 | 1) {
-    if (galleryImages.length < 2) return;
+  function syncCarouselSelection(event: UIEvent<HTMLDivElement>) {
+    const target = event.currentTarget;
+    const index = Math.round(target.scrollLeft / target.clientWidth);
+    const image = galleryImages[index];
 
-    const nextIndex =
-      (activeGalleryIndex + direction + galleryImages.length) % galleryImages.length;
-    showGalleryImage(nextIndex);
+    if (image && image !== selectedImage) setSelectedImage(image);
   }
 
-  function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
-    dragStart.current = { x: event.clientX, y: event.clientY };
-    event.currentTarget.setPointerCapture(event.pointerId);
-    setIsDragging(true);
-    setDragOffset(0);
-  }
-
-  function handlePointerMove(event: ReactPointerEvent<HTMLDivElement>) {
-    if (!dragStart.current) return;
-
-    const deltaX = event.clientX - dragStart.current.x;
-    const deltaY = event.clientY - dragStart.current.y;
-
-    if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 12) {
-      return;
-    }
-
-    setDragOffset(deltaX);
-  }
-
-  function handlePointerUp(event: ReactPointerEvent<HTMLDivElement>) {
-    if (!dragStart.current) return;
-
-    const deltaX = event.clientX - dragStart.current.x;
-    const deltaY = event.clientY - dragStart.current.y;
-    dragStart.current = null;
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
-    setIsDragging(false);
-
-    if (Math.abs(deltaX) < 42 || Math.abs(deltaX) < Math.abs(deltaY)) {
-      setDragOffset(0);
-      return;
-    }
-
-    slideGallery(deltaX < 0 ? 1 : -1);
+  function clampQuantity(value: number) {
+    return Math.min(maxQuantity, Math.max(1, value));
   }
 
   function selectVariantImage(
@@ -204,9 +153,14 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
         }),
     );
 
-    setSelectedImage(nextVariant?.image || product.image);
-    setDragOffset(0);
-    setIsDragging(false);
+    const nextImage = nextVariant?.image || product.image;
+    const nextIndex = galleryImages.indexOf(nextImage);
+
+    if (nextIndex >= 0) {
+      scrollCarouselTo(nextIndex);
+    } else {
+      setSelectedImage(nextImage);
+    }
   }
 
   function selectGender(gender: MockProductDetail["genders"][number]) {
@@ -240,137 +194,68 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
       gender: selectedGender,
       size: selectedSize,
       color: selectedColor,
+      quantity: selectedQuantity,
     });
     setAdded(true);
   }
 
   return (
     <div className="mt-8 grid w-full gap-6 lg:grid-cols-[55fr_45fr] lg:gap-4 xl:gap-5">
-      <div className="grid gap-5 md:grid-cols-[96px_1fr]">
-        <div className="order-2 grid gap-3 md:order-1">
-          <button
-            aria-label="Previous product images"
-            className="hidden h-9 w-24 place-items-center bg-transparent text-ink transition-opacity hover:opacity-65 disabled:cursor-not-allowed disabled:opacity-25 md:grid"
-            disabled={effectiveGalleryStart === 0}
-            onClick={() => moveGallery(-1)}
-            type="button"
-          >
-            <ChevronUp className="h-5 w-5" />
-          </button>
-          <div
-            className="no-scrollbar flex scroll-px-16 gap-4 overflow-x-auto scroll-smooth md:hidden"
-            ref={mobileThumbnailStrip}
-          >
-            {galleryImages.map((image, index) => (
-              <GalleryThumb
-                image={image}
-                index={index}
-                isSelected={image === displayImage}
-                key={`${image}-${index}`}
-                onClick={() => selectGalleryImage(image, index)}
-                productName={product.name}
+      <div className="grid gap-5">
+        <div
+          className="no-scrollbar flex min-h-[430px] snap-x snap-mandatory overflow-x-auto scroll-smooth bg-transparent md:min-h-[610px]"
+          onScroll={syncCarouselSelection}
+          ref={carouselRef}
+        >
+          {galleryImages.map((image, index) => (
+            <div
+              className="relative min-h-[430px] min-w-full snap-center md:min-h-[610px]"
+              key={`${image}-${index}`}
+            >
+              <Image
+                alt={product.alt}
+                className="scale-[1.03] object-contain p-3 md:scale-[0.98] md:p-4"
+                fill
+                priority={index === 0}
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                src={image}
+                unoptimized
               />
-            ))}
-          </div>
-          <div className="hidden gap-4 md:grid md:max-h-[432px] md:overflow-hidden">
-            {visibleGallery.map((image, index) => (
-              <GalleryThumb
-                image={image}
-                index={effectiveGalleryStart + index}
-                isSelected={image === displayImage}
-                key={`${image}-${effectiveGalleryStart + index}`}
-                onClick={() => selectGalleryImage(image, effectiveGalleryStart + index)}
-                productName={product.name}
-              />
-            ))}
-          </div>
-          <button
-            aria-label="Next product images"
-            className="hidden h-9 w-24 place-items-center bg-transparent text-ink transition-opacity hover:opacity-65 disabled:cursor-not-allowed disabled:opacity-25 md:grid"
-            disabled={effectiveGalleryStart >= maxGalleryStart}
-            onClick={() => moveGallery(1)}
-            type="button"
-          >
-            <ChevronDown className="h-5 w-5" />
-          </button>
+            </div>
+          ))}
         </div>
 
         <div
-          className="relative order-1 min-h-[430px] touch-pan-y overflow-hidden bg-transparent md:order-2 lg:min-h-[610px]"
-          onPointerCancel={() => {
-            dragStart.current = null;
-            setIsDragging(false);
-            setDragOffset(0);
-          }}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          ref={galleryViewport}
+          className="no-scrollbar flex scroll-px-16 justify-start gap-4 overflow-x-auto scroll-smooth px-0 md:justify-center"
+          ref={mobileThumbnailStrip}
         >
-          {galleryImages.length > 1 ? (
-            <>
-              <button
-                aria-label="Previous product image"
-                className="absolute left-1 top-1/2 z-10 grid h-9 w-9 -translate-y-1/2 place-items-center bg-transparent font-mono text-4xl font-bold leading-none text-ink transition-opacity hover:opacity-60 md:left-3"
-                onClick={() => slideGallery(-1)}
-                type="button"
-              >
-                ‹
-              </button>
-              <button
-                aria-label="Next product image"
-                className="absolute right-1 top-1/2 z-10 grid h-9 w-9 -translate-y-1/2 place-items-center bg-transparent font-mono text-4xl font-bold leading-none text-ink transition-opacity hover:opacity-60 md:right-3"
-                onClick={() => slideGallery(1)}
-                type="button"
-              >
-                ›
-              </button>
-            </>
-          ) : null}
-          {galleryImages.length > 1 ? (
-            <GallerySlide
-              alt={product.alt}
-              dragOffset={dragOffset}
-              image={previousGalleryImage}
-              isDragging={isDragging}
-              position={-100}
+          {galleryImages.map((image, index) => (
+            <GalleryThumb
+              image={image}
+              index={index}
+              isSelected={image === displayImage}
+              key={`${image}-${index}`}
+              onClick={() => selectGalleryImage(image, index)}
+              productName={product.name}
             />
-          ) : null}
-          <GallerySlide
-            alt={product.alt}
-            dragOffset={dragOffset}
-            image={displayImage}
-            isDragging={isDragging}
-            position={0}
-            priority
-          />
-          {galleryImages.length > 1 ? (
-            <GallerySlide
-              alt={product.alt}
-              dragOffset={dragOffset}
-              image={nextGalleryImage}
-              isDragging={isDragging}
-              position={100}
-            />
-          ) : null}
+          ))}
         </div>
       </div>
 
       <div className="flex flex-col items-start justify-start text-left">
-        <span className="w-fit bg-transparent px-0 py-0 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-ink/65">
-          {product.stockLabel}
-        </span>
-        <h1 className="mt-3 max-w-xl font-display text-4xl italic uppercase leading-none md:text-6xl">
+        <h1 className="max-w-xl font-display text-5xl italic uppercase leading-none md:text-6xl">
           {product.name}
         </h1>
         <p className="mt-3 font-mono text-xl font-bold uppercase text-ink md:text-2xl">
           <StorePrice amountUsd={displayPrice} />
         </p>
-        <p className="mt-3 max-w-md whitespace-pre-line text-sm font-semibold italic leading-relaxed text-ink/70">
-          {product.shortDescription}
-        </p>
+        {shortDescription ? (
+          <p className="mt-3 max-w-md whitespace-pre-line text-sm font-semibold italic leading-relaxed text-ink/70">
+            {shortDescription}
+          </p>
+        ) : null}
 
-        <div className="w-full space-y-5">
+        <div className="mt-8 w-full space-y-8">
           {availableGenders.length > 1 ? (
             <OptionGroup label="Gender">
               {availableGenders.map((gender) => (
@@ -402,9 +287,10 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
             label="Size"
             action={
               <a
-                className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] underline decoration-ink/60 underline-offset-4 transition-colors hover:text-rust"
+                className="flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-normal underline decoration-ink/60 underline-offset-4 transition-colors hover:text-rust"
                 href="#size-chart"
               >
+                <Ruler className="h-4 w-4" />
                 Size Guide
               </a>
             }
@@ -426,8 +312,33 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
             </p>
           ) : null}
 
+          <OptionGroup label="Quantity">
+            <div className="relative w-52">
+              <select
+                className="h-16 w-full appearance-none rounded-full border-2 border-ink bg-transparent px-7 font-sans text-lg text-ink"
+                onChange={(event) => {
+                  setQuantity(clampQuantity(Number(event.target.value)));
+                  setAdded(false);
+                }}
+                value={selectedQuantity}
+              >
+                {Array.from(
+                  {
+                    length: maxQuantity,
+                  },
+                  (_, index) => index + 1,
+                ).map((value) => (
+                  <option key={value} value={value}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-7 top-1/2 h-5 w-5 -translate-y-1/2" />
+            </div>
+          </OptionGroup>
+
           <button
-            className="mt-2 flex w-full items-center justify-center gap-3 rounded-full bg-ink px-6 py-4 font-sans text-sm font-black italic uppercase tracking-normal text-bone transition-colors hover:bg-rust hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-2 flex h-20 w-full items-center justify-center gap-3 rounded-full bg-ink px-6 font-sans text-base font-black italic uppercase tracking-[0.12em] text-bone transition-colors hover:bg-rust hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
             disabled={!isAvailable}
             onClick={addSelectedVariant}
             type="button"
@@ -441,20 +352,16 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
                   : "Add To Cart"}
           </button>
 
-          <section className="pt-2 text-left">
-            <h2 className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">
-              Description
-            </h2>
-            {product.description ? (
+          {description ? (
+            <section className="border-t border-ink/70 pt-8 text-left">
+              <h2 className="font-sans text-2xl font-black italic uppercase tracking-normal text-ink">
+                Description
+              </h2>
               <p className="mt-3 whitespace-pre-line text-sm font-medium italic leading-relaxed text-ink/75">
-                {product.description}
+                {description}
               </p>
-            ) : (
-              <p className="mt-3 text-sm font-medium italic leading-relaxed text-ink/75">
-                {product.shortDescription}
-              </p>
-            )}
-          </section>
+            </section>
+          ) : null}
         </div>
       </div>
     </div>
@@ -496,42 +403,6 @@ function GalleryThumb({
   );
 }
 
-function GallerySlide({
-  alt,
-  dragOffset,
-  image,
-  isDragging,
-  position,
-  priority,
-}: {
-  alt: string;
-  dragOffset: number;
-  image: string;
-  isDragging: boolean;
-  position: -100 | 0 | 100;
-  priority?: boolean;
-}) {
-  return (
-    <div
-      className="absolute inset-0 will-change-transform"
-      style={{
-        transform: `translate3d(calc(${position}% + ${dragOffset}px), 0, 0)`,
-        transition: isDragging ? "none" : "transform 260ms cubic-bezier(0.22, 1, 0.36, 1)",
-      }}
-    >
-      <Image
-        alt={alt}
-        className="scale-[1.03] object-contain p-3 md:scale-[0.98] md:p-4"
-        fill
-        priority={priority}
-        sizes="(min-width: 1024px) 50vw, 100vw"
-        src={image}
-        unoptimized
-      />
-    </div>
-  );
-}
-
 function OptionGroup({
   action,
   children,
@@ -544,10 +415,10 @@ function OptionGroup({
   return (
     <div className="text-left">
       <div className="flex items-center justify-between gap-4">
-        <p className="font-mono text-[11px] font-bold uppercase tracking-[0.18em]">{label}</p>
+        <p className="font-mono text-[13px] font-black uppercase tracking-normal">{label}</p>
         {action}
       </div>
-      <div className="mt-2 flex flex-wrap justify-start gap-2">{children}</div>
+      <div className="mt-4 flex flex-wrap justify-start gap-3">{children}</div>
     </div>
   );
 }
@@ -563,7 +434,7 @@ function OptionButton({
 }) {
   return (
     <button
-      className={`min-w-16 rounded-full border px-6 py-3 font-sans text-sm font-semibold transition ${
+      className={`min-w-24 rounded-full border-2 px-7 py-4 font-sans text-lg font-medium transition ${
         selected
           ? "border-ink bg-ink text-bone"
           : "border-ink/35 bg-transparent text-ink hover:border-ink"
@@ -589,7 +460,7 @@ function ColorOptionButton({
 }) {
   return (
     <button
-      className="min-w-16 rounded-full border px-6 py-3 font-sans text-sm font-semibold transition hover:opacity-80"
+      className="min-w-28 rounded-full border-2 px-7 py-4 font-sans text-lg font-medium transition hover:opacity-80"
       onClick={onClick}
       style={{
         backgroundColor: selected ? colorValue : "transparent",

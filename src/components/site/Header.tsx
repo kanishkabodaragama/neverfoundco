@@ -204,10 +204,10 @@ export function SiteHeader({
           </button>
         </div>
 
-        <div className="flex flex-col pt-4">
+        <div className="flex flex-col items-end pt-4">
           {navItems.map((item) => (
             <Link
-              className="px-5 py-4 font-display text-5xl italic uppercase leading-none tracking-normal text-acid transition-colors hover:bg-bone hover:text-ink active:bg-acid active:text-ink"
+              className="w-full px-8 py-4 text-right font-display text-5xl italic uppercase leading-none tracking-normal text-acid transition-colors hover:bg-bone hover:text-ink active:bg-acid active:text-ink"
               href={item.href}
               key={item.label}
               onClick={() => setOpen(false)}

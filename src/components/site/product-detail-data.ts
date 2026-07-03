@@ -27,8 +27,8 @@ export type MockProductDetail = {
   genders: ProductGender[];
   variants: ProductVariant[];
   category: string;
-  shortDescription: string;
-  description: string;
+  shortDescription: string | null;
+  description: string | null;
   preorderEnabled?: boolean;
   stockTrackingEnabled?: boolean;
   soldOut?: boolean;
@@ -50,9 +50,8 @@ const shopProductDetails: MockProductDetail[] = shopProducts.map((product) => ({
   genders: product.genders,
   variants: product.variants,
   category: product.category,
-  shortDescription: `${product.stockLabel}. No restocks. Built for the current drop.`,
-  description:
-    "Part of the Never Found limited catalog: premium everyday fabric, clean streetwear styling, and no-restock scarcity.",
+  shortDescription: null,
+  description: null,
   soldOut: product.soldOut,
 }));
 
@@ -158,11 +157,8 @@ async function mapDbProductToDetail(product: Awaited<ReturnType<typeof getActive
           ),
         ),
     category: product.category,
-    shortDescription:
-      product.short_description ?? `${product.stock_quantity} left. Built for the current drop.`,
-    description:
-      product.description ??
-      "Part of the Never Found limited catalog: premium everyday fabric, clean streetwear styling, and no-restock scarcity.",
+    shortDescription: cleanDescription(product.short_description),
+    description: cleanDescription(product.description),
     preorderEnabled: product.preorder_enabled,
     stockTrackingEnabled: product.stock_tracking_enabled,
     soldOut,
@@ -171,4 +167,12 @@ async function mapDbProductToDetail(product: Awaited<ReturnType<typeof getActive
 
 function getJsonList<T extends string>(value: unknown, fallback: T[]) {
   return Array.isArray(value) && value.length ? (value.map(String) as T[]) : fallback;
+}
+
+function cleanDescription(value: string | null | undefined) {
+  const text = value?.trim();
+
+  if (!text || text === "**text**" || text === '"**text**"') return null;
+
+  return text;
 }

@@ -26,7 +26,7 @@ type CartItem = {
 type CartContextValue = {
   items: CartItem[];
   couponCode: string;
-  addItem: (item: Omit<CartItem, "quantity">) => void;
+  addItem: (item: Omit<CartItem, "quantity"> & { quantity?: number }) => void;
   updateQuantity: (itemKey: string, quantity: number) => void;
   removeItem: (itemKey: string) => void;
   clearCart: () => void;
@@ -77,16 +77,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setItems((current) => {
           const itemKey = getCartItemKey(item);
           const existing = current.find((cartItem) => getCartItemKey(cartItem) === itemKey);
+          const quantity = Math.max(1, item.quantity ?? 1);
 
           if (existing) {
             return current.map((cartItem) =>
               getCartItemKey(cartItem) === itemKey
-                ? { ...cartItem, quantity: cartItem.quantity + 1 }
+                ? { ...cartItem, quantity: cartItem.quantity + quantity }
                 : cartItem,
             );
           }
 
-          return [...current, { ...item, quantity: 1 }];
+          return [...current, { ...item, quantity }];
         });
       },
       updateQuantity(itemKey, quantity) {
