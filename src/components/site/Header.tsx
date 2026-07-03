@@ -18,22 +18,26 @@ const mobileNavItems = [
   {
     label: "Home",
     href: "/",
-    textClass: "text-[clamp(5.9rem,24vw,8.6rem)] text-acid",
+    textClass: "text-[clamp(6.35rem,25.5vw,9.2rem)] text-acid",
+    wordClass: "scale-x-[1.34]",
   },
   {
     label: "About Us",
     href: "/about",
-    textClass: "text-[clamp(3.95rem,15.7vw,5.7rem)] text-bone",
+    textClass: "text-[clamp(4.35rem,17.2vw,6.25rem)] text-bone",
+    wordClass: "scale-x-[1.12]",
   },
   {
     label: "Contact",
     href: "/contact",
     textClass: "text-[clamp(4.55rem,18vw,6.5rem)] text-acid",
+    wordClass: "scale-x-[1.02]",
   },
   {
     label: "Login",
     href: "/account/login",
-    textClass: "text-[clamp(5.45rem,22vw,7.9rem)] text-bone",
+    textClass: "text-[clamp(6rem,24vw,8.7rem)] text-bone",
+    wordClass: "scale-x-[1.28]",
   },
 ];
 
@@ -211,7 +215,7 @@ export function SiteHeader({
         <Image
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute left-1/2 top-8 z-0 h-auto w-[120%] -translate-x-1/2 object-contain opacity-75"
+          className="pointer-events-none absolute left-1/2 top-[-1.4rem] z-0 h-auto w-[190%] -translate-x-1/2 object-contain opacity-75"
           height={220}
           priority={false}
           src="/images/brand/neverfound-red.png"
@@ -220,7 +224,7 @@ export function SiteHeader({
         <Image
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute bottom-16 left-1/2 z-0 h-auto w-[120%] -translate-x-1/2 object-contain opacity-75"
+          className="pointer-events-none absolute bottom-[-1.7rem] left-1/2 z-0 h-auto w-[190%] -translate-x-1/2 object-contain opacity-75"
           height={220}
           priority={false}
           src="/images/brand/neverfound-red.png"
@@ -229,7 +233,7 @@ export function SiteHeader({
         <Image
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-[1] object-cover opacity-[0.17]"
+          className="pointer-events-none absolute inset-0 z-[1] object-cover opacity-[0.08]"
           fill
           priority={false}
           sizes="82vw"
@@ -263,7 +267,9 @@ export function SiteHeader({
               key={item.label}
               onClick={() => setOpen(false)}
             >
-              <span className="inline-block">{item.label}</span>
+              <span className={`inline-block origin-left ${item.wordClass}`}>
+                {item.label}
+              </span>
             </Link>
           ))}
         </div>

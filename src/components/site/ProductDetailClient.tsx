@@ -203,13 +203,13 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
     <div className="mt-8 grid w-full gap-6 lg:grid-cols-[55fr_45fr] lg:gap-4 xl:gap-5">
       <div className="grid gap-5">
         <div
-          className="no-scrollbar flex min-h-[430px] touch-pan-y snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain scroll-smooth bg-transparent md:min-h-[610px]"
+          className="no-scrollbar flex min-h-[430px] touch-auto snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain scroll-smooth bg-transparent md:min-h-[610px]"
           onScroll={syncCarouselSelection}
           ref={carouselRef}
         >
           {galleryImages.map((image, index) => (
             <div
-              className="relative min-h-[430px] min-w-full touch-pan-y snap-center overflow-hidden md:min-h-[610px]"
+              className="relative min-h-[430px] min-w-full touch-auto snap-center overflow-hidden md:min-h-[610px]"
               key={`${image}-${index}`}
             >
               <Image
