@@ -18,26 +18,22 @@ const mobileNavItems = [
   {
     label: "Home",
     href: "/",
-    textClass: "text-[clamp(7.35rem,31vw,11.25rem)] text-acid",
-    wordClass: "scale-x-[1.08]",
+    colorClass: "text-acid",
+  },
+  {
+    label: "Contact Us",
+    href: "/contact",
+    colorClass: "text-bone",
   },
   {
     label: "About Us",
     href: "/about",
-    textClass: "text-[clamp(4.9rem,20.5vw,7.4rem)] text-acid",
-    wordClass: "scale-x-[1.06]",
-  },
-  {
-    label: "Contact",
-    href: "/contact",
-    textClass: "text-[clamp(5.15rem,21.6vw,7.75rem)] text-bone",
-    wordClass: "scale-x-[1.02]",
+    colorClass: "text-acid",
   },
   {
     label: "Login",
     href: "/account/login",
-    textClass: "text-[clamp(8.1rem,34vw,12.25rem)] text-bone",
-    wordClass: "scale-x-[1.04]",
+    colorClass: "text-bone",
   },
 ];
 
@@ -207,75 +203,77 @@ export function SiteHeader({
       />
 
       <nav
-        className={`fixed top-0 z-50 flex h-dvh w-full overflow-hidden bg-ink font-mono text-sm uppercase tracking-[0.16em] text-bone shadow-2xl transition-[left] duration-300 ease-out md:hidden ${
-          open ? "left-0 pointer-events-auto" : "left-[-100vw] pointer-events-none"
+        className={`fixed inset-0 z-50 overflow-hidden bg-[#0d0c0c] font-mono text-sm uppercase tracking-[0.16em] text-bone shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.65,0,0.35,1)] md:hidden ${
+          open ? "translate-x-0 pointer-events-auto" : "translate-x-full pointer-events-none"
         }`}
         aria-label="Mobile navigation"
       >
-        <Image
-          alt=""
-          aria-hidden="true"
-          className="pointer-events-none absolute left-1/2 top-[-2.4rem] z-0 h-auto w-[185%] -translate-x-1/2 object-contain opacity-85"
-          height={220}
-          priority={false}
-          src="/images/brand/neverfound-red.png"
-          width={500}
-        />
-        <Image
-          alt=""
-          aria-hidden="true"
-          className="pointer-events-none absolute bottom-[-2.6rem] left-1/2 z-0 h-auto w-[185%] -translate-x-1/2 object-contain opacity-85"
-          height={220}
-          priority={false}
-          src="/images/brand/neverfound-red.png"
-          width={500}
-        />
-        <Image
-          alt=""
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-[1] object-cover opacity-[0.22] mix-blend-screen"
-          fill
-          priority={false}
-          sizes="100vw"
-          src="/images/textures/main-background.jpg"
-        />
-        <div className="relative z-10 flex min-h-24 items-center justify-between px-7 pt-1">
-          <span className="font-display text-3xl font-black uppercase leading-none text-bone">Menu</span>
-          <button
-            aria-label="Close menu"
-            className="relative flex h-11 w-11 items-center justify-center transition-opacity hover:opacity-70"
-            onClick={() => setOpen(false)}
-            type="button"
-          >
+        <div className="absolute inset-0 bg-[#0d0c0c]" />
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute left-1/2 top-0 h-[420px] w-[1800px] -translate-x-1/2 -translate-y-[58%] rotate-[-6deg] opacity-95 saturate-[1.3]">
             <Image
               alt=""
               aria-hidden="true"
-              className="object-contain invert"
+              className="object-contain"
               fill
-              sizes="44px"
-              src="/images/icons/menu-close.png"
+              priority={false}
+              src="/images/brand/neverfound-menu-logo.png"
             />
+          </div>
+          <div className="absolute bottom-0 left-1/2 h-[420px] w-[1800px] translate-x-[-46%] translate-y-[58%] rotate-[5deg] opacity-95 saturate-[1.3]">
+            <Image
+              alt=""
+              aria-hidden="true"
+              className="object-contain"
+              fill
+              priority={false}
+              src="/images/brand/neverfound-menu-logo.png"
+            />
+          </div>
+        </div>
+        <Image
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 object-cover opacity-[0.85] sepia saturate-[4] hue-rotate-[-38deg] brightness-90 mix-blend-color-burn"
+          fill
+          priority={false}
+          sizes="100vw"
+          src="/images/textures/neverfound-menu-texture.jpg"
+        />
+        <div className="absolute inset-0 bg-black/35" />
+
+        <div className="relative z-10 flex h-full flex-col px-6 pt-8">
+          <div className="flex items-center justify-between">
+            <span className="font-display text-lg uppercase leading-none tracking-wide text-bone">
+              Menu
+            </span>
+          <button
+            aria-label="Close menu"
+            className="relative flex h-11 w-11 items-center justify-center text-bone transition-opacity hover:opacity-70"
+            onClick={() => setOpen(false)}
+            type="button"
+          >
+            <span className="absolute h-10 w-px rotate-45 bg-bone" />
+            <span className="absolute h-10 w-px -rotate-45 bg-bone" />
           </button>
-        </div>
+          </div>
 
-        <div className="relative z-10 flex flex-col items-start pl-9 pt-2">
-          {mobileNavItems.map((item) => (
-            <Link
-              aria-label={item.label}
-              className={`w-[86vw] whitespace-nowrap py-0 text-left font-display italic uppercase leading-[0.88] tracking-normal transition-colors hover:text-rust active:text-rust ${item.textClass}`}
-              href={item.href}
-              key={item.label}
-              onClick={() => setOpen(false)}
-            >
-              <span className={`inline-block origin-left ${item.wordClass}`}>
+          <div className="mt-6 flex flex-1 flex-col justify-center gap-1 pb-20">
+            {mobileNavItems.map((item) => (
+              <Link
+                className={`font-display text-[15vw] italic uppercase leading-[0.92] tracking-normal -skew-x-3 transition-colors hover:text-rust active:text-rust sm:text-[64px] ${item.colorClass}`}
+                href={item.href}
+                key={item.label}
+                onClick={() => setOpen(false)}
+              >
                 {item.label}
-              </span>
-            </Link>
-          ))}
-        </div>
+              </Link>
+            ))}
+          </div>
 
-        <div className="relative z-10 mt-auto grid gap-4 px-5 py-5">
-          <CurrencySelector tone="dark" />
+          <div className="pb-5">
+            <CurrencySelector tone="dark" />
+          </div>
         </div>
       </nav>
 
