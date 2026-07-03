@@ -313,9 +313,9 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
           ) : null}
 
           <OptionGroup label="Quantity">
-            <div className="relative w-52">
+            <div className="relative w-40">
               <select
-                className="h-16 w-full appearance-none rounded-full border-2 border-ink bg-transparent px-7 font-sans text-lg text-ink"
+                className="h-14 w-full appearance-none rounded-full border-2 border-ink bg-transparent px-6 font-sans text-base text-ink"
                 onChange={(event) => {
                   setQuantity(clampQuantity(Number(event.target.value)));
                   setAdded(false);
@@ -333,12 +333,12 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
                   </option>
                 ))}
               </select>
-              <ChevronDown className="pointer-events-none absolute right-7 top-1/2 h-5 w-5 -translate-y-1/2" />
+              <ChevronDown className="pointer-events-none absolute right-6 top-1/2 h-4 w-4 -translate-y-1/2" />
             </div>
           </OptionGroup>
 
           <button
-            className="mt-2 flex h-20 w-full items-center justify-center gap-3 rounded-full bg-ink px-6 font-sans text-base font-black italic uppercase tracking-[0.12em] text-bone transition-colors hover:bg-rust hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-1 flex h-16 w-full items-center justify-center gap-3 rounded-full bg-ink px-6 font-sans text-sm font-black italic uppercase tracking-[0.08em] text-bone transition-colors hover:bg-rust hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
             disabled={!isAvailable}
             onClick={addSelectedVariant}
             type="button"
@@ -418,7 +418,7 @@ function OptionGroup({
         <p className="font-mono text-[13px] font-black uppercase tracking-normal">{label}</p>
         {action}
       </div>
-      <div className="mt-4 flex flex-wrap justify-start gap-3">{children}</div>
+      <div className="mt-3 flex flex-wrap justify-start gap-3">{children}</div>
     </div>
   );
 }
@@ -434,7 +434,7 @@ function OptionButton({
 }) {
   return (
     <button
-      className={`min-w-24 rounded-full border-2 px-7 py-4 font-sans text-lg font-medium transition ${
+      className={`min-w-20 rounded-full border-2 px-6 py-3 font-sans text-base font-medium transition ${
         selected
           ? "border-ink bg-ink text-bone"
           : "border-ink/35 bg-transparent text-ink hover:border-ink"
@@ -460,7 +460,7 @@ function ColorOptionButton({
 }) {
   return (
     <button
-      className="min-w-28 rounded-full border-2 px-7 py-4 font-sans text-lg font-medium transition hover:opacity-80"
+      className="min-w-24 rounded-full border-2 px-6 py-3 font-sans text-base font-medium transition hover:opacity-80"
       onClick={onClick}
       style={{
         backgroundColor: selected ? colorValue : "transparent",
