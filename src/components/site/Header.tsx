@@ -68,8 +68,8 @@ const mobileMenuLogoControls: Record<"top" | "bottom", MobileMenuLogoControl> = 
   bottom: {
     xPercent: 50,
     widthVw: 155,
-    bottomPx: -45,
-    rotateDeg: 5,
+    bottomPx: -35,
+    rotateDeg: 8,
     opacity: 0.82,
   },
 };
