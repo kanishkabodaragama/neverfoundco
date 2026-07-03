@@ -204,10 +204,12 @@ export function SiteHeader({
           </button>
         </div>
 
-        <div className="flex flex-col items-end pt-4">
-          {navItems.map((item) => (
+        <div className="flex flex-col items-start px-8 pt-2">
+          {[...navItems, { label: "Login", href: "/account/login" }].map((item, index) => (
             <Link
-              className="w-full px-8 py-4 text-right font-display text-5xl italic uppercase leading-none tracking-normal text-acid transition-colors hover:bg-bone hover:text-ink active:bg-acid active:text-ink"
+              className={`w-full py-1 text-left font-display text-[clamp(4.2rem,18vw,7rem)] italic uppercase leading-[0.86] tracking-normal transition-colors hover:text-rust active:text-rust ${
+                index % 2 === 0 ? "text-acid" : "text-bone"
+              }`}
               href={item.href}
               key={item.label}
               onClick={() => setOpen(false)}
@@ -219,13 +221,6 @@ export function SiteHeader({
 
         <div className="mt-auto grid gap-4 px-5 py-5">
           <CurrencySelector tone="dark" />
-          <Link
-            className="bg-acid px-5 py-4 text-center font-bold text-ink transition-colors hover:bg-rust"
-            href="/account/login"
-            onClick={() => setOpen(false)}
-          >
-            Login
-          </Link>
         </div>
       </nav>
 

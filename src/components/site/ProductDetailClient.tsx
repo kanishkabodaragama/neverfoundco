@@ -353,7 +353,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
           </button>
 
           {description ? (
-            <section className="border-t border-ink/70 pt-8 text-left">
+            <section className="pt-8 text-left">
               <h2 className="font-sans text-2xl font-black italic uppercase tracking-normal text-ink">
                 Description
               </h2>
