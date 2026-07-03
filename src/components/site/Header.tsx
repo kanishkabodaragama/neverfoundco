@@ -14,6 +14,29 @@ const navItems = [
   { label: "Contact", href: "/contact" },
 ];
 
+const mobileNavItems = [
+  {
+    label: "Home",
+    href: "/",
+    textClass: "text-[clamp(6rem,25vw,8.8rem)] text-acid",
+  },
+  {
+    label: "About Us",
+    href: "/about",
+    textClass: "text-[clamp(4.2rem,16vw,6rem)] text-bone",
+  },
+  {
+    label: "Contact",
+    href: "/contact",
+    textClass: "text-[clamp(5rem,19.5vw,7rem)] text-acid",
+  },
+  {
+    label: "Login",
+    href: "/account/login",
+    textClass: "text-[clamp(6rem,24vw,8.5rem)] text-bone",
+  },
+];
+
 function isActiveNavItem(
   href: string,
   active: "home" | "shop" | "about" | "contact",
@@ -205,11 +228,9 @@ export function SiteHeader({
         </div>
 
         <div className="flex flex-col items-start px-8 pt-2">
-          {[...navItems, { label: "Login", href: "/account/login" }].map((item, index) => (
+          {mobileNavItems.map((item) => (
             <Link
-              className={`w-full py-1 text-left font-display text-[clamp(4.2rem,18vw,7rem)] italic uppercase leading-[0.86] tracking-normal transition-colors hover:text-rust active:text-rust ${
-                index % 2 === 0 ? "text-acid" : "text-bone"
-              }`}
+              className={`w-full whitespace-nowrap py-0.5 text-left font-display italic uppercase leading-[0.84] tracking-normal transition-colors hover:text-rust active:text-rust ${item.textClass}`}
               href={item.href}
               key={item.label}
               onClick={() => setOpen(false)}
