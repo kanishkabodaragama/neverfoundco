@@ -18,24 +18,39 @@ const mobileNavItems = [
   {
     label: "Home",
     href: "/",
+    textClass: "text-[clamp(5.4rem,23vw,8.2rem)]",
+    wordClass: "scale-x-[1.24]",
     colorClass: "text-acid",
-  },
-  {
-    label: "Contact Us",
-    href: "/contact",
-    colorClass: "text-bone",
   },
   {
     label: "About Us",
     href: "/about",
+    textClass: "text-[clamp(3.8rem,16vw,5.8rem)]",
+    wordClass: "scale-x-[1.08]",
     colorClass: "text-acid",
+  },
+  {
+    label: "Contact",
+    href: "/contact",
+    textClass: "text-[clamp(4.4rem,18.5vw,6.7rem)]",
+    wordClass: "scale-x-[1.05]",
+    colorClass: "text-bone",
   },
   {
     label: "Login",
     href: "/account/login",
+    textClass: "text-[clamp(5.1rem,21.5vw,7.8rem)]",
+    wordClass: "scale-x-[1.26]",
     colorClass: "text-bone",
   },
 ];
+
+const mobileMenuLogoLayers = {
+  bottom:
+    "pointer-events-none absolute left-1/2 top-[67%] z-0 h-auto w-[145%] -translate-x-1/2 rotate-[5deg] object-contain opacity-80",
+  top:
+    "pointer-events-none absolute left-1/2 top-[-3.5rem] z-0 h-auto w-[145%] -translate-x-1/2 rotate-[-6deg] object-contain opacity-80",
+};
 
 function isActiveNavItem(
   href: string,
@@ -203,72 +218,64 @@ export function SiteHeader({
       />
 
       <nav
-        className={`fixed inset-0 z-50 overflow-hidden bg-[#0d0c0c] font-mono text-sm uppercase tracking-[0.16em] text-bone shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.65,0,0.35,1)] md:hidden ${
+        className={`fixed inset-0 z-50 overflow-hidden bg-ink font-mono text-sm uppercase tracking-[0.16em] text-bone shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.65,0,0.35,1)] md:hidden ${
           open ? "translate-x-0 pointer-events-auto" : "translate-x-full pointer-events-none"
         }`}
         aria-label="Mobile navigation"
       >
-        <div className="absolute inset-0 bg-[#0d0c0c]" />
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute left-1/2 top-0 h-[420px] w-[1800px] -translate-x-1/2 -translate-y-[58%] rotate-[-6deg] opacity-95 saturate-[1.3]">
-            <Image
-              alt=""
-              aria-hidden="true"
-              className="object-contain"
-              fill
-              priority={false}
-              src="/images/brand/neverfound-menu-logo.png"
-            />
-          </div>
-          <div className="absolute bottom-0 left-1/2 h-[420px] w-[1800px] translate-x-[-46%] translate-y-[58%] rotate-[5deg] opacity-95 saturate-[1.3]">
-            <Image
-              alt=""
-              aria-hidden="true"
-              className="object-contain"
-              fill
-              priority={false}
-              src="/images/brand/neverfound-menu-logo.png"
-            />
-          </div>
-        </div>
         <Image
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 object-cover opacity-[0.85] sepia saturate-[4] hue-rotate-[-38deg] brightness-90 mix-blend-color-burn"
-          fill
+          className={mobileMenuLogoLayers.top}
+          height={220}
           priority={false}
-          sizes="100vw"
-          src="/images/textures/neverfound-menu-texture.jpg"
+          src="/images/brand/neverfound-red.png"
+          width={500}
         />
-        <div className="absolute inset-0 bg-black/35" />
-
-        <div className="relative z-10 flex h-full flex-col px-6 pt-8">
+        <div className="relative z-10 flex h-full flex-col px-8 pt-8">
           <div className="flex items-center justify-between">
-            <span className="font-display text-lg uppercase leading-none tracking-wide text-bone">
+            <span className="font-display text-3xl uppercase leading-none tracking-normal text-bone/70">
               Menu
             </span>
-          <button
-            aria-label="Close menu"
-            className="relative flex h-11 w-11 items-center justify-center text-bone transition-opacity hover:opacity-70"
-            onClick={() => setOpen(false)}
-            type="button"
-          >
-            <span className="absolute h-10 w-px rotate-45 bg-bone" />
-            <span className="absolute h-10 w-px -rotate-45 bg-bone" />
-          </button>
+            <button
+              aria-label="Close menu"
+              className="relative flex h-11 w-11 items-center justify-center text-bone transition-opacity hover:opacity-70"
+              onClick={() => setOpen(false)}
+              type="button"
+            >
+              <Image
+                alt=""
+                aria-hidden="true"
+                className="object-contain invert"
+                fill
+                sizes="44px"
+                src="/images/icons/menu-close.png"
+              />
+            </button>
           </div>
 
-          <div className="mt-6 flex flex-1 flex-col justify-center gap-1 pb-20">
+          <div className="relative mt-16 flex flex-1 flex-col items-start gap-3 pb-40">
             {mobileNavItems.map((item) => (
               <Link
-                className={`font-display text-[15vw] italic uppercase leading-[0.92] tracking-normal -skew-x-3 transition-colors hover:text-rust active:text-rust sm:text-[64px] ${item.colorClass}`}
+                className={`w-[min(72vw,21rem)] whitespace-nowrap font-display italic uppercase leading-[0.9] tracking-normal transition-colors hover:text-rust active:text-rust ${item.textClass} ${item.colorClass}`}
                 href={item.href}
                 key={item.label}
                 onClick={() => setOpen(false)}
               >
-                {item.label}
+                <span className={`inline-block origin-left ${item.wordClass}`}>
+                  {item.label}
+                </span>
               </Link>
             ))}
+            <Image
+              alt=""
+              aria-hidden="true"
+              className={mobileMenuLogoLayers.bottom}
+              height={220}
+              priority={false}
+              src="/images/brand/neverfound-red.png"
+              width={500}
+            />
           </div>
 
           <div className="pb-5">
