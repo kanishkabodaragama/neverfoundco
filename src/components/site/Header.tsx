@@ -197,7 +197,7 @@ export function SiteHeader({
   return (
     <>
     <header
-      className={`sticky top-0 border-0 bg-transparent text-ink shadow-none outline-none transition-transform duration-300 ease-out ${
+      className={`fixed inset-x-0 top-0 border-0 bg-transparent text-ink shadow-none outline-none transition-transform duration-300 ease-out ${
         open || cartOpen ? "z-40" : "z-40"
       } ${
         headerHidden ? "-translate-y-full" : open || cartOpen ? "" : "translate-y-0"

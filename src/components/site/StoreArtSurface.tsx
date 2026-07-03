@@ -4,24 +4,16 @@ import { siteTextureSettings } from "@/components/site/site-texture-settings";
 
 export function StoreArtSurface({
   children,
+  homeGraffiTexture = false,
   productTexture = false,
 }: {
   children: ReactNode;
+  homeGraffiTexture?: boolean;
   productTexture?: boolean;
 }) {
   return (
-    <main className="relative -mt-20 overflow-hidden bg-ink pt-20 md:-mt-[5.75rem] md:pt-[5.75rem]">
-      <Image
-        alt=""
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-0 object-cover"
-        fill
-        priority={false}
-        sizes="100vw"
-        src="/images/textures/main-background.jpg"
-        style={{ opacity: siteTextureSettings.darkTextureOpacity }}
-      />
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-[2] h-32 overflow-hidden md:h-44">
+    <main className="relative overflow-hidden bg-acid">
+      <div className="pointer-events-none absolute inset-x-0 top-20 z-[2] h-32 overflow-hidden md:top-[10.75rem] md:h-44">
         <Image
           alt=""
           aria-hidden="true"
@@ -48,12 +40,24 @@ export function StoreArtSurface({
           className="pointer-events-none absolute inset-0 z-[1] bg-acid"
           style={{ opacity: siteTextureSettings.yellowLayerOpacity }}
         />
+        {homeGraffiTexture ? (
+          <Image
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 z-[2] object-cover object-top mix-blend-multiply"
+            fill
+            priority={false}
+            sizes="100vw"
+            src="/images/textures/graffi-mobile.png"
+            style={{ opacity: siteTextureSettings.homeGraffiTextureOpacity }}
+          />
+        ) : null}
         {productTexture ? (
           <>
             <Image
               alt=""
               aria-hidden="true"
-              className="pointer-events-none absolute inset-0 z-[2] object-cover object-center opacity-[0.22] mix-blend-multiply md:hidden"
+              className="pointer-events-none absolute inset-0 z-[3] object-cover object-center opacity-[0.22] mix-blend-multiply md:hidden"
               fill
               priority={false}
               sizes="100vw"
@@ -62,7 +66,7 @@ export function StoreArtSurface({
             <Image
               alt=""
               aria-hidden="true"
-              className="pointer-events-none absolute inset-0 z-[2] hidden object-cover object-center opacity-[0.22] mix-blend-multiply md:block"
+              className="pointer-events-none absolute inset-0 z-[3] hidden object-cover object-center opacity-[0.22] mix-blend-multiply md:block"
               fill
               priority={false}
               sizes="100vw"

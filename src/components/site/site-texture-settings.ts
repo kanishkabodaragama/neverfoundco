@@ -5,4 +5,5 @@ export const siteTextureSettings = {
   yellowLayerOpacity: 0.96,
   darkTextureOpacity: 0.1,
   footerTextureOpacity: 0.08,
+  homeGraffiTextureOpacity: 0.22,
 };

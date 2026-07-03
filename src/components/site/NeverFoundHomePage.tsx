@@ -17,7 +17,7 @@ export function NeverFoundHomePage({
   return (
     <div className="flex min-h-screen flex-col overflow-x-hidden bg-ink text-ink">
       <Header />
-      <StoreArtSurface>
+      <StoreArtSurface homeGraffiTexture>
         <section className="bg-acid px-5 pb-12 pt-6 text-ink md:px-8 md:pb-20 md:pt-24">
           {/* <div className="mb-10 flex items-end justify-between md:mb-14">
             <h2 className="font-display text-4xl uppercase leading-none md:text-6xl">
@@ -38,7 +38,7 @@ export function NeverFoundHomePage({
         </section>
         <NvrFndGallery />
       </StoreArtSurface>
-      <Footer />
+      <Footer graffiTexture />
     </div>
   );
 }

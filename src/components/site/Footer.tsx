@@ -17,7 +17,7 @@ const rightFooterLinks = [
   { label: "About Us", href: "/about" },
 ];
 
-export function Footer() {
+export function Footer({ graffiTexture = false }: { graffiTexture?: boolean }) {
   return (
     <footer className="relative overflow-hidden border-0 bg-ink text-acid shadow-none outline-none">
       <Image
@@ -30,6 +30,18 @@ export function Footer() {
         src="/images/textures/main-background.jpg"
         style={{ opacity: siteTextureSettings.footerTextureOpacity }}
       />
+      {graffiTexture ? (
+        <Image
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-[1] object-cover object-bottom mix-blend-screen"
+          fill
+          priority={false}
+          sizes="100vw"
+          src="/images/textures/graffi-mobile.png"
+          style={{ opacity: siteTextureSettings.homeGraffiTextureOpacity }}
+        />
+      ) : null}
       <div className="relative z-10 px-5 pb-5 pt-7 md:px-8 md:pb-7 md:pt-8">
         <Link
           aria-label="Never Found home"
