@@ -92,7 +92,7 @@ function MobileMenuRedLogo({ position }: { position: "top" | "bottom" }) {
     <Image
       alt=""
       aria-hidden="true"
-      className="pointer-events-none absolute z-0 h-auto max-w-none object-contain"
+      className="pointer-events-none absolute z-[1] h-auto max-w-none object-contain"
       height={800}
       priority={false}
       src="/images/brand/neverfound-red-menu-source.png"
@@ -197,7 +197,7 @@ export function SiteHeader({
   return (
     <>
     <header
-      className={`sticky top-0 border-0 bg-acid text-ink shadow-none outline-none transition-transform duration-300 ease-out after:absolute after:inset-x-0 after:-bottom-2 after:h-2 after:bg-acid after:content-[''] ${
+      className={`sticky top-0 border-0 bg-transparent text-ink shadow-none outline-none transition-transform duration-300 ease-out ${
         open || cartOpen ? "z-40" : "z-40"
       } ${
         headerHidden ? "-translate-y-full" : open || cartOpen ? "" : "translate-y-0"
@@ -206,7 +206,7 @@ export function SiteHeader({
       <div className="relative grid grid-cols-[3rem_1fr_3rem] items-center px-3 py-0 md:flex md:justify-between md:px-8 md:py-1.5">
         <button
           aria-expanded={open}
-          aria-label={open ? "Close menu" : "Open menu"}
+          aria-label="Open menu"
           className="relative z-10 col-start-1 flex h-10 w-9 items-center justify-center justify-self-start p-1 text-ink transition-opacity hover:opacity-75 md:hidden"
           onClick={() => {
             setHidden(false);
@@ -214,19 +214,15 @@ export function SiteHeader({
           }}
           type="button"
         >
-          {open ? (
-            <CloseGlyph />
-          ) : (
-            <Image
-              alt=""
-              aria-hidden="true"
-              className="object-contain"
-              height={34}
-              priority
-              src="/images/icons/mobile-menu.png"
-              width={34}
-            />
-          )}
+          <Image
+            alt=""
+            aria-hidden="true"
+            className="object-contain"
+            height={34}
+            priority
+            src="/images/icons/mobile-menu.png"
+            width={34}
+          />
         </button>
 
         <Link
@@ -307,7 +303,7 @@ export function SiteHeader({
         <Image
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-[1] object-cover opacity-[0.17] mix-blend-screen"
+          className="pointer-events-none absolute inset-0 z-0 object-cover opacity-[0.17] mix-blend-screen"
           fill
           priority={false}
           sizes="100vw"

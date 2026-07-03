@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { siteTextureSettings } from "@/components/site/site-texture-settings";
 
 const leftFooterLinks = [
   { label: "Privacy Policy", href: "/privacy" },
@@ -18,8 +19,18 @@ const rightFooterLinks = [
 
 export function Footer() {
   return (
-    <footer className="border-0 bg-ink text-acid shadow-none outline-none">
-      <div className="px-5 pb-5 pt-7 md:px-8 md:pb-7 md:pt-8">
+    <footer className="relative overflow-hidden border-0 bg-ink text-acid shadow-none outline-none">
+      <Image
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0 object-cover mix-blend-screen"
+        fill
+        priority={false}
+        sizes="100vw"
+        src="/images/textures/main-background.jpg"
+        style={{ opacity: siteTextureSettings.footerTextureOpacity }}
+      />
+      <div className="relative z-10 px-5 pb-5 pt-7 md:px-8 md:pb-7 md:pt-8">
         <Link
           aria-label="Never Found home"
           className="relative mx-auto block h-[76px] w-44 md:h-[78px] md:w-56"
