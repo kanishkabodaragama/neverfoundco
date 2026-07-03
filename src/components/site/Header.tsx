@@ -18,22 +18,22 @@ const mobileNavItems = [
   {
     label: "Home",
     href: "/",
-    textClass: "text-[clamp(6rem,25vw,8.8rem)] text-acid",
+    textClass: "text-[clamp(4.8rem,20vw,7.4rem)] text-acid",
   },
   {
     label: "About Us",
     href: "/about",
-    textClass: "text-[clamp(4.2rem,16vw,6rem)] text-bone",
+    textClass: "text-[clamp(3.8rem,15vw,5.5rem)] text-bone",
   },
   {
     label: "Contact",
     href: "/contact",
-    textClass: "text-[clamp(5rem,19.5vw,7rem)] text-acid",
+    textClass: "text-[clamp(4.4rem,17.5vw,6.4rem)] text-acid",
   },
   {
     label: "Login",
     href: "/account/login",
-    textClass: "text-[clamp(6rem,24vw,8.5rem)] text-bone",
+    textClass: "text-[clamp(4.8rem,20vw,7.4rem)] text-bone",
   },
 ];
 
@@ -227,10 +227,10 @@ export function SiteHeader({
           </button>
         </div>
 
-        <div className="flex flex-col items-start px-8 pt-2">
+        <div className="flex flex-col items-start pl-8 pt-2">
           {mobileNavItems.map((item) => (
             <Link
-              className={`w-full whitespace-nowrap py-0.5 text-left font-display italic uppercase leading-[0.84] tracking-normal transition-colors hover:text-rust active:text-rust ${item.textClass}`}
+              className={`w-[min(69vw,20rem)] whitespace-nowrap py-0.5 text-right font-display italic uppercase leading-[0.84] tracking-normal transition-colors hover:text-rust active:text-rust ${item.textClass}`}
               href={item.href}
               key={item.label}
               onClick={() => setOpen(false)}
