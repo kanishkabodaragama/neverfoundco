@@ -347,7 +347,7 @@ export function SiteHeader({
           </div>
 
           <div
-            className="relative mt-9 flex flex-1 flex-col gap-4 pb-60"
+            className="relative flex flex-1 flex-col justify-center gap-4"
             style={{
               textAlign: mobileMenuItemsControl.textAlignment,
               transform: `translate(${mobileMenuItemsControl.xPx}px, ${mobileMenuItemsControl.yPx}px)`,
