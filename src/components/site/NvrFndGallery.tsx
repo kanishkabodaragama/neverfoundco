@@ -22,6 +22,20 @@ const galleryImages = [
   },
 ];
 
+// Gallery title font controls:
+// Uses the same Anton-based font as the mobile slide menu.
+// fontSizeVw controls mobile scaling, maxFontSizePx caps desktop size.
+// letterGapPx adjusts letter spacing in pixels.
+// xPx moves the title horizontally: 0 = original, negative = left, positive = right.
+const galleryTitleControl = {
+  fontFamily: "var(--font-display), Anton, Impact, sans-serif",
+  minFontSizePx: 25,
+  fontSizeVw: 20.5,
+  maxFontSizePx: 128,
+  letterGapPx: 0,
+  xPx: -20,
+};
+
 export function NvrFndGallery() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const stripRef = useRef<HTMLDivElement | null>(null);
@@ -60,7 +74,16 @@ export function NvrFndGallery() {
 
   return (
     <section className="overflow-hidden bg-transparent py-10 text-ink md:py-14">
-      <h2 className="px-5 font-display text-[16vw] italic uppercase leading-[0.82] md:px-8 md:text-8xl lg:text-9xl">
+      <h2
+        className="whitespace-nowrap px-5 uppercase leading-[0.82] md:px-8"
+        style={{
+          fontFamily: galleryTitleControl.fontFamily,
+          fontSize: `clamp(${galleryTitleControl.minFontSizePx}px, ${galleryTitleControl.fontSizeVw}vw, ${galleryTitleControl.maxFontSizePx}px)`,
+          fontStyle: "italic",
+          letterSpacing: `${galleryTitleControl.letterGapPx}px`,
+          transform: `translateX(${galleryTitleControl.xPx}px)`,
+        }}
+      >
         NVR FND GALLERY
       </h2>
       <div
