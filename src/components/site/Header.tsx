@@ -52,7 +52,7 @@ const mobileNavItems: MobileNavItem[] = [
   {
     label: "About Us",
     href: "/about",
-    fontSizePx: 100,
+    fontSizePx: 105,
     xPx: -8,
     textAlignment: "center",
     rowVerticalAlignment: "center",
