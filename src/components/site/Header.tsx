@@ -32,7 +32,7 @@ const mobileNavItems: MobileNavItem[] = [
   {
     label: "Home",
     href: "/",
-    fontSizePx: 135,
+    fontSizePx: 235,
     xPx: -12,
     textAlignment: "center",
     rowVerticalAlignment: "center",
@@ -42,7 +42,7 @@ const mobileNavItems: MobileNavItem[] = [
   {
     label: "Contact Us",
     href: "/contact",
-    fontSizePx: 73,
+    fontSizePx: 173,
     xPx: -10,
     textAlignment: "center",
     rowVerticalAlignment: "center",
@@ -52,7 +52,7 @@ const mobileNavItems: MobileNavItem[] = [
   {
     label: "About Us",
     href: "/about",
-    fontSizePx: 83,
+    fontSizePx: 183,
     xPx: -8,
     textAlignment: "center",
     rowVerticalAlignment: "center",
@@ -62,7 +62,7 @@ const mobileNavItems: MobileNavItem[] = [
   {
     label: "Login",
     href: "/account/login",
-    fontSizePx: 140,
+    fontSizePx: 240,
     xPx: -12,
     textAlignment: "center",
     rowVerticalAlignment: "center",
