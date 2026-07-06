@@ -15,6 +15,7 @@ type MobileNavItem = {
   label: string;
   href: string;
   fontSizePx: number;
+  xPx?: number;
   textAlignment?: MobileMenuTextAlignment;
   rowVerticalAlignment?: MobileMenuRowVerticalAlignment;
   wordClass: string;
@@ -31,7 +32,8 @@ const mobileNavItems: MobileNavItem[] = [
   {
     label: "Home",
     href: "/",
-    fontSizePx: 180,
+    fontSizePx: 135,
+    xPx: -12,
     textAlignment: "center",
     rowVerticalAlignment: "center",
     wordClass: "scale-x-[1.02]",
@@ -40,7 +42,8 @@ const mobileNavItems: MobileNavItem[] = [
   {
     label: "Contact Us",
     href: "/contact",
-    fontSizePx: 90,
+    fontSizePx: 73,
+    xPx: -10,
     textAlignment: "center",
     rowVerticalAlignment: "center",
     wordClass: "scale-x-[0.98]",
@@ -49,7 +52,8 @@ const mobileNavItems: MobileNavItem[] = [
   {
     label: "About Us",
     href: "/about",
-    fontSizePx: 95,
+    fontSizePx: 83,
+    xPx: -8,
     textAlignment: "center",
     rowVerticalAlignment: "center",
     wordClass: "scale-x-[1.02]",
@@ -58,7 +62,8 @@ const mobileNavItems: MobileNavItem[] = [
   {
     label: "Login",
     href: "/account/login",
-    fontSizePx: 180,
+    fontSizePx: 140,
+    xPx: -12,
     textAlignment: "center",
     rowVerticalAlignment: "center",
     wordClass: "scale-x-[1]",
@@ -89,14 +94,18 @@ const mobileMenuItemsControl: {
 };
 
 const mobileMenuLogoBaseWidthVw = 155;
+const mobileMenuItemsFontFamily =
+  "var(--font-display), Anton, Impact, sans-serif";
 
 // Manual mobile menu controls:
 // logos: scale = size, xPercent/xPx = left/right, yPx = up/down, rotateDeg = angle.
-// menuItems: change xPx/yPx above to move every item as one group.
+// menuItems: shared xPx/yPx above moves every item as one group.
+// Per-item xPx: 0 = center, negative = left, positive = right.
 // textAlignment words: "left", "center", "right", "justify".
 // rowVerticalAlignment words: "top", "center", "bottom".
 // rowHeightScale changes each menu item's row height relative to its font size.
-// Per-item textAlignment/rowVerticalAlignment values override the shared defaults.
+// mobileMenuItemsFontFamily sets the menu item font. Current value uses Anton.
+// Per-item xPx/textAlignment/rowVerticalAlignment values override or add to the shared defaults.
 const mobileMenuLogoControls: Record<"top" | "bottom", MobileMenuLogoControl> = {
   top: {
     scale: 1,
@@ -400,15 +409,18 @@ export function SiteHeader({
 
               return (
                 <Link
-                  className={`flex w-full whitespace-nowrap font-display italic uppercase leading-[0.86] tracking-normal transition-colors hover:text-rust active:text-rust ${item.colorClass}`}
+                  className={`flex w-full whitespace-nowrap uppercase leading-[0.86] tracking-normal transition-colors hover:text-rust active:text-rust ${item.colorClass}`}
                   href={item.href}
                   key={item.label}
                   onClick={() => setOpen(false)}
                   style={{
                     alignItems: getMenuItemAlignItems(rowVerticalAlignment),
+                    fontFamily: mobileMenuItemsFontFamily,
                     fontSize: `${item.fontSizePx}px`,
+                    fontStyle: "italic",
                     justifyContent: getMenuItemJustifyContent(textAlignment),
                     minHeight: `${item.fontSizePx * mobileMenuItemsControl.rowHeightScale}px`,
+                    transform: `translateX(${item.xPx ?? 0}px)`,
                   }}
                 >
                   <span
@@ -426,7 +438,7 @@ export function SiteHeader({
             })}
           </div>
 
-          <div className="relative z-20 mt-auto pb-5">
+          <div className="absolute inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+20px)] z-20 flex justify-center px-6">
             <CurrencySelector tone="dark" />
           </div>
         </div>
