@@ -25,14 +25,14 @@ const mobileNavItems = [
   {
     label: "Contact Us",
     href: "/contact",
-    fontSizePx: 120,
+    fontSizePx: 90,
     wordClass: "scale-x-[0.98]",
     colorClass: "text-bone",
   },
   {
     label: "About Us",
     href: "/about",
-    fontSizePx: 140,
+    fontSizePx: 95,
     wordClass: "scale-x-[1.02]",
     colorClass: "text-acid",
   },
