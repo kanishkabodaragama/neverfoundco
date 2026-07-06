@@ -18,57 +18,63 @@ const mobileNavItems = [
   {
     label: "Home",
     href: "/",
-    textClass: "text-[140px]",
+    fontSizePx: 140,
     wordClass: "scale-x-[1.02]",
     colorClass: "text-acid",
   },
   {
     label: "Contact Us",
     href: "/contact",
-    textClass: "text-[75px]",
+    fontSizePx: 75,
     wordClass: "scale-x-[0.98]",
     colorClass: "text-bone",
   },
   {
     label: "About Us",
     href: "/about",
-    textClass: "text-[90px]",
+    fontSizePx: 90,
     wordClass: "scale-x-[1.02]",
     colorClass: "text-acid",
   },
   {
     label: "Login",
     href: "/account/login",
-    textClass: "text-[150px]",
+    fontSizePx: 150,
     wordClass: "scale-x-[1]",
     colorClass: "text-bone",
   },
 ];
 
 type MobileMenuLogoControl = {
+  scale: number;
   xPercent: number;
-  widthVw: number;
+  yPx: number;
   rotateDeg: number;
   opacity: number;
-  topPx?: number;
-  bottomPx?: number;
 };
 
-// Manual red logo controls for the mobile sliding menu:
-// widthVw = scale, xPercent = horizontal position, topPx/bottomPx = vertical position,
-// rotateDeg = rotation, opacity = transparency from 0 to 1.
+const mobileMenuItemsControl = {
+  xPx: 0,
+  yPx: 0,
+};
+
+const mobileMenuLogoBaseWidthVw = 155;
+
+// Manual mobile menu controls:
+// logos: scale = size, xPercent/xPx = left/right, yPx = up/down, rotateDeg = angle.
+// menuItems: change xPx/yPx above to move every menu item as one group.
 const mobileMenuLogoControls: Record<"top" | "bottom", MobileMenuLogoControl> = {
   top: {
+    scale: 1,
     xPercent: 50,
-    widthVw: 155,
-    topPx: -110,
+    yPx: -110,
     rotateDeg: 10,
     opacity: 0.82,
   },
   bottom: {
+    scale: 1,
     xPercent: 40,
-    widthVw: 155,
-    bottomPx: -30,
+    yPx: -30,
     rotateDeg: 8,
     opacity: 0.82,
   },
@@ -92,17 +98,16 @@ function MobileMenuRedLogo({ position }: { position: "top" | "bottom" }) {
     <Image
       alt=""
       aria-hidden="true"
-      className="pointer-events-none absolute z-[1] h-auto max-w-none object-contain"
+      className="pointer-events-none absolute z-[3] h-auto max-w-none object-contain"
       height={800}
       priority={false}
       src="/images/brand/neverfound-red-menu-source.png"
       style={{
-        bottom: controls.bottomPx,
+        [position]: `${controls.yPx}px`,
         left: `${controls.xPercent}%`,
         opacity: controls.opacity,
-        top: controls.topPx,
-        transform: `translateX(-50%) rotate(${controls.rotateDeg}deg)`,
-        width: `${controls.widthVw}vw`,
+        transform: `translateX(-50%) rotate(${controls.rotateDeg}deg) scale(${controls.scale})`,
+        width: `${mobileMenuLogoBaseWidthVw}vw`,
       }}
       width={1600}
     />
@@ -298,8 +303,6 @@ export function SiteHeader({
         }`}
         aria-label="Mobile navigation"
       >
-        <MobileMenuRedLogo position="top" />
-        <MobileMenuRedLogo position="bottom" />
         <Image
           alt=""
           aria-hidden="true"
@@ -309,7 +312,9 @@ export function SiteHeader({
           sizes="100vw"
           src="/images/textures/main-background.jpg"
         />
-        <div className="absolute inset-0 z-[2] bg-black/35" />
+        <div className="absolute inset-0 z-[1] bg-black/35" />
+        <MobileMenuRedLogo position="top" />
+        <MobileMenuRedLogo position="bottom" />
 
         <div className="relative z-10 flex h-full flex-col px-6 pt-8">
           <div className="flex items-center justify-between">
@@ -333,15 +338,21 @@ export function SiteHeader({
             </button>
           </div>
 
-          <div className="relative mt-9 flex flex-1 flex-col items-start gap-4 pb-60">
+          <div
+            className="relative mt-9 flex flex-1 flex-col items-center gap-4 pb-60 text-center"
+            style={{
+              transform: `translate(${mobileMenuItemsControl.xPx}px, ${mobileMenuItemsControl.yPx}px)`,
+            }}
+          >
             {mobileNavItems.map((item) => (
               <Link
-                className={`w-[calc(100vw-3rem)] whitespace-nowrap font-display italic uppercase leading-[0.86] tracking-normal transition-colors hover:text-rust active:text-rust ${item.textClass} ${item.colorClass}`}
+                className={`w-full whitespace-nowrap font-display italic uppercase leading-[0.86] tracking-normal transition-colors hover:text-rust active:text-rust ${item.colorClass}`}
                 href={item.href}
                 key={item.label}
                 onClick={() => setOpen(false)}
+                style={{ fontSize: `${item.fontSizePx}px` }}
               >
-                <span className={`inline-block origin-left ${item.wordClass}`}>
+                <span className={`inline-block origin-center ${item.wordClass}`}>
                   {item.label}
                 </span>
               </Link>
