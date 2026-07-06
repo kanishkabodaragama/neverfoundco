@@ -54,7 +54,7 @@ type MobileMenuLogoControl = {
 };
 
 const mobileMenuItemsControl = {
-  xPx: 0,
+  xPx: -50,
   yPx: 0,
 };
 
