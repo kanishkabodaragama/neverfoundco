@@ -60,7 +60,7 @@ const mobileMenuItemsControl: {
   yPx: number;
   textAlignment: MobileMenuTextAlignment;
 } = {
-  xPx: -50,
+  xPx: 0,
   yPx: 0,
   textAlignment: "center",
 };
@@ -325,7 +325,7 @@ export function SiteHeader({
         <MobileMenuRedLogo position="bottom" />
 
         <div className="relative z-10 flex h-full flex-col px-6 pt-8">
-          <div className="flex items-center justify-between">
+          <div className="relative z-20 flex items-center justify-between">
             <span className="font-display text-[20px] uppercase leading-none tracking-normal text-bone">
               Menu
             </span>
@@ -347,7 +347,7 @@ export function SiteHeader({
           </div>
 
           <div
-            className="relative flex flex-1 flex-col justify-center gap-4"
+            className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 px-6"
             style={{
               textAlign: mobileMenuItemsControl.textAlignment,
               transform: `translate(${mobileMenuItemsControl.xPx}px, ${mobileMenuItemsControl.yPx}px)`,
@@ -380,7 +380,7 @@ export function SiteHeader({
             ))}
           </div>
 
-          <div className="pb-5">
+          <div className="relative z-20 mt-auto pb-5">
             <CurrencySelector tone="dark" />
           </div>
         </div>
