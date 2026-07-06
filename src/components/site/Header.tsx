@@ -11,17 +11,29 @@ import { StorePrice } from "@/components/site/StorePrice";
 type MobileMenuTextAlignment = "left" | "center" | "right" | "justify";
 type MobileMenuRowVerticalAlignment = "top" | "center" | "bottom";
 
+type MobileNavItem = {
+  label: string;
+  href: string;
+  fontSizePx: number;
+  textAlignment?: MobileMenuTextAlignment;
+  rowVerticalAlignment?: MobileMenuRowVerticalAlignment;
+  wordClass: string;
+  colorClass: string;
+};
+
 const navItems = [
   { label: "Home", href: "/" },
   { label: "About Us", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];
 
-const mobileNavItems = [
+const mobileNavItems: MobileNavItem[] = [
   {
     label: "Home",
     href: "/",
     fontSizePx: 180,
+    textAlignment: "center",
+    rowVerticalAlignment: "center",
     wordClass: "scale-x-[1.02]",
     colorClass: "text-acid",
   },
@@ -29,6 +41,8 @@ const mobileNavItems = [
     label: "Contact Us",
     href: "/contact",
     fontSizePx: 90,
+    textAlignment: "center",
+    rowVerticalAlignment: "center",
     wordClass: "scale-x-[0.98]",
     colorClass: "text-bone",
   },
@@ -36,6 +50,8 @@ const mobileNavItems = [
     label: "About Us",
     href: "/about",
     fontSizePx: 95,
+    textAlignment: "center",
+    rowVerticalAlignment: "center",
     wordClass: "scale-x-[1.02]",
     colorClass: "text-acid",
   },
@@ -43,6 +59,8 @@ const mobileNavItems = [
     label: "Login",
     href: "/account/login",
     fontSizePx: 180,
+    textAlignment: "center",
+    rowVerticalAlignment: "center",
     wordClass: "scale-x-[1]",
     colorClass: "text-bone",
   },
@@ -78,6 +96,7 @@ const mobileMenuLogoBaseWidthVw = 155;
 // textAlignment words: "left", "center", "right", "justify".
 // rowVerticalAlignment words: "top", "center", "bottom".
 // rowHeightScale changes each menu item's row height relative to its font size.
+// Per-item textAlignment/rowVerticalAlignment values override the shared defaults.
 const mobileMenuLogoControls: Record<"top" | "bottom", MobileMenuLogoControl> = {
   top: {
     scale: 1,
@@ -372,40 +391,39 @@ export function SiteHeader({
               transform: `translate(${mobileMenuItemsControl.xPx}px, ${mobileMenuItemsControl.yPx}px)`,
             }}
           >
-            {mobileNavItems.map((item) => (
-              <Link
-                className={`flex w-full whitespace-nowrap font-display italic uppercase leading-[0.86] tracking-normal transition-colors hover:text-rust active:text-rust ${item.colorClass}`}
-                href={item.href}
-                key={item.label}
-                onClick={() => setOpen(false)}
-                style={{
-                  alignItems: getMenuItemAlignItems(
-                    mobileMenuItemsControl.rowVerticalAlignment,
-                  ),
-                  fontSize: `${item.fontSizePx}px`,
-                  justifyContent: getMenuItemJustifyContent(
-                    mobileMenuItemsControl.textAlignment,
-                  ),
-                  minHeight: `${item.fontSizePx * mobileMenuItemsControl.rowHeightScale}px`,
-                }}
-              >
-                <span
-                  className={`inline-block origin-center ${item.wordClass}`}
+            {mobileNavItems.map((item) => {
+              const textAlignment =
+                item.textAlignment ?? mobileMenuItemsControl.textAlignment;
+              const rowVerticalAlignment =
+                item.rowVerticalAlignment ??
+                mobileMenuItemsControl.rowVerticalAlignment;
+
+              return (
+                <Link
+                  className={`flex w-full whitespace-nowrap font-display italic uppercase leading-[0.86] tracking-normal transition-colors hover:text-rust active:text-rust ${item.colorClass}`}
+                  href={item.href}
+                  key={item.label}
+                  onClick={() => setOpen(false)}
                   style={{
-                    textAlignLast:
-                      mobileMenuItemsControl.textAlignment === "justify"
-                        ? "justify"
-                        : "auto",
-                    width:
-                      mobileMenuItemsControl.textAlignment === "justify"
-                        ? "100%"
-                        : "auto",
+                    alignItems: getMenuItemAlignItems(rowVerticalAlignment),
+                    fontSize: `${item.fontSizePx}px`,
+                    justifyContent: getMenuItemJustifyContent(textAlignment),
+                    minHeight: `${item.fontSizePx * mobileMenuItemsControl.rowHeightScale}px`,
                   }}
                 >
-                  {item.label}
-                </span>
-              </Link>
-            ))}
+                  <span
+                    className={`inline-block origin-center ${item.wordClass}`}
+                    style={{
+                      textAlignLast:
+                        textAlignment === "justify" ? "justify" : "auto",
+                      width: textAlignment === "justify" ? "100%" : "auto",
+                    }}
+                  >
+                    {item.label}
+                  </span>
+                </Link>
+              );
+            })}
           </div>
 
           <div className="relative z-20 mt-auto pb-5">
