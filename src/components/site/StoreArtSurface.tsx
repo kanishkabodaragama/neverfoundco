@@ -8,11 +8,20 @@ import { siteTextureSettings } from "@/components/site/site-texture-settings";
 // widthVw/scale: size controls, rotateDeg: rotation angle, opacity: 0 to 1.
 const fixedBackgroundLogoControl = {
   xPercent: 50,
-  yPx: 64,
+  yPx: -100,
   widthVw: 92,
-  scale: 1,
-  rotateDeg: 0,
-  opacity: 0.72,
+  scale: 1.5,
+  rotateDeg: 5,
+  opacity: 1,
+};
+
+// Overlay above the red logo and below page content.
+// yPx moves the overlay start: 0 starts at the top, positive moves it down.
+// transparency: 0 is fully visible, 1 is fully transparent.
+const redLogoOverlayControl = {
+  yPx: 0,
+  src: "/images/textures/menu-overlay.png",
+  transparency: 0.02,
 };
 
 export function StoreArtSurface({
@@ -58,6 +67,22 @@ export function StoreArtSurface({
           }}
           width={500}
         />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-[5]"
+          style={{ top: `${redLogoOverlayControl.yPx}px` }}
+        >
+          <Image
+            alt=""
+            aria-hidden="true"
+            className="object-cover mix-blend-multiply"
+            fill
+            priority={false}
+            sizes="100vw"
+            src={redLogoOverlayControl.src}
+            style={{ opacity: 1 - redLogoOverlayControl.transparency }}
+          />
+        </div>
         {homeGraffiTexture ? (
           <Image
             alt=""

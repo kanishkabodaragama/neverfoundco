@@ -7,6 +7,10 @@ import { StoreArtSurface } from "@/components/site/StoreArtSurface";
 import { StorePrice } from "@/components/site/StorePrice";
 import { shopProducts, type ShopProduct } from "@/components/site/shop-data";
 
+// Home product section position control:
+// 0 = original position, positive moves it down, negative moves it up.
+const homeProductSectionTopMarginPx = 0;
+
 export function NeverFoundHomePage({
   products = shopProducts,
 }: {
@@ -18,7 +22,10 @@ export function NeverFoundHomePage({
     <div className="flex min-h-screen flex-col overflow-x-hidden bg-ink text-ink">
       <Header />
       <StoreArtSurface homeGraffiTexture>
-        <section className="bg-acid px-5 pb-12 pt-6 text-ink md:px-8 md:pb-20 md:pt-24">
+        <section
+          className="bg-acid px-5 pb-12 pt-6 text-ink md:px-8 md:pb-20 md:pt-24"
+          style={{ marginTop: `${homeProductSectionTopMarginPx}px` }}
+        >
           {/* <div className="mb-10 flex items-end justify-between md:mb-14">
             <h2 className="font-display text-4xl uppercase leading-none md:text-6xl">
               Current
