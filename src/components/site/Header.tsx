@@ -58,7 +58,7 @@ type MobileMenuLogoControl = {
 const mobileMenuItemsControl: {
   xPx: number;
   yPx: number;
-  textAlignment: "center";
+  textAlignment: MobileMenuTextAlignment;
 } = {
   xPx: -50,
   yPx: 0,
