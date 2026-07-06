@@ -66,6 +66,10 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+body.nvr-gallery-lightbox-open .site-header {
+  display: none;
+}
+
 ::selection {
   background: #e8ff3d;
   color: #0a0a0a;

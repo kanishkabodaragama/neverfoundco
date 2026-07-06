@@ -1,30 +1,42 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
 import { NvrFndGallery } from "@/components/site/NvrFndGallery";
 import { StoreArtSurface } from "@/components/site/StoreArtSurface";
 import { StorePrice } from "@/components/site/StorePrice";
+import { listStorefrontGalleryImages } from "@/lib/db/storefront-gallery";
 import { shopProducts, type ShopProduct } from "@/components/site/shop-data";
 
-// Home product section position control:
-// 0 = original position, positive moves it down, negative moves it up.
-const homeProductSectionTopMarginPx = 0;
+// Home product section top padding control:
+// topPaddingPx adds space inside the product section without pushing the background overlay down.
+const homeProductSectionControl = {
+  topPaddingPx: 60,
+};
 
-export function NeverFoundHomePage({
+export async function NeverFoundHomePage({
   products = shopProducts,
 }: {
   products?: ShopProduct[];
 }) {
   const featuredProducts = products.filter((product) => !product.soldOut).slice(0, 4);
+  const galleryImages = (await listStorefrontGalleryImages()).map((image, index) => ({
+    alt: image.alt_text ?? `Never Found gallery image ${index + 1}`,
+    src: image.image_url,
+  }));
 
   return (
     <div className="flex min-h-screen flex-col overflow-x-hidden bg-ink text-ink">
       <Header />
       <StoreArtSurface homeGraffiTexture>
         <section
-          className="bg-acid px-5 pb-12 pt-6 text-ink md:px-8 md:pb-20 md:pt-24"
-          style={{ marginTop: `${homeProductSectionTopMarginPx}px` }}
+          className="bg-acid px-5 pb-12 pt-[calc(1.5rem+var(--home-product-top-padding))] text-ink md:px-8 md:pb-20 md:pt-[calc(6rem+var(--home-product-top-padding))]"
+          style={
+            {
+              "--home-product-top-padding": `${homeProductSectionControl.topPaddingPx}px`,
+            } as CSSProperties
+          }
         >
           {/* <div className="mb-10 flex items-end justify-between md:mb-14">
             <h2 className="font-display text-4xl uppercase leading-none md:text-6xl">
@@ -43,7 +55,7 @@ export function NeverFoundHomePage({
             ))}
           </div>
         </section>
-        <NvrFndGallery />
+        <NvrFndGallery images={galleryImages} />
       </StoreArtSurface>
       <Footer graffiTexture />
     </div>

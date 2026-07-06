@@ -180,51 +180,12 @@ export function SiteHeader({
 }) {
   const [open, setOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
-  const [hidden, setHidden] = useState(false);
   const cart = useCart();
   const cartCount = cart.items.reduce((total, item) => total + item.quantity, 0);
   const subtotal = cart.items.reduce(
     (total, item) => total + item.unitPrice * item.quantity,
     0,
   );
-  const headerHidden = hidden && !open && !cartOpen;
-
-  useEffect(() => {
-    if (open || cartOpen) {
-      return;
-    }
-
-    let lastScrollY = window.scrollY;
-    let ticking = false;
-
-    function updateHeader() {
-      const currentScrollY = window.scrollY;
-      const scrollingDown = currentScrollY > lastScrollY + 4;
-      const scrollingUp = currentScrollY < lastScrollY - 4;
-
-      if (scrollingDown && currentScrollY > 80) {
-        setHidden(true);
-      } else if (scrollingUp || currentScrollY <= 8) {
-        setHidden(false);
-      }
-
-      lastScrollY = currentScrollY;
-      ticking = false;
-    }
-
-    function onScroll() {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(updateHeader);
-    }
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-    };
-  }, [cartOpen, open]);
-
   useEffect(() => {
     if (!open) {
       return;
@@ -256,20 +217,13 @@ export function SiteHeader({
 
   return (
     <>
-    <header
-      className={`fixed inset-x-0 top-0 border-0 bg-transparent text-ink shadow-none outline-none transition-transform duration-300 ease-out ${
-        open || cartOpen ? "z-40" : "z-40"
-      } ${
-        headerHidden ? "-translate-y-full" : open || cartOpen ? "" : "translate-y-0"
-      }`}
-    >
+    <header className="site-header fixed inset-x-0 top-0 z-40 translate-y-0 border-0 bg-transparent text-ink shadow-none outline-none">
       <div className="relative grid grid-cols-[3rem_1fr_3rem] items-center px-3 py-0 md:flex md:justify-between md:px-8 md:py-1.5">
         <button
           aria-expanded={open}
           aria-label="Open menu"
           className="relative z-10 col-start-1 flex h-10 w-9 items-center justify-center justify-self-start p-1 text-ink transition-opacity hover:opacity-75 md:hidden"
           onClick={() => {
-            setHidden(false);
             setOpen((value) => !value);
           }}
           type="button"
@@ -327,7 +281,6 @@ export function SiteHeader({
           </Link>
           <CartLink
             onClick={() => {
-              setHidden(false);
               setCartOpen(true);
             }}
           />
@@ -336,7 +289,6 @@ export function SiteHeader({
         <div className="relative z-10 col-start-3 flex h-10 w-9 items-center justify-center justify-self-end md:hidden">
           <CartLink
             onClick={() => {
-              setHidden(false);
               setCartOpen(true);
             }}
           />

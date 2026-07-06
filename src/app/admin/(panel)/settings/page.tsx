@@ -1,15 +1,25 @@
 import { CheckCircle2, CreditCard } from "lucide-react";
+import { AdminAlert } from "@/components/admin/admin-alert";
 import { requireAdmin } from "@/lib/admin-auth";
 import { listPaymentGateways } from "@/lib/db/payment-gateways";
-import { getCheckoutPaymentTimeoutMinutes } from "@/lib/db/site-settings";
+import {
+  getCheckoutPaymentTimeoutMinutes,
+  getProductRecommendationsEnabled,
+} from "@/lib/db/site-settings";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminSettingsPage() {
+export default async function AdminSettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; success?: string }>;
+}) {
   await requireAdmin();
-  const [gateways, checkoutPaymentTimeoutMinutes] = await Promise.all([
+  const [flash, gateways, checkoutPaymentTimeoutMinutes, recommendationsEnabled] = await Promise.all([
+    searchParams,
     listPaymentGateways(),
     getCheckoutPaymentTimeoutMinutes(),
+    getProductRecommendationsEnabled(),
   ]);
 
   return (
@@ -18,6 +28,7 @@ export default async function AdminSettingsPage() {
         <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
         <p className="admin-muted mt-2 text-sm">Configure operational rules for the storefront.</p>
       </div>
+      <AdminAlert error={flash.error} success={flash.success} />
 
       <section className="admin-card overflow-hidden">
         <div className="border-b border-[#ece7df] p-4">
@@ -106,6 +117,33 @@ export default async function AdminSettingsPage() {
           </p>
           <button className="admin-action w-fit px-4 py-2.5" type="submit">
             Save timing
+          </button>
+        </form>
+      </section>
+
+      <section className="admin-card overflow-hidden">
+        <div className="border-b border-[#ece7df] p-4">
+          <h2 className="font-semibold">Product recommendations</h2>
+          <p className="admin-muted mt-1 text-sm">
+            Turn the product page &quot;You may also like&quot; section on or off.
+          </p>
+        </div>
+        <form
+          action="/api/admin/settings/product-recommendations"
+          className="flex flex-wrap items-center justify-between gap-4 p-4"
+          method="post"
+        >
+          <label className="flex items-center gap-3 text-sm font-semibold">
+            <input
+              className="h-5 w-5 accent-[#332c26]"
+              defaultChecked={recommendationsEnabled}
+              name="product_recommendations_enabled"
+              type="checkbox"
+            />
+            Show &quot;You may also like&quot; on product pages
+          </label>
+          <button className="admin-action px-4 py-2.5" type="submit">
+            Save recommendation setting
           </button>
         </form>
       </section>

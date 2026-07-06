@@ -20,6 +20,8 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
   const [quantity, setQuantity] = useState(1);
   const carouselRef = useRef<HTMLDivElement | null>(null);
   const mobileThumbnailStrip = useRef<HTMLDivElement | null>(null);
+  const carouselTouchStartX = useRef<number | null>(null);
+  const isLoopingCarousel = useRef(false);
   const availableGenders = useMemo(
     () => uniqueVariantValues(product.variants.map((variant) => variant.gender)),
     [product.variants],
@@ -106,12 +108,16 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
   }, [activeGalleryIndex]);
 
   function scrollCarouselTo(index: number, behavior: ScrollBehavior = "smooth") {
-    const image = galleryImages[index];
+    const wrappedIndex =
+      galleryImages.length > 0
+        ? ((index % galleryImages.length) + galleryImages.length) % galleryImages.length
+        : index;
+    const image = galleryImages[wrappedIndex];
     if (!image) return;
 
     setSelectedImage(image);
     carouselRef.current?.scrollTo({
-      left: carouselRef.current.clientWidth * index,
+      left: carouselRef.current.clientWidth * wrappedIndex,
       behavior,
     });
   }
@@ -127,6 +133,41 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
     const image = galleryImages[index];
 
     if (image && image !== selectedImage) setSelectedImage(image);
+  }
+
+  function loopCarouselAtScrollEnd(event: UIEvent<HTMLDivElement>) {
+    syncCarouselSelection(event);
+
+    const node = event.currentTarget;
+    if (isLoopingCarousel.current || galleryImages.length < 2) return;
+
+    const maxScrollLeft = node.scrollWidth - node.clientWidth;
+    if (maxScrollLeft <= 0) return;
+
+    if (node.scrollLeft >= maxScrollLeft - 1) {
+      isLoopingCarousel.current = true;
+      requestAnimationFrame(() => {
+        scrollCarouselTo(0, "smooth");
+        window.setTimeout(() => {
+          isLoopingCarousel.current = false;
+        }, 300);
+      });
+    }
+  }
+
+  function loopCarouselOnEdgeSwipe(endX: number) {
+    const startX = carouselTouchStartX.current;
+    carouselTouchStartX.current = null;
+    if (startX === null || galleryImages.length < 2) return;
+
+    const deltaX = endX - startX;
+    if (Math.abs(deltaX) < 40) return;
+
+    if (deltaX < 0 && activeGalleryIndex >= galleryImages.length - 1) {
+      scrollCarouselTo(0);
+    } else if (deltaX > 0 && activeGalleryIndex <= 0) {
+      scrollCarouselTo(galleryImages.length - 1);
+    }
   }
 
   function clampQuantity(value: number) {
@@ -204,7 +245,11 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
       <div className="grid gap-5">
         <div
           className="no-scrollbar flex min-h-[430px] touch-auto snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain scroll-smooth bg-transparent md:min-h-[610px]"
-          onScroll={syncCarouselSelection}
+          onScroll={loopCarouselAtScrollEnd}
+          onTouchEnd={(event) => loopCarouselOnEdgeSwipe(event.changedTouches[0]?.clientX ?? 0)}
+          onTouchStart={(event) => {
+            carouselTouchStartX.current = event.touches[0]?.clientX ?? null;
+          }}
           ref={carouselRef}
         >
           {galleryImages.map((image, index) => (

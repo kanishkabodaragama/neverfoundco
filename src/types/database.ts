@@ -58,6 +58,17 @@ export type Database = {
         Insert: Insert<Database["public"]["Tables"]["product_images"]["Row"]>;
         Update: Update<Database["public"]["Tables"]["product_images"]["Row"]>;
       };
+      storefront_gallery_images: {
+        Row: Row<{
+          id: string;
+          image_url: string;
+          storage_path: string | null;
+          alt_text: string | null;
+          created_at: string;
+        }>;
+        Insert: Insert<Database["public"]["Tables"]["storefront_gallery_images"]["Row"]>;
+        Update: Update<Database["public"]["Tables"]["storefront_gallery_images"]["Row"]>;
+      };
       product_variants: {
         Row: Row<{
           id: string;
