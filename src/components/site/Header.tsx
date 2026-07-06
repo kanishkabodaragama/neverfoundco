@@ -9,6 +9,7 @@ import { CurrencySelector } from "@/components/site/CurrencySelector";
 import { StorePrice } from "@/components/site/StorePrice";
 
 type MobileMenuTextAlignment = "left" | "center" | "right" | "justify";
+type MobileMenuRowVerticalAlignment = "top" | "center" | "bottom";
 
 const navItems = [
   { label: "Home", href: "/" },
@@ -59,10 +60,14 @@ const mobileMenuItemsControl: {
   xPx: number;
   yPx: number;
   textAlignment: MobileMenuTextAlignment;
+  rowHeightScale: number;
+  rowVerticalAlignment: MobileMenuRowVerticalAlignment;
 } = {
   xPx: 0,
   yPx: 0,
   textAlignment: "center",
+  rowHeightScale: 1,
+  rowVerticalAlignment: "center",
 };
 
 const mobileMenuLogoBaseWidthVw = 155;
@@ -71,6 +76,8 @@ const mobileMenuLogoBaseWidthVw = 155;
 // logos: scale = size, xPercent/xPx = left/right, yPx = up/down, rotateDeg = angle.
 // menuItems: change xPx/yPx above to move every item as one group.
 // textAlignment words: "left", "center", "right", "justify".
+// rowVerticalAlignment words: "top", "center", "bottom".
+// rowHeightScale changes each menu item's row height relative to its font size.
 const mobileMenuLogoControls: Record<"top" | "bottom", MobileMenuLogoControl> = {
   top: {
     scale: 1,
@@ -97,6 +104,18 @@ function isActiveNavItem(
   }
 
   return href.includes(active);
+}
+
+function getMenuItemJustifyContent(alignment: MobileMenuTextAlignment) {
+  if (alignment === "left") return "flex-start";
+  if (alignment === "right") return "flex-end";
+  return "center";
+}
+
+function getMenuItemAlignItems(alignment: MobileMenuRowVerticalAlignment) {
+  if (alignment === "top") return "flex-start";
+  if (alignment === "bottom") return "flex-end";
+  return "center";
 }
 
 function MobileMenuRedLogo({ position }: { position: "top" | "bottom" }) {
@@ -355,11 +374,20 @@ export function SiteHeader({
           >
             {mobileNavItems.map((item) => (
               <Link
-                className={`w-full whitespace-nowrap font-display italic uppercase leading-[0.86] tracking-normal transition-colors hover:text-rust active:text-rust ${item.colorClass}`}
+                className={`flex w-full whitespace-nowrap font-display italic uppercase leading-[0.86] tracking-normal transition-colors hover:text-rust active:text-rust ${item.colorClass}`}
                 href={item.href}
                 key={item.label}
                 onClick={() => setOpen(false)}
-                style={{ fontSize: `${item.fontSizePx}px` }}
+                style={{
+                  alignItems: getMenuItemAlignItems(
+                    mobileMenuItemsControl.rowVerticalAlignment,
+                  ),
+                  fontSize: `${item.fontSizePx}px`,
+                  justifyContent: getMenuItemJustifyContent(
+                    mobileMenuItemsControl.textAlignment,
+                  ),
+                  minHeight: `${item.fontSizePx * mobileMenuItemsControl.rowHeightScale}px`,
+                }}
               >
                 <span
                   className={`inline-block origin-center ${item.wordClass}`}
