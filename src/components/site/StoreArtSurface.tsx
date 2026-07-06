@@ -2,6 +2,19 @@ import Image from "next/image";
 import type { ReactNode } from "react";
 import { siteTextureSettings } from "@/components/site/site-texture-settings";
 
+// Fixed red background logo controls:
+// xPercent: 50 is centered, lower moves left, higher moves right.
+// yPx: distance from the top of the viewport in pixels.
+// widthVw/scale: size controls, rotateDeg: rotation angle, opacity: 0 to 1.
+const fixedBackgroundLogoControl = {
+  xPercent: 50,
+  yPx: 64,
+  widthVw: 92,
+  scale: 1,
+  rotateDeg: 0,
+  opacity: 0.72,
+};
+
 export function StoreArtSurface({
   children,
   homeGraffiTexture = false,
@@ -13,17 +26,6 @@ export function StoreArtSurface({
 }) {
   return (
     <main className="relative overflow-hidden bg-acid">
-      <div className="pointer-events-none absolute inset-x-0 top-20 z-[2] h-32 overflow-hidden md:top-[10.75rem] md:h-44">
-        <Image
-          alt=""
-          aria-hidden="true"
-          className="absolute left-1/2 top-[-48%] h-auto w-[92vw] max-w-5xl -translate-x-1/2 object-contain opacity-70 md:top-[-54%] md:w-[68vw]"
-          height={220}
-          priority={false}
-          src="/images/brand/neverfound-red.png"
-          width={500}
-        />
-      </div>
       <div className="store-art-surface relative z-10 text-ink">
         <Image
           alt=""
@@ -39,6 +41,22 @@ export function StoreArtSurface({
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 z-[1] bg-acid"
           style={{ opacity: siteTextureSettings.yellowLayerOpacity }}
+        />
+        <Image
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none fixed z-[4] h-auto max-w-none object-contain"
+          height={220}
+          priority={false}
+          src="/images/brand/neverfound-red.png"
+          style={{
+            left: `${fixedBackgroundLogoControl.xPercent}%`,
+            opacity: fixedBackgroundLogoControl.opacity,
+            top: `${fixedBackgroundLogoControl.yPx}px`,
+            transform: `translateX(-50%) rotate(${fixedBackgroundLogoControl.rotateDeg}deg) scale(${fixedBackgroundLogoControl.scale})`,
+            width: `${fixedBackgroundLogoControl.widthVw}vw`,
+          }}
+          width={500}
         />
         {homeGraffiTexture ? (
           <Image
