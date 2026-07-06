@@ -8,6 +8,8 @@ import { CartLink } from "@/components/site/CartLink";
 import { CurrencySelector } from "@/components/site/CurrencySelector";
 import { StorePrice } from "@/components/site/StorePrice";
 
+type MobileMenuTextAlignment = "left" | "center" | "right" | "justify";
+
 const navItems = [
   { label: "Home", href: "/" },
   { label: "About Us", href: "/about" },
@@ -53,16 +55,22 @@ type MobileMenuLogoControl = {
   opacity: number;
 };
 
-const mobileMenuItemsControl = {
+const mobileMenuItemsControl: {
+  xPx: number;
+  yPx: number;
+  textAlignment: MobileMenuTextAlignment;
+} = {
   xPx: -50,
   yPx: 0,
+  textAlignment: "center",
 };
 
 const mobileMenuLogoBaseWidthVw = 155;
 
 // Manual mobile menu controls:
 // logos: scale = size, xPercent/xPx = left/right, yPx = up/down, rotateDeg = angle.
-// menuItems: change xPx/yPx above to move every menu item as one group.
+// menuItems: change xPx/yPx above to move every item as one group.
+// textAlignment words: "left", "center", "right", "justify".
 const mobileMenuLogoControls: Record<"top" | "bottom", MobileMenuLogoControl> = {
   top: {
     scale: 1,
@@ -339,8 +347,9 @@ export function SiteHeader({
           </div>
 
           <div
-            className="relative mt-9 flex flex-1 flex-col items-center gap-4 pb-60 text-center"
+            className="relative mt-9 flex flex-1 flex-col gap-4 pb-60"
             style={{
+              textAlign: mobileMenuItemsControl.textAlignment,
               transform: `translate(${mobileMenuItemsControl.xPx}px, ${mobileMenuItemsControl.yPx}px)`,
             }}
           >
@@ -352,7 +361,19 @@ export function SiteHeader({
                 onClick={() => setOpen(false)}
                 style={{ fontSize: `${item.fontSizePx}px` }}
               >
-                <span className={`inline-block origin-center ${item.wordClass}`}>
+                <span
+                  className={`inline-block origin-center ${item.wordClass}`}
+                  style={{
+                    textAlignLast:
+                      mobileMenuItemsControl.textAlignment === "justify"
+                        ? "justify"
+                        : "auto",
+                    width:
+                      mobileMenuItemsControl.textAlignment === "justify"
+                        ? "100%"
+                        : "auto",
+                  }}
+                >
                   {item.label}
                 </span>
               </Link>
