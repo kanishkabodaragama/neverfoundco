@@ -257,7 +257,7 @@ export function CheckoutExperience({
   }
 
   return (
-    <section className="grid w-full gap-8 bg-acid px-5 py-12 text-ink md:grid-cols-[1.1fr_0.9fr] md:px-8 md:py-16 xl:px-12">
+    <section className="grid w-full gap-8 bg-acid px-5 pb-12 pt-[calc(env(safe-area-inset-top)+6.5rem)] text-ink md:grid-cols-[1.1fr_0.9fr] md:px-8 md:py-16 xl:px-12">
       <form className="space-y-6" onSubmit={handleSubmit}>
         <div>
           <p className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">

@@ -24,7 +24,7 @@ export default async function AccountPage() {
     <div className="min-h-screen bg-acid text-ink">
       <Header />
       <StoreArtSurface>
-      <div className="px-5 py-10 md:px-8 xl:px-12">
+      <div className="px-5 pb-10 pt-[calc(env(safe-area-inset-top)+6.5rem)] md:px-8 md:py-10 xl:px-12">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">Customer file</p>

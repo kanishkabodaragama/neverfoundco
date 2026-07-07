@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import type { MutableRefObject } from "react";
 
 const galleryImages = [
@@ -35,22 +36,18 @@ type NvrFndGalleryImage = {
 // xPx moves the title horizontally: 0 = original, negative = left, positive = right.
 const galleryTitleControl = {
   fontFamily: "var(--font-display), Anton, Impact, sans-serif",
-  minFontSizePx: 10,
-  fontSizeVw: 15,
-  maxFontSizePx: 128,
+  minFontSizePx: 52,
+  fontSizeVw: 16,
+  maxFontSizePx: 228,
   letterGapPx: 0,
-  xPx: -20,
+  xPx: 0,
 };
 
 // Gallery section controls:
 // yPx moves the whole gallery section: 0 = current position, negative = up, positive = down.
 // This uses margin so the footer stays directly attached to the gallery.
-// visibleSlides controls how many tiles show in the carousel. 3.3 = 3 full images plus 30% of the next.
 const gallerySectionControl = {
   yPx: 0,
-  visibleSlides: 3.3,
-  mobileHeightPx: 190,
-  desktopHeightPx: 288,
 };
 
 export function NvrFndGallery({
@@ -59,26 +56,11 @@ export function NvrFndGallery({
   images?: NvrFndGalleryImage[];
 }) {
   const displayImages = images.length ? images : galleryImages;
+  const stripImages =
+    displayImages.length > 1 ? [...displayImages, ...displayImages] : displayImages;
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const stripRef = useRef<HTMLDivElement | null>(null);
   const modalRef = useRef<HTMLDivElement | null>(null);
-  const stripTouchStartX = useRef<number | null>(null);
   const modalTouchStartX = useRef<number | null>(null);
-  const isLoopingStrip = useRef(false);
-
-  const syncStripToIndex = useCallback(
-    (index: number, behavior: ScrollBehavior = "auto") => {
-      const node = stripRef.current;
-      const slide = node?.querySelector<HTMLElement>("[data-gallery-slide]");
-      if (!node || !slide) return;
-
-      node.scrollTo({
-        left: slide.offsetWidth * index,
-        behavior,
-      });
-    },
-    [],
-  );
 
   useEffect(() => {
     if (activeIndex === null) return;
@@ -105,12 +87,6 @@ export function NvrFndGallery({
     };
   }, [activeIndex]);
 
-  useEffect(() => {
-    if (activeIndex === null) return;
-
-    syncStripToIndex(activeIndex, "smooth");
-  }, [activeIndex, syncStripToIndex]);
-
   function syncModalIndex() {
     const node = modalRef.current;
     if (!node) return;
@@ -119,32 +95,8 @@ export function NvrFndGallery({
     setActiveIndex(Math.min(displayImages.length - 1, Math.max(0, index)));
   }
 
-  function getCurrentStripIndex() {
-    const node = stripRef.current;
-    const slide = node?.querySelector<HTMLElement>("[data-gallery-slide]");
-    if (!node || !slide) return 0;
-
-    return Math.round(node.scrollLeft / slide.offsetWidth);
-  }
-
   function rememberTouchStart(ref: MutableRefObject<number | null>, x: number) {
     ref.current = x;
-  }
-
-  function loopStripOnEdgeSwipe(endX: number) {
-    const startX = stripTouchStartX.current;
-    stripTouchStartX.current = null;
-    if (startX === null || displayImages.length < 2) return;
-
-    const deltaX = endX - startX;
-    if (Math.abs(deltaX) < 40) return;
-
-    const index = getCurrentStripIndex();
-    if (deltaX < 0 && index >= displayImages.length - 1) {
-      syncStripToIndex(0, "smooth");
-    } else if (deltaX > 0 && index <= 0) {
-      syncStripToIndex(displayImages.length - 1, "smooth");
-    }
   }
 
   function loopModalOnEdgeSwipe(endX: number) {
@@ -162,73 +114,60 @@ export function NvrFndGallery({
     }
   }
 
-  function loopStripAtScrollEnd() {
-    const node = stripRef.current;
-    if (!node || isLoopingStrip.current || displayImages.length < 2) return;
-
-    const maxScrollLeft = node.scrollWidth - node.clientWidth;
-    if (maxScrollLeft <= 0) return;
-
-    if (node.scrollLeft >= maxScrollLeft - 1) {
-      isLoopingStrip.current = true;
-      requestAnimationFrame(() => {
-        node.scrollTo({ left: 0, behavior: "smooth" });
-        window.setTimeout(() => {
-          isLoopingStrip.current = false;
-        }, 300);
-      });
-    }
+  function moveModal(direction: -1 | 1) {
+    if (activeIndex === null) return;
+    setActiveIndex(
+      ((activeIndex + direction) % displayImages.length + displayImages.length) %
+        displayImages.length,
+    );
   }
 
   return (
     <section
-      className="overflow-hidden bg-transparent text-ink"
+      className="overflow-hidden bg-ink text-ink"
       style={{ marginTop: `${gallerySectionControl.yPx}px` }}
     >
-      <h2
-        className="whitespace-nowrap px-5 uppercase leading-none md:px-8"
-        style={{
-          fontFamily: galleryTitleControl.fontFamily,
-          fontSize: `clamp(${galleryTitleControl.minFontSizePx}px, ${galleryTitleControl.fontSizeVw}vw, ${galleryTitleControl.maxFontSizePx}px)`,
-          fontStyle: "italic",
-          letterSpacing: `${galleryTitleControl.letterGapPx}px`,
-          transform: `translateX(${galleryTitleControl.xPx}px)`,
-        }}
-      >
-        NVR FND GALLERY
-      </h2>
+      <div className="overflow-hidden bg-acid px-0 pt-2">
+        <h2
+          className="inline-block whitespace-nowrap uppercase leading-[0.76]"
+          style={{
+            fontFamily: galleryTitleControl.fontFamily,
+            fontSize: `clamp(${galleryTitleControl.minFontSizePx}px, ${galleryTitleControl.fontSizeVw}vw, ${galleryTitleControl.maxFontSizePx}px)`,
+            fontStyle: "italic",
+            letterSpacing: `${galleryTitleControl.letterGapPx}px`,
+            transform: `translateX(${galleryTitleControl.xPx}px)`,
+          }}
+        >
+          NVR FND GALLERY
+        </h2>
+      </div>
       <div
+        aria-label="Never Found gallery strip"
         className="no-scrollbar flex touch-pan-x snap-x snap-mandatory overflow-x-auto scroll-smooth bg-ink"
-        onScroll={loopStripAtScrollEnd}
-        onTouchEnd={(event) => loopStripOnEdgeSwipe(event.changedTouches[0]?.clientX ?? 0)}
-        onTouchStart={(event) =>
-          rememberTouchStart(stripTouchStartX, event.touches[0]?.clientX ?? 0)
-        }
-        ref={stripRef}
       >
-        {displayImages.map((image, index) => (
-          <button
-            aria-label={`Open gallery image ${index + 1}`}
-            className="relative snap-start overflow-hidden bg-ink"
-            data-gallery-slide
-            key={image.src}
-            onClick={() => setActiveIndex(index)}
-            style={{
-              flex: `0 0 calc(100% / ${gallerySectionControl.visibleSlides})`,
-              height: `clamp(${gallerySectionControl.mobileHeightPx}px, 26vw, ${gallerySectionControl.desktopHeightPx}px)`,
-            }}
-            type="button"
-          >
-            <Image
-              alt={image.alt}
-              className="object-cover"
-              fill
-              sizes={`calc(100vw / ${gallerySectionControl.visibleSlides})`}
-              src={image.src}
-              unoptimized
-            />
-          </button>
-        ))}
+        {stripImages.map((image, index) => {
+          const originalIndex = index % displayImages.length;
+
+          return (
+            <button
+              aria-label={`Open gallery image ${originalIndex + 1}`}
+              className="group relative h-[172px] w-[42vw] shrink-0 snap-start overflow-hidden bg-ink outline-offset-4 transition-opacity duration-200 active:opacity-80 sm:h-[220px] sm:w-[30vw] md:h-[236px] md:w-[24vw] lg:h-[260px] lg:w-[22vw] xl:w-[20vw]"
+              data-gallery-slide
+              key={`${image.src}-${index}`}
+              onClick={() => setActiveIndex(originalIndex)}
+              type="button"
+            >
+              <Image
+                alt={image.alt}
+                className="object-cover transition-transform duration-300 group-hover:scale-[1.025] motion-reduce:transition-none"
+                fill
+                sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 22vw, (min-width: 768px) 24vw, (min-width: 640px) 30vw, 42vw"
+                src={image.src}
+                unoptimized
+              />
+            </button>
+          );
+        })}
       </div>
 
       {activeIndex !== null ? (
@@ -239,12 +178,27 @@ export function NvrFndGallery({
         >
           <button
             aria-label="Close gallery"
-            className="absolute right-4 top-4 z-20 grid h-12 w-12 place-items-center text-acid"
+            className="absolute right-4 top-[calc(env(safe-area-inset-top)+1rem)] z-20 grid h-12 w-12 place-items-center text-acid transition-opacity hover:opacity-75"
             onClick={() => setActiveIndex(null)}
             type="button"
           >
-            <span className="absolute h-9 w-0.5 rotate-45 bg-acid" />
-            <span className="absolute h-9 w-0.5 -rotate-45 bg-acid" />
+            <X className="h-8 w-8" strokeWidth={2.2} />
+          </button>
+          <button
+            aria-label="Previous gallery image"
+            className="absolute left-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 place-items-center bg-acid text-ink transition-colors hover:bg-rust md:grid"
+            onClick={() => moveModal(-1)}
+            type="button"
+          >
+            <ChevronLeft className="h-6 w-6" strokeWidth={2.2} />
+          </button>
+          <button
+            aria-label="Next gallery image"
+            className="absolute right-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 place-items-center bg-acid text-ink transition-colors hover:bg-rust md:grid"
+            onClick={() => moveModal(1)}
+            type="button"
+          >
+            <ChevronRight className="h-6 w-6" strokeWidth={2.2} />
           </button>
           <div
             className="no-scrollbar flex h-full snap-x snap-mandatory overflow-x-auto scroll-smooth"
@@ -267,6 +221,12 @@ export function NvrFndGallery({
                 />
               </div>
             ))}
+          </div>
+          <div className="pointer-events-none absolute inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+1rem)] z-20 flex justify-center">
+            <span className="bg-acid px-4 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-ink">
+              {(activeIndex + 1).toString().padStart(2, "0")} /{" "}
+              {displayImages.length.toString().padStart(2, "0")}
+            </span>
           </div>
         </div>
       ) : null}

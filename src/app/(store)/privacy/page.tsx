@@ -40,7 +40,7 @@ export default function PrivacyPage() {
     <div className="min-h-screen bg-acid text-ink">
       <Header />
       <StoreArtSurface>
-      <div className="w-full px-5 py-8 md:px-8 xl:px-12">
+      <div className="w-full px-5 pb-8 pt-[calc(env(safe-area-inset-top)+6.5rem)] md:px-8 md:py-8 xl:px-12">
         <p className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">Policy file</p>
         <h1 className="mt-4 font-display text-5xl uppercase leading-none md:text-7xl">
           Privacy Policy

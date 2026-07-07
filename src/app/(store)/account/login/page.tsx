@@ -18,7 +18,7 @@ export default async function CustomerLoginPage({
     <div className="min-h-screen bg-acid text-ink">
       <Header />
       <StoreArtSurface>
-      <div className="mx-auto grid min-h-[70vh] w-full max-w-xl place-items-center px-5 py-12">
+      <div className="mx-auto grid min-h-[70vh] w-full max-w-xl place-items-center px-5 pb-12 pt-[calc(env(safe-area-inset-top)+6.5rem)] md:py-12">
         <form action="/api/account/login" className="w-full border border-ink bg-transparent p-6" method="post">
           <p className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">Customer file</p>
           <h1 className="mt-4 font-display text-5xl uppercase leading-none">Order login</h1>

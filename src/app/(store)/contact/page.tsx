@@ -16,7 +16,7 @@ export default function ContactPage() {
     <div className="min-h-screen w-full bg-acid text-ink">
       <Header />
       <StoreArtSurface>
-        <section className="w-full bg-acid px-5 py-12 text-ink md:px-8 md:py-20 xl:px-12">
+        <section className="w-full bg-acid px-5 pb-12 pt-[calc(env(safe-area-inset-top)+6.5rem)] text-ink md:px-8 md:py-20 xl:px-12">
           <p className="font-mono text-[11px] uppercase tracking-[0.28em]">Support file</p>
           <h1 className="mt-7 font-display text-[18vw] uppercase leading-[0.82] md:text-8xl lg:text-9xl">
             Contact

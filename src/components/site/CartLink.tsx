@@ -9,7 +9,7 @@ export function CartLink({ onClick }: { onClick: () => void }) {
 
   return (
     <button
-      className="group relative flex h-10 min-h-10 w-9 items-center justify-center px-0 text-ink transition-colors hover:text-rust md:h-auto md:min-h-9 md:w-auto md:px-3"
+      className="group relative flex h-11 min-h-11 w-11 touch-manipulation items-center justify-center px-0 text-ink transition-colors hover:text-rust md:h-auto md:min-h-9 md:w-auto md:px-3"
       onClick={onClick}
       aria-label="Cart"
       type="button"

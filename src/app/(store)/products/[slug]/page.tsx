@@ -95,7 +95,7 @@ function NeverFoundProductPage({
     <div className="min-h-screen w-full bg-acid text-ink">
       <SiteHeader active="shop" />
       <StoreArtSurface productTexture>
-        <section className="bg-acid px-5 py-8 md:px-8 md:py-10 xl:px-12">
+        <section className="bg-acid px-5 pb-8 pt-[calc(env(safe-area-inset-top)+6.5rem)] md:px-8 md:py-10 xl:px-12">
           <nav
             aria-label="Breadcrumb"
             className="flex flex-wrap items-center gap-3 font-mono text-[11px] uppercase tracking-[0.28em] text-ink/55"

@@ -2,22 +2,23 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useCart } from "@/components/store/cart-provider";
 import { CartLink } from "@/components/site/CartLink";
 import { CurrencySelector } from "@/components/site/CurrencySelector";
 import { StorePrice } from "@/components/site/StorePrice";
 
-type MobileMenuTextAlignment = "left" | "center" | "right" | "justify";
-type MobileMenuRowVerticalAlignment = "top" | "center" | "bottom";
+type ActiveSection = "home" | "shop" | "about" | "contact";
 
 type MobileNavItem = {
   label: string;
   href: string;
-  fontSizePx: number;
-  xPx?: number;
-  textAlignment?: MobileMenuTextAlignment;
-  rowVerticalAlignment?: MobileMenuRowVerticalAlignment;
+  minFontPx: number;
+  idealFontDvh: number;
+  maxFontPx: number;
+  fitDivisor: number;
+  targetTextVw: number;
   wordClass: string;
   colorClass: string;
 };
@@ -32,40 +33,44 @@ const mobileNavItems: MobileNavItem[] = [
   {
     label: "Home",
     href: "/",
-    fontSizePx: 175,
-    xPx: -12,
-    textAlignment: "center",
-    rowVerticalAlignment: "center",
-    wordClass: "scale-x-[1.02]",
+    minFontPx: 142,
+    idealFontDvh: 23,
+    maxFontPx: 280,
+    fitDivisor: 2.16,
+    targetTextVw: 104,
+    wordClass: "scale-x-[1.01]",
     colorClass: "text-acid",
   },
   {
     label: "Contact Us",
     href: "/contact",
-    fontSizePx: 90,
-    xPx: -10,
-    textAlignment: "center",
-    rowVerticalAlignment: "center",
-    wordClass: "scale-x-[0.98]",
+    minFontPx: 86,
+    idealFontDvh: 13.6,
+    maxFontPx: 150,
+    fitDivisor: 4.28,
+    targetTextVw: 104,
+    wordClass: "scale-x-[1]",
     colorClass: "text-bone",
   },
   {
     label: "About Us",
     href: "/about",
-    fontSizePx: 105,
-    xPx: -8,
-    textAlignment: "center",
-    rowVerticalAlignment: "center",
-    wordClass: "scale-x-[1.02]",
+    minFontPx: 98,
+    idealFontDvh: 16,
+    maxFontPx: 176,
+    fitDivisor: 3.5,
+    targetTextVw: 104,
+    wordClass: "scale-x-[1]",
     colorClass: "text-acid",
   },
   {
     label: "Login",
     href: "/account/login",
-    fontSizePx: 180,
-    xPx: -12,
-    textAlignment: "center",
-    rowVerticalAlignment: "center",
+    minFontPx: 138,
+    idealFontDvh: 22.5,
+    maxFontPx: 270,
+    fitDivisor: 1.94,
+    targetTextVw: 104,
     wordClass: "scale-x-[1]",
     colorClass: "text-bone",
   },
@@ -79,71 +84,39 @@ type MobileMenuLogoControl = {
   opacity: number;
 };
 
-const mobileMenuItemsControl: {
-  xPx: number;
-  yPx: number;
-  textAlignment: MobileMenuTextAlignment;
-  rowHeightScale: number;
-  rowVerticalAlignment: MobileMenuRowVerticalAlignment;
-} = {
-  xPx: 0,
-  yPx: 0,
-  textAlignment: "center",
-  rowHeightScale: 1,
-  rowVerticalAlignment: "center",
-};
-
-const mobileMenuLogoBaseWidthVw = 155;
+const mobileMenuLogoBaseWidthVw = 174;
 const mobileMenuItemsFontFamily =
   "var(--font-display), Anton, Impact, sans-serif";
-
-// Manual mobile menu controls:
-// logos: scale = size, xPercent/xPx = left/right, yPx = up/down, rotateDeg = angle.
-// menuItems: shared xPx/yPx above moves every item as one group.
-// Per-item xPx: 0 = center, negative = left, positive = right.
-// textAlignment words: "left", "center", "right", "justify".
-// rowVerticalAlignment words: "top", "center", "bottom".
-// rowHeightScale changes each menu item's row height relative to its font size.
-// mobileMenuItemsFontFamily sets the menu item font. Current value uses Anton.
-// Per-item xPx/textAlignment/rowVerticalAlignment values override or add to the shared defaults.
+const mobileMenuWordBiasVw = -1.8;
 const mobileMenuLogoControls: Record<"top" | "bottom", MobileMenuLogoControl> = {
   top: {
     scale: 1,
     xPercent: 50,
-    yPx: -110,
+    yPx: -138,
     rotateDeg: 10,
-    opacity: 0.82,
+    opacity: 0.86,
   },
   bottom: {
-    scale: 1,
-    xPercent: 40,
-    yPx: -30,
+    scale: 1.08,
+    xPercent: 47,
+    yPx: -58,
     rotateDeg: 8,
-    opacity: 0.82,
+    opacity: 0.8,
   },
 };
 
-function isActiveNavItem(
-  href: string,
-  active: "home" | "shop" | "about" | "contact",
-) {
-  if (href === "/") {
-    return active === "home";
-  }
-
-  return href.includes(active);
+function getActiveSection(pathname: string, fallback: ActiveSection): ActiveSection {
+  if (pathname === "/") return "home";
+  if (pathname.startsWith("/shop") || pathname.startsWith("/products")) return "shop";
+  if (pathname.startsWith("/about")) return "about";
+  if (pathname.startsWith("/contact")) return "contact";
+  return fallback;
 }
 
-function getMenuItemJustifyContent(alignment: MobileMenuTextAlignment) {
-  if (alignment === "left") return "flex-start";
-  if (alignment === "right") return "flex-end";
-  return "center";
-}
-
-function getMenuItemAlignItems(alignment: MobileMenuRowVerticalAlignment) {
-  if (alignment === "top") return "flex-start";
-  if (alignment === "bottom") return "flex-end";
-  return "center";
+function isActiveHref(href: string, pathname: string, active: ActiveSection) {
+  if (href === "/") return pathname === "/" && active === "home";
+  if (href === "/shop") return active === "shop";
+  return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 function MobileMenuRedLogo({ position }: { position: "top" | "bottom" }) {
@@ -170,24 +143,29 @@ function MobileMenuRedLogo({ position }: { position: "top" | "bottom" }) {
 }
 
 export function Header() {
-  return <SiteHeader active="home" />;
+  return <SiteHeader />;
 }
 
 export function SiteHeader({
   active = "home",
 }: {
-  active?: "home" | "shop" | "about" | "contact";
+  active?: ActiveSection;
 }) {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const [headerHidden, setHeaderHidden] = useState(false);
+  const [hasScrolled, setHasScrolled] = useState(false);
   const cart = useCart();
+  const currentActive = getActiveSection(pathname, active);
   const cartCount = cart.items.reduce((total, item) => total + item.quantity, 0);
   const subtotal = cart.items.reduce(
     (total, item) => total + item.unitPrice * item.quantity,
     0,
   );
+
   useEffect(() => {
-    if (!open) {
+    if (!open && !cartOpen) {
       return;
     }
 
@@ -213,16 +191,60 @@ export function SiteHeader({
       documentElement.style.overscrollBehavior = originalHtmlOverscrollBehavior;
       window.scrollTo(0, scrollY);
     };
-  }, [open]);
+  }, [cartOpen, open]);
+
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+
+    function syncHeaderVisibility() {
+      const nextScrollY = window.scrollY;
+      const scrolled = nextScrollY > 12;
+      const scrollingDown = nextScrollY > lastScrollY;
+      const movedEnough = Math.abs(nextScrollY - lastScrollY) > 6;
+
+      setHasScrolled(scrolled);
+
+      if (open || cartOpen || nextScrollY < 80) {
+        setHeaderHidden(false);
+      } else if (movedEnough) {
+        setHeaderHidden(scrollingDown);
+      }
+
+      lastScrollY = nextScrollY;
+      ticking = false;
+    }
+
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(syncHeaderVisibility);
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    syncHeaderVisibility();
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [cartOpen, open]);
 
   return (
     <>
-    <header className="site-header fixed inset-x-0 top-0 z-40 translate-y-0 border-0 bg-transparent text-ink shadow-none outline-none">
+    <header
+      className={`site-header fixed inset-x-0 top-0 z-40 border-0 text-ink shadow-none outline-none transition-[transform,background-color,backdrop-filter] duration-300 motion-reduce:transition-none ${
+        headerHidden ? "-translate-y-full" : "translate-y-0"
+      } ${
+        hasScrolled || open || cartOpen
+          ? "bg-acid/82 backdrop-blur-md"
+          : "bg-transparent"
+      }`}
+    >
       <div className="relative grid grid-cols-[3rem_1fr_3rem] items-center px-3 py-0 md:flex md:justify-between md:px-8 md:py-1.5">
         <button
           aria-expanded={open}
           aria-label="Open menu"
-          className="relative z-10 col-start-1 flex h-10 w-9 items-center justify-center justify-self-start p-1 text-ink transition-opacity hover:opacity-75 md:hidden"
+          className="relative z-10 col-start-1 flex h-11 w-11 touch-manipulation items-center justify-center justify-self-start p-1 text-ink transition-opacity hover:opacity-75 md:hidden"
           onClick={() => {
             setOpen((value) => !value);
           }}
@@ -257,8 +279,13 @@ export function SiteHeader({
         <nav className="hidden items-center gap-8 font-mono text-xs uppercase tracking-[0.28em] text-ink/75 md:flex">
           {navItems.map((item) => (
             <Link
+              aria-current={
+                isActiveHref(item.href, pathname, currentActive) ? "page" : undefined
+              }
               className={`transition-colors hover:text-rust ${
-                isActiveNavItem(item.href, active) ? "text-rust" : ""
+                isActiveHref(item.href, pathname, currentActive)
+                  ? "font-bold text-rust"
+                  : ""
               }`}
               href={item.href}
               key={item.label}
@@ -267,7 +294,10 @@ export function SiteHeader({
             </Link>
           ))}
           <Link
-            className="bg-ink px-4 py-2 font-bold text-acid transition-colors hover:bg-rust hover:text-ink"
+            aria-current={currentActive === "shop" ? "page" : undefined}
+            className={`bg-ink px-4 py-2 font-bold transition-colors hover:bg-rust hover:text-ink ${
+              currentActive === "shop" ? "text-rust" : "text-acid"
+            }`}
             href="/shop"
           >
             Shop now
@@ -276,7 +306,10 @@ export function SiteHeader({
 
         <div className="hidden items-center gap-3 md:flex">
           <CurrencySelector />
-          <Link className="font-mono text-xs font-bold uppercase tracking-[0.28em] text-ink/70 hover:text-rust" href="/account/login">
+          <Link
+            className="font-mono text-xs font-bold uppercase tracking-[0.28em] text-ink/70 hover:text-rust"
+            href="/account/login"
+          >
             Login
           </Link>
           <CartLink
@@ -286,7 +319,7 @@ export function SiteHeader({
           />
         </div>
 
-        <div className="relative z-10 col-start-3 flex h-10 w-9 items-center justify-center justify-self-end md:hidden">
+        <div className="relative z-10 col-start-3 flex h-11 w-11 items-center justify-center justify-self-end md:hidden">
           <CartLink
             onClick={() => {
               setCartOpen(true);
@@ -319,18 +352,18 @@ export function SiteHeader({
           sizes="100vw"
           src="/images/textures/main-background.jpg"
         />
-        <div className="absolute inset-0 z-[1] bg-black/35" />
+        <div className="absolute inset-0 z-[1] bg-black/42" />
         <MobileMenuRedLogo position="top" />
         <MobileMenuRedLogo position="bottom" />
 
-        <div className="relative z-10 flex h-full flex-col px-6 pt-8">
+        <div className="relative z-10 h-full px-6 pt-[calc(env(safe-area-inset-top)+1.25rem)]">
           <div className="relative z-20 flex items-center justify-between">
-            <span className="font-display text-[20px] uppercase leading-none tracking-normal text-bone">
+            <span className="font-display text-[20px] uppercase leading-none tracking-normal text-bone drop-shadow-[0_1px_8px_rgba(0,0,0,0.55)]">
               Menu
             </span>
             <button
               aria-label="Close menu"
-              className="relative flex h-8 w-8 items-center justify-center text-bone transition-opacity hover:opacity-70"
+              className="relative flex h-11 w-11 touch-manipulation items-center justify-center text-bone transition-opacity hover:opacity-70"
               onClick={() => setOpen(false)}
               type="button"
             >
@@ -346,41 +379,31 @@ export function SiteHeader({
           </div>
 
           <div
-            className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 px-6"
+            className="absolute inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+0.5rem)] top-[calc(env(safe-area-inset-top)+4.4rem)] z-10 flex flex-col justify-center gap-[clamp(0.35rem,1.35dvh,0.95rem)] overflow-hidden"
             style={{
-              textAlign: mobileMenuItemsControl.textAlignment,
-              transform: `translate(${mobileMenuItemsControl.xPx}px, ${mobileMenuItemsControl.yPx}px)`,
+              transform: "translateY(clamp(-5.75rem, -10.5dvh, -4rem))",
             }}
           >
             {mobileNavItems.map((item) => {
-              const textAlignment =
-                item.textAlignment ?? mobileMenuItemsControl.textAlignment;
-              const rowVerticalAlignment =
-                item.rowVerticalAlignment ??
-                mobileMenuItemsControl.rowVerticalAlignment;
+              const isCurrent = isActiveHref(item.href, pathname, currentActive);
 
               return (
                 <Link
-                  className={`flex w-full whitespace-nowrap uppercase leading-[0.86] tracking-normal transition-colors hover:text-rust active:text-rust ${item.colorClass}`}
+                  aria-current={isCurrent ? "page" : undefined}
+                  className={`flex w-screen min-w-screen touch-manipulation items-center justify-center overflow-visible py-[clamp(0.1rem,0.45dvh,0.35rem)] whitespace-nowrap uppercase leading-[0.78] tracking-normal transition-[color,opacity] duration-200 hover:text-rust focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-acid active:text-rust ${item.colorClass}`}
                   href={item.href}
                   key={item.label}
                   onClick={() => setOpen(false)}
                   style={{
-                    alignItems: getMenuItemAlignItems(rowVerticalAlignment),
                     fontFamily: mobileMenuItemsFontFamily,
-                    fontSize: `${item.fontSizePx}px`,
+                    fontSize: `clamp(${item.minFontPx}px, min(${item.idealFontDvh}dvh, calc(${item.targetTextVw}vw / ${item.fitDivisor})), ${item.maxFontPx}px)`,
                     fontStyle: "italic",
-                    justifyContent: getMenuItemJustifyContent(textAlignment),
-                    minHeight: `${item.fontSizePx * mobileMenuItemsControl.rowHeightScale}px`,
-                    transform: `translateX(${item.xPx ?? 0}px)`,
                   }}
                 >
                   <span
-                    className={`inline-block origin-center ${item.wordClass}`}
+                    className={`inline-block origin-center drop-shadow-[0_2px_14px_rgba(0,0,0,0.32)] ${item.wordClass}`}
                     style={{
-                      textAlignLast:
-                        textAlignment === "justify" ? "justify" : "auto",
-                      width: textAlignment === "justify" ? "100%" : "auto",
+                      transform: `translateX(${mobileMenuWordBiasVw}vw)`,
                     }}
                   >
                     {item.label}
@@ -388,10 +411,6 @@ export function SiteHeader({
                 </Link>
               );
             })}
-          </div>
-
-          <div className="absolute inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+20px)] z-20 flex justify-center px-6">
-            <CurrencySelector tone="dark" />
           </div>
         </div>
       </nav>
@@ -421,7 +440,7 @@ export function SiteHeader({
           </div>
           <button
             aria-label="Close cart"
-            className="grid h-10 w-10 place-items-center text-ink transition-opacity hover:opacity-65"
+            className="grid h-11 w-11 touch-manipulation place-items-center text-ink transition-opacity hover:opacity-65"
             onClick={() => setCartOpen(false)}
             type="button"
           >
@@ -466,19 +485,21 @@ export function SiteHeader({
                       </div>
 
                       <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center rounded-full border border-ink font-mono text-[10px] font-bold">
+                        <div className="flex min-h-11 items-center overflow-hidden rounded-full border border-ink font-mono text-[10px] font-bold">
                           <button
-                            className="px-2.5 py-1 transition hover:bg-ink hover:text-acid"
+                            aria-label={`Decrease quantity for ${item.name}`}
+                            className="grid h-11 min-w-11 touch-manipulation place-items-center transition hover:bg-ink hover:text-acid"
                             onClick={() => cart.updateQuantity(itemKey, item.quantity - 1)}
                             type="button"
                           >
                             -
                           </button>
-                          <span className="min-w-7 border-x border-ink px-2 py-1 text-center">
+                          <span className="grid h-11 min-w-9 place-items-center border-x border-ink px-2 text-center">
                             {item.quantity}
                           </span>
                           <button
-                            className="px-2.5 py-1 transition hover:bg-ink hover:text-acid"
+                            aria-label={`Increase quantity for ${item.name}`}
+                            className="grid h-11 min-w-11 touch-manipulation place-items-center transition hover:bg-ink hover:text-acid"
                             onClick={() => cart.updateQuantity(itemKey, item.quantity + 1)}
                             type="button"
                           >
@@ -486,7 +507,7 @@ export function SiteHeader({
                           </button>
                         </div>
                         <button
-                          className="font-mono text-[9px] font-bold uppercase tracking-[0.12em] text-rust"
+                          className="min-h-11 touch-manipulation px-1 font-mono text-[9px] font-bold uppercase tracking-[0.12em] text-rust"
                           onClick={() => cart.removeItem(itemKey)}
                           type="button"
                         >
@@ -516,7 +537,7 @@ export function SiteHeader({
           )}
         </div>
 
-        <div className="px-5 py-5">
+        <div className="px-5 pb-[calc(env(safe-area-inset-bottom)+1.25rem)] pt-5">
           <div className="flex items-center justify-between font-mono text-xs font-bold uppercase tracking-[0.2em]">
             <span>Subtotal</span>
             <span>
