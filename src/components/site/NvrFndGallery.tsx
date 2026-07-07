@@ -33,14 +33,14 @@ type NvrFndGalleryImage = {
 // Uses the same Anton-based font as the mobile slide menu.
 // fontSizeVw controls mobile scaling, maxFontSizePx caps desktop size.
 // letterGapPx adjusts letter spacing in pixels.
-// xPx moves the title horizontally: 0 = original, negative = left, positive = right.
+// xCss moves the title horizontally. The small negative shift lets both edges crop.
 const galleryTitleControl = {
   fontFamily: "var(--font-display), Anton, Impact, sans-serif",
   minFontSizePx: 52,
   fontSizeVw: 16,
   maxFontSizePx: 228,
   letterGapPx: 0,
-  xPx: 0,
+  xCss: "clamp(-12px, -1.1vw, -4px)",
 };
 
 // Gallery section controls:
@@ -135,7 +135,7 @@ export function NvrFndGallery({
             fontSize: `clamp(${galleryTitleControl.minFontSizePx}px, ${galleryTitleControl.fontSizeVw}vw, ${galleryTitleControl.maxFontSizePx}px)`,
             fontStyle: "italic",
             letterSpacing: `${galleryTitleControl.letterGapPx}px`,
-            transform: `translateX(${galleryTitleControl.xPx}px)`,
+            transform: `translateX(${galleryTitleControl.xCss})`,
           }}
         >
           NVR FND GALLERY
