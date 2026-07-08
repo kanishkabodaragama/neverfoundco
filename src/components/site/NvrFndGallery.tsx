@@ -1,8 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
-import type { MutableRefObject } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const galleryImages = [
   {
@@ -59,12 +58,15 @@ export function NvrFndGallery({
   images?: NvrFndGalleryImage[];
 }) {
   const displayImages = images.length ? images : galleryImages;
+  const loopedImages = useMemo(
+    () => [...displayImages, ...displayImages, ...displayImages],
+    [displayImages],
+  );
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const stripRef = useRef<HTMLDivElement | null>(null);
   const modalRef = useRef<HTMLDivElement | null>(null);
-  const stripTouchStartX = useRef<number | null>(null);
-  const modalTouchStartX = useRef<number | null>(null);
-  const isLoopingStrip = useRef(false);
+  const isRepositioningStrip = useRef(false);
+  const isRepositioningModal = useRef(false);
 
   const syncStripToIndex = useCallback(
     (index: number, behavior: ScrollBehavior = "auto") => {
@@ -73,12 +75,67 @@ export function NvrFndGallery({
       if (!node || !slide) return;
 
       node.scrollTo({
-        left: slide.offsetWidth * index,
+        left: slide.offsetWidth * (displayImages.length + index),
         behavior,
       });
     },
-    [],
+    [displayImages.length],
   );
+
+  const keepStripInMiddleSet = useCallback(() => {
+    const node = stripRef.current;
+    const slide = node?.querySelector<HTMLElement>("[data-gallery-slide]");
+    if (!node || !slide || displayImages.length < 2 || isRepositioningStrip.current) {
+      return;
+    }
+
+    const setWidth = slide.offsetWidth * displayImages.length;
+    if (setWidth <= 0) return;
+
+    let nextScrollLeft = node.scrollLeft;
+    if (node.scrollLeft < setWidth * 0.5) {
+      nextScrollLeft = node.scrollLeft + setWidth;
+    } else if (node.scrollLeft >= setWidth * 1.5) {
+      nextScrollLeft = node.scrollLeft - setWidth;
+    } else {
+      return;
+    }
+
+    isRepositioningStrip.current = true;
+    node.scrollTo({ left: nextScrollLeft, behavior: "auto" });
+    requestAnimationFrame(() => {
+      isRepositioningStrip.current = false;
+    });
+  }, [displayImages.length]);
+
+  const keepModalInMiddleSet = useCallback(() => {
+    const node = modalRef.current;
+    if (!node || displayImages.length < 2 || isRepositioningModal.current) {
+      return;
+    }
+
+    const setWidth = node.clientWidth * displayImages.length;
+    if (setWidth <= 0) return;
+
+    let nextScrollLeft = node.scrollLeft;
+    if (node.scrollLeft < setWidth * 0.5) {
+      nextScrollLeft = node.scrollLeft + setWidth;
+    } else if (node.scrollLeft >= setWidth * 1.5) {
+      nextScrollLeft = node.scrollLeft - setWidth;
+    } else {
+      return;
+    }
+
+    isRepositioningModal.current = true;
+    node.scrollTo({ left: nextScrollLeft, behavior: "auto" });
+    requestAnimationFrame(() => {
+      isRepositioningModal.current = false;
+    });
+  }, [displayImages.length]);
+
+  useEffect(() => {
+    syncStripToIndex(0);
+  }, [syncStripToIndex]);
 
   useEffect(() => {
     if (activeIndex === null) return;
@@ -86,7 +143,7 @@ export function NvrFndGallery({
     document.body.classList.add("nvr-gallery-lightbox-open");
     document.body.style.overflow = "hidden";
     modalRef.current?.scrollTo({
-      left: modalRef.current.clientWidth * activeIndex,
+      left: modalRef.current.clientWidth * (displayImages.length + activeIndex),
       behavior: "auto",
     });
 
@@ -103,7 +160,7 @@ export function NvrFndGallery({
       document.body.style.overflow = "";
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [activeIndex]);
+  }, [activeIndex, displayImages.length]);
 
   useEffect(() => {
     if (activeIndex === null) return;
@@ -115,69 +172,7 @@ export function NvrFndGallery({
     const node = modalRef.current;
     if (!node) return;
 
-    const index = Math.round(node.scrollLeft / node.clientWidth);
-    setActiveIndex(Math.min(displayImages.length - 1, Math.max(0, index)));
-  }
-
-  function getCurrentStripIndex() {
-    const node = stripRef.current;
-    const slide = node?.querySelector<HTMLElement>("[data-gallery-slide]");
-    if (!node || !slide) return 0;
-
-    return Math.round(node.scrollLeft / slide.offsetWidth);
-  }
-
-  function rememberTouchStart(ref: MutableRefObject<number | null>, x: number) {
-    ref.current = x;
-  }
-
-  function loopStripOnEdgeSwipe(endX: number) {
-    const startX = stripTouchStartX.current;
-    stripTouchStartX.current = null;
-    if (startX === null || displayImages.length < 2) return;
-
-    const deltaX = endX - startX;
-    if (Math.abs(deltaX) < 40) return;
-
-    const index = getCurrentStripIndex();
-    if (deltaX < 0 && index >= displayImages.length - 1) {
-      syncStripToIndex(0, "smooth");
-    } else if (deltaX > 0 && index <= 0) {
-      syncStripToIndex(displayImages.length - 1, "smooth");
-    }
-  }
-
-  function loopModalOnEdgeSwipe(endX: number) {
-    const startX = modalTouchStartX.current;
-    modalTouchStartX.current = null;
-    if (startX === null || activeIndex === null || displayImages.length < 2) return;
-
-    const deltaX = endX - startX;
-    if (Math.abs(deltaX) < 40) return;
-
-    if (deltaX < 0 && activeIndex >= displayImages.length - 1) {
-      setActiveIndex(0);
-    } else if (deltaX > 0 && activeIndex <= 0) {
-      setActiveIndex(displayImages.length - 1);
-    }
-  }
-
-  function loopStripAtScrollEnd() {
-    const node = stripRef.current;
-    if (!node || isLoopingStrip.current || displayImages.length < 2) return;
-
-    const maxScrollLeft = node.scrollWidth - node.clientWidth;
-    if (maxScrollLeft <= 0) return;
-
-    if (node.scrollLeft >= maxScrollLeft - 1) {
-      isLoopingStrip.current = true;
-      requestAnimationFrame(() => {
-        node.scrollTo({ left: 0, behavior: "smooth" });
-        window.setTimeout(() => {
-          isLoopingStrip.current = false;
-        }, 300);
-      });
-    }
+    keepModalInMiddleSet();
   }
 
   return (
@@ -199,36 +194,35 @@ export function NvrFndGallery({
       </h2>
       <div
         className="no-scrollbar flex touch-pan-x snap-x snap-mandatory overflow-x-auto scroll-smooth bg-ink"
-        onScroll={loopStripAtScrollEnd}
-        onTouchEnd={(event) => loopStripOnEdgeSwipe(event.changedTouches[0]?.clientX ?? 0)}
-        onTouchStart={(event) =>
-          rememberTouchStart(stripTouchStartX, event.touches[0]?.clientX ?? 0)
-        }
+        onScroll={keepStripInMiddleSet}
         ref={stripRef}
       >
-        {displayImages.map((image, index) => (
-          <button
-            aria-label={`Open gallery image ${index + 1}`}
-            className="relative snap-start overflow-hidden bg-ink"
-            data-gallery-slide
-            key={image.src}
-            onClick={() => setActiveIndex(index)}
-            style={{
-              flex: `0 0 calc(100% / ${gallerySectionControl.visibleSlides})`,
-              height: `clamp(${gallerySectionControl.mobileHeightPx}px, 26vw, ${gallerySectionControl.desktopHeightPx}px)`,
-            }}
-            type="button"
-          >
-            <Image
-              alt={image.alt}
-              className="object-cover"
-              fill
-              sizes={`calc(100vw / ${gallerySectionControl.visibleSlides})`}
-              src={image.src}
-              unoptimized
-            />
-          </button>
-        ))}
+        {loopedImages.map((image, index) => {
+          const imageIndex = index % displayImages.length;
+          return (
+            <button
+              aria-label={`Open gallery image ${imageIndex + 1}`}
+              className="relative snap-start overflow-hidden bg-ink"
+              data-gallery-slide
+              key={`${image.src}-${index}`}
+              onClick={() => setActiveIndex(imageIndex)}
+              style={{
+                flex: `0 0 calc(100% / ${gallerySectionControl.visibleSlides})`,
+                height: `clamp(${gallerySectionControl.mobileHeightPx}px, 26vw, ${gallerySectionControl.desktopHeightPx}px)`,
+              }}
+              type="button"
+            >
+              <Image
+                alt={image.alt}
+                className="object-cover"
+                fill
+                sizes={`calc(100vw / ${gallerySectionControl.visibleSlides})`}
+                src={image.src}
+                unoptimized
+              />
+            </button>
+          );
+        })}
       </div>
 
       {activeIndex !== null ? (
@@ -249,14 +243,13 @@ export function NvrFndGallery({
           <div
             className="no-scrollbar flex h-full snap-x snap-mandatory overflow-x-auto scroll-smooth"
             onScroll={syncModalIndex}
-            onTouchEnd={(event) => loopModalOnEdgeSwipe(event.changedTouches[0]?.clientX ?? 0)}
-            onTouchStart={(event) =>
-              rememberTouchStart(modalTouchStartX, event.touches[0]?.clientX ?? 0)
-            }
             ref={modalRef}
           >
-            {displayImages.map((image) => (
-              <div className="relative h-full min-w-full snap-center" key={image.src}>
+            {loopedImages.map((image, index) => (
+              <div
+                className="relative h-full min-w-full snap-center"
+                key={`${image.src}-modal-${index}`}
+              >
                 <Image
                   alt={image.alt}
                   className="object-contain p-4"
