@@ -9,8 +9,8 @@
   --color-foreground: var(--foreground);
   --color-ink: #0a0a0a;
   --color-bone: #f5f3ec;
-  --color-acid: #e8ff3d;
-  --color-acid-dim: #c4d62e;
+  --color-acid: #abeb5a;
+  --color-acid-dim: #94cf45;
   --color-rust: #ff4d1c;
   --font-sans: "Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Space Mono", "Space Mono Fallback", ui-monospace, monospace;
@@ -71,12 +71,12 @@ body.nvr-gallery-lightbox-open .site-header {
 }
 
 ::selection {
-  background: #e8ff3d;
+  background: #abeb5a;
   color: #0a0a0a;
 }
 
 :focus-visible {
-  outline: 2px solid #e8ff3d;
+  outline: 2px solid #abeb5a;
   outline-offset: 3px;
 }
 
@@ -449,7 +449,7 @@ body.nvr-gallery-lightbox-open .site-header {
   }
 
   .text-stroke {
-    -webkit-text-stroke: 1.5px #e8ff3d;
+    -webkit-text-stroke: 1.5px var(--color-acid);
     color: transparent;
   }
 
