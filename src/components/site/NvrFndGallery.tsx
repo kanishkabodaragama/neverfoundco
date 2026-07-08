@@ -48,12 +48,12 @@ const galleryTitleControl = {
 // Gallery section controls:
 // yPx moves the whole gallery section: 0 = current position, negative = up, positive = down.
 // This uses margin so the footer stays directly attached to the gallery.
-// visibleSlides controls how many tiles show in the carousel. 3.3 = 3 full images plus 30% of the next.
+// visibleSlides controls how many tiles show in the carousel.
 const gallerySectionControl = {
   yPx: 0,
-  visibleSlides: 3.3,
-  mobileHeightPx: 190,
-  desktopHeightPx: 288,
+  visibleSlides: 4,
+  mobileHeightPx: 217,
+  desktopHeightPx: 217,
 };
 
 export function NvrFndGallery({
@@ -69,7 +69,7 @@ export function NvrFndGallery({
   title?: string;
   visibleSlides?: number;
 }) {
-  const displayImages = images.length ? images : galleryImages;
+  const displayImages = (images.length ? images : galleryImages).slice(0, 4);
   const loopedImages = useMemo(
     () => [...displayImages, ...displayImages, ...displayImages],
     [displayImages],
@@ -211,7 +211,7 @@ export function NvrFndGallery({
         {title}
       </h2>
       <div
-        className="no-scrollbar flex touch-pan-x snap-x snap-mandatory overflow-x-auto bg-ink"
+        className="no-scrollbar flex w-full touch-pan-x snap-x snap-mandatory overflow-x-auto bg-ink"
         onScroll={keepStripInMiddleSet}
         ref={stripRef}
       >
