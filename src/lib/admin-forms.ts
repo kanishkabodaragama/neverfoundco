@@ -27,7 +27,35 @@ function getAdminRedirectOrigin(request: Request, targetUrl: URL) {
     return targetUrl.origin;
   }
 
-  return new URL(request.url).origin;
+  return getBrowserOrigin(request) ?? new URL(request.url).origin;
+}
+
+function getBrowserOrigin(request: Request) {
+  const origin = getHeaderOrigin(request.headers.get("origin"));
+  if (origin) return origin;
+
+  const referer = getHeaderOrigin(request.headers.get("referer"));
+  if (referer) return referer;
+
+  const forwardedHost =
+    request.headers.get("x-forwarded-host") ?? request.headers.get("host");
+  if (!forwardedHost) return null;
+
+  const forwardedProto =
+    request.headers.get("x-forwarded-proto") ??
+    new URL(request.url).protocol.replace(":", "");
+
+  return `${forwardedProto}://${forwardedHost}`;
+}
+
+function getHeaderOrigin(value: string | null) {
+  if (!value) return null;
+
+  try {
+    return new URL(value).origin;
+  } catch {
+    return null;
+  }
 }
 
 export function getFormString(formData: FormData, key: string) {

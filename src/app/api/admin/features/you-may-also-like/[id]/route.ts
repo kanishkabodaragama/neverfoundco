@@ -67,7 +67,7 @@ async function updateItem(request: Request, id: string, formData: FormData) {
     const { error } = await supabase
       .from("you_may_also_like_items")
       .update({
-        exclude_current_product: formData.get("exclude_current_product") === "on",
+        exclude_current_product: false,
         ...(uploaded
           ? {
               image_url: uploaded.imageUrl,

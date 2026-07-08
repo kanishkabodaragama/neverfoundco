@@ -59,7 +59,7 @@ export async function POST(request: Request) {
     });
 
     const { error } = await supabase.from("you_may_also_like_items").insert({
-      exclude_current_product: formData.get("exclude_current_product") === "on",
+      exclude_current_product: false,
       image_url: uploaded.imageUrl,
       product_id: productId,
       sort_order: Number.isFinite(displayOrder)

@@ -83,7 +83,6 @@ export function YouMayAlsoLikeFeatureManager({
                 <th>Order</th>
                 <th>Image</th>
                 <th>Product</th>
-                <th>Same product rule</th>
                 <th>Created</th>
                 <th className="text-right">Actions</th>
               </tr>
@@ -118,11 +117,6 @@ export function YouMayAlsoLikeFeatureManager({
                     ) : (
                       <span className="text-red-600">Product missing</span>
                     )}
-                  </td>
-                  <td>
-                    {item.exclude_current_product
-                      ? "Hidden on its own product page"
-                      : "Can show on its own product page"}
                   </td>
                   <td>{new Date(item.created_at).toLocaleString()}</td>
                   <td className="text-right">
@@ -335,14 +329,6 @@ function FeatureItemForm({
             ) : null}
             {preview ? <UploadThumb item={preview} onRemove={resetUpload} size={64} /> : null}
           </div>
-          <label className="flex items-center gap-3 text-sm font-semibold">
-            <input
-              defaultChecked={item?.exclude_current_product ?? true}
-              name="exclude_current_product"
-              type="checkbox"
-            />
-            Avoid showing the same product on its own product page
-          </label>
         </div>
       </div>
 

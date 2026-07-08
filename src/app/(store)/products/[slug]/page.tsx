@@ -60,7 +60,7 @@ export default async function ProductPage({
   if (!product) notFound();
 
   const [recommendationItems, recommendationsEnabled] = await Promise.all([
-    listStorefrontYouMayAlsoLikeItems(product.id),
+    listStorefrontYouMayAlsoLikeItems(),
     getProductRecommendationsEnabled(),
   ]);
 
@@ -87,8 +87,6 @@ function NeverFoundProductPage({
     href: item.products?.slug ? `/products/${item.products.slug}` : "/shop",
     src: item.image_url,
   }));
-  const normalizedRelatedGalleryImages =
-    normalizeRecommendationGalleryImages(relatedGalleryImages);
 
   return (
     <div className="min-h-screen w-full bg-acid text-ink">
@@ -105,9 +103,9 @@ function NeverFoundProductPage({
           <ProductDetailClient product={product} />
         </section>
 
-        {recommendationsEnabled && normalizedRelatedGalleryImages.length ? (
+        {recommendationsEnabled && relatedGalleryImages.length ? (
           <NvrFndGallery
-            images={normalizedRelatedGalleryImages}
+            images={relatedGalleryImages}
             lightbox={false}
             slideAspectRatio="1.18 / 1"
             title="YOU MAY ALSO LIKE"
@@ -121,21 +119,4 @@ function NeverFoundProductPage({
       <Footer />
     </div>
   );
-}
-
-function normalizeRecommendationGalleryImages(
-  images: Array<{ alt: string; href: string; src: string }>,
-) {
-  if (images.length <= 1) return [];
-  if (images.length >= 4) return images;
-
-  const normalized = [...images];
-  let index = 0;
-
-  while (normalized.length < 4) {
-    normalized.push(images[index % images.length]);
-    index += 1;
-  }
-
-  return normalized;
 }

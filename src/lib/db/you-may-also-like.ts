@@ -38,7 +38,7 @@ export async function listAdminYouMayAlsoLikeItems() {
   return (data ?? []) as YouMayAlsoLikeItem[];
 }
 
-export async function listStorefrontYouMayAlsoLikeItems(currentProductId: string) {
+export async function listStorefrontYouMayAlsoLikeItems() {
   await connection();
   if (!hasSupabaseServerEnv()) return [];
 
@@ -52,7 +52,6 @@ export async function listStorefrontYouMayAlsoLikeItems(currentProductId: string
   if (error) return [];
 
   return ((data ?? []) as YouMayAlsoLikeItem[]).filter((item) => {
-    if (!item.products?.is_active) return false;
-    return !(item.exclude_current_product && item.product_id === currentProductId);
+    return Boolean(item.products?.is_active);
   });
 }
