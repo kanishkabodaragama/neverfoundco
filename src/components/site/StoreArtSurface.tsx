@@ -23,7 +23,7 @@ const backgroundLogoControl = {
   widthVw: 92,
   scale: 1.5,
   rotateDeg: 5,
-  opacity: 1,
+  opacity: 0.3,
 };
 
 // Overlay above the red logo and below page content.
