@@ -601,8 +601,45 @@ export function ProductForm({
       </section>
 
       <section className="admin-card p-4">
+        <h2 className="font-semibold">You may also like image</h2>
+        <p className="admin-muted mt-1">
+          Optional image used only in the product page You may also like carousel. Leave it empty to use the featured image.
+        </p>
+        <div className="mt-4 grid gap-4 md:grid-cols-[180px_1fr]">
+          {youMayAlsoLikeImageUrl && !youMayAlsoLikeRemoved ? (
+            <ExistingImagePreview
+              label="Current image"
+              name={`${product?.name ?? "Product"} recommendation image`}
+              onRemove={() => setYouMayAlsoLikeRemoved(true)}
+              url={youMayAlsoLikeImageUrl}
+            />
+          ) : (
+            <ExistingImagePreview
+              label="Current image"
+              name={`${product?.name ?? "Product"} recommendation image`}
+            />
+          )}
+          <div className="grid content-start gap-3">
+            <FilePreviewInput
+              label={
+                youMayAlsoLikeImageUrl && !youMayAlsoLikeRemoved
+                  ? "Replace You may also like image"
+                  : "Upload You may also like image"
+              }
+              name="you_may_also_like_file"
+            />
+            {youMayAlsoLikeRemoved ? (
+              <p className="text-xs font-semibold text-red-600">
+                Custom You may also like image will be removed unless you upload a replacement.
+              </p>
+            ) : null}
+          </div>
+        </div>
+      </section>
+
+      <section className="admin-card p-4">
         <h2 className="font-semibold">Media</h2>
-        <p className="admin-muted mt-1">Upload one featured product image, an optional You may also like image, and gallery images. Each image must be below {MAX_FILE_SIZE_MB} MB.</p>
+        <p className="admin-muted mt-1">Upload one featured product image and gallery images. Each image must be below {MAX_FILE_SIZE_MB} MB.</p>
         {featuredImageUrl || product?.product_images?.length ? (
           <div className="mt-4 grid gap-4 md:grid-cols-[180px_1fr]">
             <div className="grid gap-4">
@@ -651,32 +688,6 @@ export function ProductForm({
         ) : null}
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           {!featuredImageUrl ? <FilePreviewInput label="Featured image" name="featured_file" /> : null}
-          <div className="grid gap-3">
-            {youMayAlsoLikeImageUrl && !youMayAlsoLikeRemoved ? (
-              <ExistingImagePreview
-                label="Current You may also like image"
-                name={`${product?.name ?? "Product"} recommendation image`}
-                onRemove={() => setYouMayAlsoLikeRemoved(true)}
-                url={youMayAlsoLikeImageUrl}
-              />
-            ) : null}
-            <FilePreviewInput
-              label={
-                youMayAlsoLikeImageUrl && !youMayAlsoLikeRemoved
-                  ? "Replace You may also like image"
-                  : "You may also like image"
-              }
-              name="you_may_also_like_file"
-            />
-            <p className="admin-muted text-xs">
-              Leave this empty to use the featured image in the You may also like carousel.
-            </p>
-            {youMayAlsoLikeRemoved ? (
-              <p className="text-xs font-semibold text-red-600">
-                Custom You may also like image will be removed unless you upload a replacement.
-              </p>
-            ) : null}
-          </div>
           <FilePreviewInput label="Gallery images" multiple name="gallery_files" />
         </div>
       </section>

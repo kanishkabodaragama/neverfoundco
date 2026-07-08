@@ -2,8 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
-import type { TouchEvent } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 type NvrFndGalleryImage = {
   alt: string;
@@ -73,24 +72,53 @@ export function NvrFndGallery({
     () => [...displayImages, ...displayImages, ...displayImages],
     [displayImages],
   );
-  const stripSlides = useMemo(
-    () =>
-      displayImages.length > 1
-        ? [displayImages[displayImages.length - 1], ...displayImages, displayImages[0]]
-        : displayImages,
-    [displayImages],
-  );
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const [stripPosition, setStripPosition] = useState(1);
-  const [isStripResetting, setIsStripResetting] = useState(false);
+  const stripRef = useRef<HTMLDivElement | null>(null);
   const modalRef = useRef<HTMLDivElement | null>(null);
+  const isRepositioningStrip = useRef(false);
   const isRepositioningModal = useRef(false);
-  const stripTouchStart = useRef<{ x: number; y: number } | null>(null);
-  const stripSwipeTriggered = useRef(false);
-  const isStripAnimating = useRef(false);
-  const displayedStripPosition = displayImages.length > 1 ? stripPosition : 0;
 
-  function keepModalInMiddleSet() {
+  const syncStripToIndex = useCallback(
+    (index: number, behavior: ScrollBehavior = "auto") => {
+      const node = stripRef.current;
+      const slide = node?.querySelector<HTMLElement>("[data-gallery-slide]");
+      if (!node || !slide) return;
+
+      node.scrollTo({
+        left: slide.offsetWidth * (displayImages.length + index),
+        behavior,
+      });
+    },
+    [displayImages.length],
+  );
+
+  const keepStripInMiddleSet = useCallback(() => {
+    const node = stripRef.current;
+    const slide = node?.querySelector<HTMLElement>("[data-gallery-slide]");
+    if (!node || !slide || displayImages.length < 2 || isRepositioningStrip.current) {
+      return;
+    }
+
+    const setWidth = slide.offsetWidth * displayImages.length;
+    if (setWidth <= 0) return;
+
+    let nextScrollLeft = node.scrollLeft;
+    if (node.scrollLeft < slide.offsetWidth) {
+      nextScrollLeft = node.scrollLeft + setWidth;
+    } else if (node.scrollLeft >= setWidth * 2) {
+      nextScrollLeft = node.scrollLeft - setWidth;
+    } else {
+      return;
+    }
+
+    isRepositioningStrip.current = true;
+    node.scrollTo({ left: nextScrollLeft, behavior: "auto" });
+    requestAnimationFrame(() => {
+      isRepositioningStrip.current = false;
+    });
+  }, [displayImages.length]);
+
+  const keepModalInMiddleSet = useCallback(() => {
     const node = modalRef.current;
     if (!node || displayImages.length < 2 || isRepositioningModal.current) {
       return;
@@ -113,7 +141,16 @@ export function NvrFndGallery({
     requestAnimationFrame(() => {
       isRepositioningModal.current = false;
     });
-  }
+  }, [displayImages.length]);
+
+  useLayoutEffect(() => {
+    syncStripToIndex(0);
+  }, [syncStripToIndex]);
+
+  useEffect(() => {
+    window.addEventListener("resize", keepStripInMiddleSet);
+    return () => window.removeEventListener("resize", keepStripInMiddleSet);
+  }, [keepStripInMiddleSet]);
 
   useEffect(() => {
     if (!lightbox || activeIndex === null) return;
@@ -140,77 +177,17 @@ export function NvrFndGallery({
     };
   }, [activeIndex, displayImages.length, lightbox]);
 
+  useEffect(() => {
+    if (!lightbox || activeIndex === null) return;
+
+    syncStripToIndex(activeIndex, "smooth");
+  }, [activeIndex, lightbox, syncStripToIndex]);
+
   function syncModalIndex() {
     const node = modalRef.current;
     if (!node) return;
 
     keepModalInMiddleSet();
-  }
-
-  function rotateStrip(direction: 1 | -1) {
-    if (displayImages.length < 2 || isStripAnimating.current) return;
-
-    isStripAnimating.current = true;
-    setIsStripResetting(false);
-    setStripPosition((position) => position + direction);
-  }
-
-  function settleLoopedStrip() {
-    if (displayImages.length < 2) return;
-
-    if (stripPosition === 0) {
-      setIsStripResetting(true);
-      setStripPosition(displayImages.length);
-    } else if (stripPosition === displayImages.length + 1) {
-      setIsStripResetting(true);
-      setStripPosition(1);
-    }
-
-    isStripAnimating.current = false;
-  }
-
-  function handleStripTouchStart(event: TouchEvent<HTMLDivElement>) {
-    const touch = event.touches[0];
-    if (!touch) return;
-
-    stripSwipeTriggered.current = false;
-    stripTouchStart.current = {
-      x: touch.clientX,
-      y: touch.clientY,
-    };
-  }
-
-  function handleStripTouchMove(event: TouchEvent<HTMLDivElement>) {
-    const start = stripTouchStart.current;
-    const touch = event.touches[0];
-    if (!start || !touch) return;
-
-    const deltaX = touch.clientX - start.x;
-    const deltaY = touch.clientY - start.y;
-
-    if (Math.abs(deltaX) > 8 && Math.abs(deltaX) > Math.abs(deltaY)) {
-      event.preventDefault();
-    }
-  }
-
-  function handleStripTouchEnd(event: TouchEvent<HTMLDivElement>) {
-    const start = stripTouchStart.current;
-    const touch = event.changedTouches[0];
-    stripTouchStart.current = null;
-    if (!start || !touch || displayImages.length < 2) return;
-
-    const deltaX = touch.clientX - start.x;
-    if (Math.abs(deltaX) < 40) return;
-
-    stripSwipeTriggered.current = true;
-    rotateStrip(deltaX < 0 ? 1 : -1);
-  }
-
-  function shouldCancelClickAfterSwipe() {
-    if (!stripSwipeTriggered.current) return false;
-
-    stripSwipeTriggered.current = false;
-    return true;
   }
 
   return (
@@ -232,23 +209,12 @@ export function NvrFndGallery({
         {title}
       </h2>
       <div
-        className="touch-pan-y overflow-hidden bg-ink"
-        onTouchEnd={handleStripTouchEnd}
-        onTouchMove={handleStripTouchMove}
-        onTouchStart={handleStripTouchStart}
+        className="no-scrollbar flex touch-pan-x snap-x snap-mandatory overflow-x-auto bg-ink"
+        onScroll={keepStripInMiddleSet}
+        ref={stripRef}
       >
-        <div
-          className={`flex ${
-            isStripResetting ? "" : "transition-transform duration-300 ease-out"
-          }`}
-          onTransitionEnd={settleLoopedStrip}
-          style={{ transform: `translate3d(calc(-${displayedStripPosition} * (100vw / ${visibleSlides})), 0, 0)` }}
-        >
-        {stripSlides.map((image, index) => {
-          const imageIndex =
-            displayImages.length > 1
-              ? (index - 1 + displayImages.length) % displayImages.length
-              : index;
+        {loopedImages.map((image, index) => {
+          const imageIndex = index % displayImages.length;
           const slideStyle = {
             flex: `0 0 calc(100% / ${visibleSlides})`,
             height: `clamp(${gallerySectionControl.mobileHeightPx}px, 26vw, ${gallerySectionControl.desktopHeightPx}px)`,
@@ -272,9 +238,6 @@ export function NvrFndGallery({
                 data-gallery-slide
                 href={image.href}
                 key={`${image.src}-${index}`}
-                onClick={(event) => {
-                  if (shouldCancelClickAfterSwipe()) event.preventDefault();
-                }}
                 style={slideStyle}
               >
                 {imageNode}
@@ -288,11 +251,7 @@ export function NvrFndGallery({
               className="relative snap-start overflow-hidden bg-ink"
               data-gallery-slide
               key={`${image.src}-${index}`}
-              onClick={(event) => {
-                if (shouldCancelClickAfterSwipe()) {
-                  event.preventDefault();
-                  return;
-                }
+              onClick={() => {
                 if (lightbox) setActiveIndex(imageIndex);
               }}
               style={slideStyle}
@@ -302,7 +261,6 @@ export function NvrFndGallery({
             </button>
           );
         })}
-        </div>
       </div>
 
       {lightbox && activeIndex !== null ? (

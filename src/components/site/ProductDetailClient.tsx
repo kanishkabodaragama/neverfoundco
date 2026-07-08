@@ -18,7 +18,8 @@ const productGalleryLayoutControls = {
   thumbnailVisibleCount: 6,
   thumbnailGapPx: 12,
   thumbnailOffsetXpx: 0,
-  thumbnailOffsetYpx: -12,
+  thumbnailOffsetYpx: -60,
+  thumbnailImageScale: 1,
 };
 
 const sizeRows = [
@@ -601,10 +602,11 @@ function GalleryThumb({
     >
       <Image
         alt={`${productName} thumbnail ${index + 1}`}
-        className="object-contain p-2"
+        className="object-contain"
         fill
         sizes="96px"
         src={image}
+        style={{ transform: `scale(${productGalleryLayoutControls.thumbnailImageScale})` }}
         unoptimized
       />
     </button>
