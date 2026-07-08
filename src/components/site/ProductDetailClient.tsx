@@ -18,7 +18,7 @@ const productGalleryLayoutControls = {
   mainImageYpx: 0,
   mainImageScale: 1.03,
   thumbnailVisibleCount: 6,
-  thumbnailGapPx: 12,
+  thumbnailGapPx: 20,
   thumbnailOffsetXpx: 0,
   thumbnailOffsetYpx: -60,
   thumbnailImageScale: 1,
