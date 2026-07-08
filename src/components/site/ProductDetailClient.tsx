@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { ChevronDown, Ruler } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { ReactNode, UIEvent } from "react";
+import type { ReactNode, TouchEvent } from "react";
 import { useCart } from "@/components/store/cart-provider";
 import { StorePrice } from "@/components/site/StorePrice";
 import type { MockProductDetail } from "@/components/site/product-detail-data";
@@ -11,6 +11,7 @@ import { isUuid } from "@/lib/ids";
 import { getVariantCombinationKey, uniqueVariantValues } from "@/lib/product-variants";
 
 const productGalleryLayoutControls = {
+  mainImageOffsetYpx: 14,
   thumbnailVisibleCount: 6,
   thumbnailGapPx: 12,
   thumbnailOffsetYpx: -12,
@@ -22,12 +23,13 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
   const [requestedColor, setSelectedColor] = useState(product.colors[0]);
   const [requestedSize, setSelectedSize] = useState(product.sizes[0]);
   const [selectedImage, setSelectedImage] = useState(product.image);
+  const [carouselPosition, setCarouselPosition] = useState(1);
+  const [isCarouselResetting, setIsCarouselResetting] = useState(false);
   const [added, setAdded] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  const carouselRef = useRef<HTMLDivElement | null>(null);
   const mobileThumbnailStrip = useRef<HTMLDivElement | null>(null);
-  const carouselTouchStartX = useRef<number | null>(null);
-  const isLoopingCarousel = useRef(false);
+  const carouselTouchStart = useRef<{ x: number; y: number } | null>(null);
+  const isCarouselAnimating = useRef(false);
   const availableGenders = useMemo(
     () => uniqueVariantValues(product.variants.map((variant) => variant.gender)),
     [product.variants],
@@ -85,7 +87,9 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
       ].filter((image, index, list): image is string => Boolean(image) && list.indexOf(image) === index),
     [product.gallery, product.image, product.variants],
   );
-  const displayImage = selectedImage;
+  const displayImage = galleryImages.includes(selectedImage)
+    ? selectedImage
+    : galleryImages[0] ?? selectedImage;
   const displayPrice = selectedVariant?.price ?? product.price;
   const isAvailable = Boolean(
     selectedVariant &&
@@ -93,6 +97,14 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
   );
   const displayImageIndex = galleryImages.indexOf(displayImage);
   const activeGalleryIndex = Math.max(0, displayImageIndex);
+  const carouselSlides = useMemo(
+    () =>
+      galleryImages.length > 1
+        ? [galleryImages[galleryImages.length - 1], ...galleryImages, galleryImages[0]]
+        : galleryImages,
+    [galleryImages],
+  );
+  const displayedCarouselPosition = galleryImages.length > 1 ? carouselPosition : 0;
   const shortDescription = product.shortDescription?.trim();
   const description = product.description?.trim();
   const maxQuantity =
@@ -109,71 +121,85 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
     thumbnail?.scrollIntoView({
       behavior: "smooth",
       block: "nearest",
-      inline: "center",
+      inline: "nearest",
     });
   }, [activeGalleryIndex]);
 
-  function scrollCarouselTo(index: number, behavior: ScrollBehavior = "smooth") {
-    const wrappedIndex =
-      galleryImages.length > 0
-        ? ((index % galleryImages.length) + galleryImages.length) % galleryImages.length
-        : index;
+  function showGalleryIndex(index: number) {
+    if (!galleryImages.length) return;
+
+    const wrappedIndex = ((index % galleryImages.length) + galleryImages.length) % galleryImages.length;
     const image = galleryImages[wrappedIndex];
     if (!image) return;
 
     setSelectedImage(image);
-    carouselRef.current?.scrollTo({
-      left: carouselRef.current.clientWidth * wrappedIndex,
-      behavior,
-    });
+    isCarouselAnimating.current = false;
+    setIsCarouselResetting(false);
+    setCarouselPosition(galleryImages.length > 1 ? wrappedIndex + 1 : 0);
+  }
+
+  function rotateGallery(direction: 1 | -1) {
+    if (galleryImages.length < 2 || isCarouselAnimating.current) return;
+
+    const nextIndex = (activeGalleryIndex + direction + galleryImages.length) % galleryImages.length;
+    isCarouselAnimating.current = true;
+    setSelectedImage(galleryImages[nextIndex]);
+    setIsCarouselResetting(false);
+    setCarouselPosition((currentPosition) => currentPosition + direction);
   }
 
   function selectGalleryImage(image: string, index: number) {
     setSelectedImage(image);
-    scrollCarouselTo(index);
+    showGalleryIndex(index);
   }
 
-  function syncCarouselSelection(event: UIEvent<HTMLDivElement>) {
-    const target = event.currentTarget;
-    const index = Math.round(target.scrollLeft / target.clientWidth);
-    const image = galleryImages[index];
+  function settleLoopedCarousel() {
+    if (galleryImages.length < 2) return;
 
-    if (image && image !== selectedImage) setSelectedImage(image);
+    if (carouselPosition === 0) {
+      setIsCarouselResetting(true);
+      setCarouselPosition(galleryImages.length);
+    } else if (carouselPosition === galleryImages.length + 1) {
+      setIsCarouselResetting(true);
+      setCarouselPosition(1);
+    }
+
+    isCarouselAnimating.current = false;
   }
 
-  function loopCarouselAtScrollEnd(event: UIEvent<HTMLDivElement>) {
-    syncCarouselSelection(event);
+  function handleCarouselTouchStart(event: TouchEvent<HTMLDivElement>) {
+    const touch = event.touches[0];
+    if (!touch) return;
 
-    const node = event.currentTarget;
-    if (isLoopingCarousel.current || galleryImages.length < 2) return;
+    carouselTouchStart.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+    };
+  }
 
-    const maxScrollLeft = node.scrollWidth - node.clientWidth;
-    if (maxScrollLeft <= 0) return;
+  function handleCarouselTouchMove(event: TouchEvent<HTMLDivElement>) {
+    const start = carouselTouchStart.current;
+    const touch = event.touches[0];
+    if (!start || !touch) return;
 
-    if (node.scrollLeft >= maxScrollLeft - 1) {
-      isLoopingCarousel.current = true;
-      requestAnimationFrame(() => {
-        scrollCarouselTo(0, "smooth");
-        window.setTimeout(() => {
-          isLoopingCarousel.current = false;
-        }, 300);
-      });
+    const deltaX = touch.clientX - start.x;
+    const deltaY = touch.clientY - start.y;
+
+    if (Math.abs(deltaX) > 8 && Math.abs(deltaX) > Math.abs(deltaY)) {
+      event.preventDefault();
     }
   }
 
-  function loopCarouselOnEdgeSwipe(endX: number) {
-    const startX = carouselTouchStartX.current;
-    carouselTouchStartX.current = null;
-    if (startX === null || galleryImages.length < 2) return;
+  function handleCarouselTouchEnd(event: TouchEvent<HTMLDivElement>) {
+    const start = carouselTouchStart.current;
+    const touch = event.changedTouches[0];
+    carouselTouchStart.current = null;
+    if (!start || !touch || galleryImages.length < 2) return;
 
-    const deltaX = endX - startX;
+    const deltaX = touch.clientX - start.x;
     if (Math.abs(deltaX) < 40) return;
 
-    if (deltaX < 0 && activeGalleryIndex >= galleryImages.length - 1) {
-      scrollCarouselTo(0);
-    } else if (deltaX > 0 && activeGalleryIndex <= 0) {
-      scrollCarouselTo(galleryImages.length - 1);
-    }
+    rotateGallery(deltaX < 0 ? 1 : -1);
   }
 
   function clampQuantity(value: number) {
@@ -204,7 +230,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
     const nextIndex = galleryImages.indexOf(nextImage);
 
     if (nextIndex >= 0) {
-      scrollCarouselTo(nextIndex);
+      showGalleryIndex(nextIndex);
     } else {
       setSelectedImage(nextImage);
     }
@@ -248,37 +274,45 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
 
   return (
     <div className="grid w-full gap-6 lg:grid-cols-[55fr_45fr] lg:gap-4 xl:gap-5">
-      <div className="grid gap-5">
+      <div
+        className="grid gap-5"
+        style={{ marginTop: `${productGalleryLayoutControls.mainImageOffsetYpx}px` }}
+      >
         <div
-          className="no-scrollbar flex min-h-[430px] touch-auto snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain scroll-smooth bg-transparent md:min-h-[610px]"
-          onScroll={loopCarouselAtScrollEnd}
-          onTouchEnd={(event) => loopCarouselOnEdgeSwipe(event.changedTouches[0]?.clientX ?? 0)}
-          onTouchStart={(event) => {
-            carouselTouchStartX.current = event.touches[0]?.clientX ?? null;
-          }}
-          ref={carouselRef}
+          className="min-h-[430px] touch-pan-y overflow-hidden bg-transparent md:min-h-[610px]"
+          onTouchEnd={handleCarouselTouchEnd}
+          onTouchMove={handleCarouselTouchMove}
+          onTouchStart={handleCarouselTouchStart}
         >
-          {galleryImages.map((image, index) => (
-            <div
-              className="relative min-h-[430px] min-w-full touch-auto snap-center overflow-hidden md:min-h-[610px]"
-              key={`${image}-${index}`}
-            >
-              <Image
-                alt={product.alt}
-                className="scale-[1.03] object-contain p-3 md:scale-[0.98] md:p-4"
-                draggable={false}
-                fill
-                priority={index === 0}
-                sizes="(min-width: 1024px) 50vw, 100vw"
-                src={image}
-                unoptimized
-              />
-            </div>
-          ))}
+          <div
+            className={`flex ${
+              isCarouselResetting ? "" : "transition-transform duration-300 ease-out"
+            }`}
+            onTransitionEnd={settleLoopedCarousel}
+            style={{ transform: `translate3d(-${displayedCarouselPosition * 100}%, 0, 0)` }}
+          >
+            {carouselSlides.map((image, index) => (
+              <div
+                className="relative min-h-[430px] min-w-full touch-pan-y overflow-hidden md:min-h-[610px]"
+                key={`${image}-${index}`}
+              >
+                <Image
+                  alt={product.alt}
+                  className="scale-[1.03] object-contain p-3 md:scale-[0.98] md:p-4"
+                  draggable={false}
+                  fill
+                  priority={index === 1}
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  src={image}
+                  unoptimized
+                />
+              </div>
+            ))}
+          </div>
         </div>
 
         <div
-          className="no-scrollbar grid grid-flow-col justify-start overflow-x-auto scroll-smooth px-0"
+          className="no-scrollbar grid touch-pan-x grid-flow-col justify-start overflow-x-auto overscroll-x-contain scroll-smooth px-0"
           ref={mobileThumbnailStrip}
           style={{
             gap: `${productGalleryLayoutControls.thumbnailGapPx}px`,
