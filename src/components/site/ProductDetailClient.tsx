@@ -30,7 +30,7 @@ const productTextControls = {
   itemGapPx: 20,
   title: {
     xPx: 0,
-    yPx: -20,
+    yPx: -10,
     mobileFontSizePx: 35,
     desktopFontSizePx: 60,
     lineHeight: 1,
