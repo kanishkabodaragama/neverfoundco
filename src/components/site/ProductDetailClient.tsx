@@ -12,7 +12,7 @@ import { getVariantCombinationKey, uniqueVariantValues } from "@/lib/product-var
 
 const productGalleryLayoutControls = {
   mainImageSectionOffsetYpx: 14,
-  mainImageTopPaddingPx: 12,
+  mainImageTopPaddingPx: 100,
   mainImageDesktopTopPaddingPx: 16,
   mainImageXpx: 0,
   mainImageYpx: 0,
@@ -38,7 +38,7 @@ const productTextControls = {
   },
   price: {
     xPx: 0,
-    yPx: -20,
+    yPx: -10,
     fontFamily: "var(--font-display), Anton, Impact, sans-serif",
     fontWeight: 600,
     mobileFontSizePx: 17.5,
