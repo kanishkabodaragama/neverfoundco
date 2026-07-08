@@ -15,6 +15,13 @@ const homeProductSectionControl = {
   topPaddingPx: 60,
 };
 
+// Home product card info controls:
+// xPx/yPx move the title and price together.
+const homeProductCardInfoControl = {
+  xPx: 0,
+  yPx: -20,
+};
+
 // Home gallery controls:
 // galleryAspectRatio sets the gallery image W:H ratio while keeping the current width.
 const homeGalleryControl = {
@@ -96,7 +103,12 @@ function EvidenceProductCard({
         ) : null}
       </div>
 
-      <div className="mt-0.5 flex flex-col items-center gap-1 text-center md:mt-1 md:flex-row md:items-start md:justify-between md:text-left">
+      <div
+        className="mt-0.5 flex flex-col items-center gap-1 text-center md:mt-1 md:flex-row md:items-start md:justify-between md:text-left"
+        style={{
+          transform: `translate(${homeProductCardInfoControl.xPx}px, ${homeProductCardInfoControl.yPx}px)`,
+        }}
+      >
         <div>
           <h3 className="font-display text-base uppercase leading-tight sm:text-xl">{product.name}</h3>
         </div>
