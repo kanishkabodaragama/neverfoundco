@@ -15,6 +15,12 @@ const homeProductSectionControl = {
   topPaddingPx: 60,
 };
 
+// Home gallery controls:
+// galleryAspectRatio sets the gallery image W:H ratio while keeping the current width.
+const homeGalleryControl = {
+  galleryAspectRatio: "1 / 1.27",
+};
+
 export async function NeverFoundHomePage({
   products = shopProducts,
 }: {
@@ -55,7 +61,10 @@ export async function NeverFoundHomePage({
             ))}
           </div>
         </section>
-        <NvrFndGallery images={galleryImages} slideHeightPx={397} />
+        <NvrFndGallery
+          images={galleryImages}
+          slideAspectRatio={homeGalleryControl.galleryAspectRatio}
+        />
       </StoreArtSurface>
       <Footer graffiTexture />
     </div>

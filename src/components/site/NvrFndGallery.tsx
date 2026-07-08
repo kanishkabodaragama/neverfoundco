@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 
 type NvrFndGalleryImage = {
   alt: string;
@@ -59,12 +60,14 @@ const gallerySectionControl = {
 export function NvrFndGallery({
   images = galleryImages,
   lightbox = true,
+  slideAspectRatio,
   slideHeightPx,
   title = "NVR FND GALLERY",
   visibleSlides = gallerySectionControl.visibleSlides,
 }: {
   images?: NvrFndGalleryImage[];
   lightbox?: boolean;
+  slideAspectRatio?: string;
   slideHeightPx?: number;
   title?: string;
   visibleSlides?: number;
@@ -217,12 +220,18 @@ export function NvrFndGallery({
       >
         {loopedImages.map((image, index) => {
           const imageIndex = index % displayImages.length;
-          const slideStyle = {
+          const slideStyle: CSSProperties = {
             flex: `0 0 calc(100% / ${visibleSlides})`,
-            height: slideHeightPx
-              ? `${slideHeightPx}px`
-              : `clamp(${gallerySectionControl.mobileHeightPx}px, 26vw, ${gallerySectionControl.desktopHeightPx}px)`,
           };
+
+          if (slideAspectRatio) {
+            slideStyle.aspectRatio = slideAspectRatio;
+          } else {
+            slideStyle.height = slideHeightPx
+              ? `${slideHeightPx}px`
+              : `clamp(${gallerySectionControl.mobileHeightPx}px, 26vw, ${gallerySectionControl.desktopHeightPx}px)`;
+          }
+
           const imageNode = (
             <Image
               alt={image.alt}
