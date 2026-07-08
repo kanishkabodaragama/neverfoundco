@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { ChevronDown, Ruler, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { ReactNode, TouchEvent } from "react";
+import type { CSSProperties, ReactNode, TouchEvent } from "react";
 import { useCart } from "@/components/store/cart-provider";
 import { StorePrice } from "@/components/site/StorePrice";
 import type { MockProductDetail } from "@/components/site/product-detail-data";
@@ -12,6 +12,8 @@ import { getVariantCombinationKey, uniqueVariantValues } from "@/lib/product-var
 
 const productGalleryLayoutControls = {
   mainImageSectionOffsetYpx: 14,
+  mainImageTopPaddingPx: 12,
+  mainImageDesktopTopPaddingPx: 16,
   mainImageXpx: 0,
   mainImageYpx: 0,
   mainImageScale: 1.03,
@@ -23,8 +25,9 @@ const productGalleryLayoutControls = {
 };
 
 // Product title and price controls:
-// xPx/yPx move each text element. Font sizes are in pixels.
+// xPx/yPx move each text element. Font sizes and gaps are in pixels.
 const productTextControls = {
+  itemGapPx: 20,
   title: {
     xPx: 0,
     yPx: -20,
@@ -36,11 +39,11 @@ const productTextControls = {
   price: {
     xPx: 0,
     yPx: -20,
-    fontFamily: "var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace",
-    fontWeight: 900,
-    mobileFontSizePx: 20,
-    desktopFontSizePx: 24,
-    lineHeight: 1.15,
+    fontFamily: "var(--font-display), Anton, Impact, sans-serif",
+    fontWeight: 600,
+    mobileFontSizePx: 17.5,
+    desktopFontSizePx: 30,
+    lineHeight: 1,
     letterGapPx: 0,
   },
 };
@@ -362,15 +365,19 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
               >
                 <Image
                   alt={product.alt}
-                  className="object-contain p-3 md:p-4"
+                  className="object-contain px-3 pb-3 pt-[var(--main-product-image-top-padding)] md:px-4 md:pb-4 md:pt-[var(--main-product-image-desktop-top-padding)]"
                   draggable={false}
                   fill
                   priority={index === 1}
                   sizes="(min-width: 1024px) 50vw, 100vw"
                   src={image}
-                  style={{
-                    transform: `translate(${productGalleryLayoutControls.mainImageXpx}px, ${productGalleryLayoutControls.mainImageYpx}px) scale(${productGalleryLayoutControls.mainImageScale})`,
-                  }}
+                  style={
+                    {
+                      "--main-product-image-desktop-top-padding": `${productGalleryLayoutControls.mainImageDesktopTopPaddingPx}px`,
+                      "--main-product-image-top-padding": `${productGalleryLayoutControls.mainImageTopPaddingPx}px`,
+                      transform: `translate(${productGalleryLayoutControls.mainImageXpx}px, ${productGalleryLayoutControls.mainImageYpx}px) scale(${productGalleryLayoutControls.mainImageScale})`,
+                    } as CSSProperties
+                  }
                   unoptimized
                 />
               </div>
@@ -404,38 +411,50 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
         </div>
       </div>
 
-      <div className="flex flex-col items-start justify-start text-left">
+      <div
+        className="flex flex-col items-start justify-start text-left"
+        style={{ rowGap: `${productTextControls.itemGapPx}px` }}
+      >
         <h1
           className="max-w-xl font-display italic uppercase"
           style={{
             fontSize: `clamp(${productTextControls.title.mobileFontSizePx}px, 8vw, ${productTextControls.title.desktopFontSizePx}px)`,
             letterSpacing: `${productTextControls.title.letterGapPx}px`,
             lineHeight: productTextControls.title.lineHeight,
-            transform: `translate(${productTextControls.title.xPx}px, ${productTextControls.title.yPx}px)`,
+            marginLeft: `${productTextControls.title.xPx}px`,
+            marginTop: `${productTextControls.title.yPx}px`,
           }}
         >
           {product.name}
         </h1>
         <p
-          className="mt-3 uppercase text-ink"
+          className="uppercase text-ink"
           style={{
             fontFamily: productTextControls.price.fontFamily,
             fontSize: `clamp(${productTextControls.price.mobileFontSizePx}px, 4vw, ${productTextControls.price.desktopFontSizePx}px)`,
             fontWeight: productTextControls.price.fontWeight,
             letterSpacing: `${productTextControls.price.letterGapPx}px`,
             lineHeight: productTextControls.price.lineHeight,
-            transform: `translate(${productTextControls.price.xPx}px, ${productTextControls.price.yPx}px)`,
+            marginLeft: `${productTextControls.price.xPx}px`,
+            marginTop: `${productTextControls.price.yPx}px`,
           }}
         >
           <StorePrice amountUsd={displayPrice} />
         </p>
         {shortDescription ? (
-          <p className="mt-3 max-w-md whitespace-pre-line text-sm font-semibold italic leading-relaxed text-ink/70">
+          <p className="max-w-md whitespace-pre-line text-sm font-semibold italic leading-relaxed text-ink/70">
             {shortDescription}
           </p>
         ) : null}
 
-        <div className="mt-8 w-full space-y-8">
+        <div
+          className="w-full"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            rowGap: `${productTextControls.itemGapPx}px`,
+          }}
+        >
           {availableGenders.length > 1 ? (
             <OptionGroup label="Gender">
               {availableGenders.map((gender) => (
@@ -519,7 +538,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
           </OptionGroup>
 
           <button
-            className="mt-1 flex h-12 w-full items-center justify-center gap-3 rounded-full bg-ink px-6 py-2 font-sans text-xs font-black italic uppercase tracking-[0.08em] text-bone transition-colors hover:bg-rust hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex h-12 w-full items-center justify-center gap-3 rounded-full bg-ink px-6 py-2 font-sans text-xs font-black italic uppercase tracking-[0.08em] text-bone transition-colors hover:bg-rust hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
             disabled={!isAvailable}
             onClick={addSelectedVariant}
             type="button"
