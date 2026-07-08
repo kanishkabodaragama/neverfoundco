@@ -89,4 +89,4 @@ npm run lint
 npm run build
 ```
 
-In this environment, sandboxed builds can fail while fetching `next/font` assets. If that happens, rerun the build with network access. thes
+In this environment, sandboxed builds can fail while fetching `next/font` assets. If that happens, rerun the build with network access. thess
