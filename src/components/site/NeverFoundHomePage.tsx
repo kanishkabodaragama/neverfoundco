@@ -55,7 +55,7 @@ export async function NeverFoundHomePage({
             ))}
           </div>
         </section>
-        <NvrFndGallery images={galleryImages} />
+        <NvrFndGallery images={galleryImages} slideHeightPx={397} />
       </StoreArtSurface>
       <Footer graffiTexture />
     </div>
