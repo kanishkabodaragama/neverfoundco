@@ -11,9 +11,13 @@ import { isUuid } from "@/lib/ids";
 import { getVariantCombinationKey, uniqueVariantValues } from "@/lib/product-variants";
 
 const productGalleryLayoutControls = {
-  mainImageOffsetYpx: 14,
+  mainImageSectionOffsetYpx: 14,
+  mainImageXpx: 0,
+  mainImageYpx: 0,
+  mainImageScale: 1.03,
   thumbnailVisibleCount: 6,
   thumbnailGapPx: 12,
+  thumbnailOffsetXpx: 0,
   thumbnailOffsetYpx: -12,
 };
 
@@ -312,7 +316,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
     <div className="grid w-full gap-6 lg:grid-cols-[55fr_45fr] lg:gap-4 xl:gap-5">
       <div
         className="grid gap-5"
-        style={{ marginTop: `${productGalleryLayoutControls.mainImageOffsetYpx}px` }}
+        style={{ marginTop: `${productGalleryLayoutControls.mainImageSectionOffsetYpx}px` }}
       >
         <div
           className="min-h-[430px] touch-pan-y overflow-hidden bg-transparent md:min-h-[610px]"
@@ -334,12 +338,15 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
               >
                 <Image
                   alt={product.alt}
-                  className="scale-[1.03] object-contain p-3 md:scale-[0.98] md:p-4"
+                  className="object-contain p-3 md:p-4"
                   draggable={false}
                   fill
                   priority={index === 1}
                   sizes="(min-width: 1024px) 50vw, 100vw"
                   src={image}
+                  style={{
+                    transform: `translate(${productGalleryLayoutControls.mainImageXpx}px, ${productGalleryLayoutControls.mainImageYpx}px) scale(${productGalleryLayoutControls.mainImageScale})`,
+                  }}
                   unoptimized
                 />
               </div>
@@ -357,6 +364,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
               productGalleryLayoutControls.thumbnailGapPx
             }px) / ${productGalleryLayoutControls.thumbnailVisibleCount})`,
             marginTop: `${productGalleryLayoutControls.thumbnailOffsetYpx}px`,
+            transform: `translateX(${productGalleryLayoutControls.thumbnailOffsetXpx}px)`,
           }}
         >
           {galleryImages.map((image, index) => (

@@ -17,6 +17,7 @@ export type ShopProduct = {
   variants: ProductVariant[];
   stockLabel: string;
   image: string;
+  youMayAlsoLikeImage?: string | null;
   gallery: string[];
   alt: string;
   soldOut?: boolean;
@@ -356,6 +357,7 @@ export function mapDbProductToShopProduct(product: ProductWithImages): ShopProdu
     variants,
     stockLabel,
     image: mainImage,
+    youMayAlsoLikeImage: product.you_may_also_like_image_url ?? null,
     gallery: [mainImage, ...images.map((image) => image.image_url)].filter(
       (value, index, list) => list.indexOf(value) === index,
     ),

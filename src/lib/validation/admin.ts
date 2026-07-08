@@ -6,6 +6,8 @@ export const productFormSchema = z.object({
   short_description: z.string().optional(),
   description: z.string().optional(),
   main_image_url: z.string().url().optional().nullable(),
+  you_may_also_like_image_url: z.string().url().optional().nullable(),
+  you_may_also_like_storage_path: z.string().optional().nullable(),
   category: z.string().min(1),
   product_status: z.enum(["draft", "published", "inactive"]).default("draft"),
   stock_tracking_enabled: z.coerce.boolean().default(true),

@@ -79,6 +79,7 @@ export function ProductForm({
   });
   const [basisConfirmed, setBasisConfirmed] = useState(Boolean(product?.product_variants?.length));
   const [featuredRemoved, setFeaturedRemoved] = useState(false);
+  const [youMayAlsoLikeRemoved, setYouMayAlsoLikeRemoved] = useState(false);
   const [removedGalleryImageIds, setRemovedGalleryImageIds] = useState<string[]>([]);
   const [removedVariantImageIds, setRemovedVariantImageIds] = useState<string[]>([]);
   const [variantError, setVariantError] = useState("");
@@ -123,6 +124,7 @@ export function ProductForm({
   const remainingStock = Math.max(0, Number(totalStock || 0) - assignedStock);
   const serializedVariants = useMemo(() => JSON.stringify(variants), [variants]);
   const featuredImageUrl = product?.main_image_url ?? product?.product_images?.[0]?.image_url ?? null;
+  const youMayAlsoLikeImageUrl = product?.you_may_also_like_image_url ?? null;
 
   function dispatchUploadProgress(detail: ProductUploadProgress) {
     window.dispatchEvent(new CustomEvent(PRODUCT_UPLOAD_PROGRESS_EVENT, { detail }));
@@ -261,6 +263,7 @@ export function ProductForm({
       <input name="sizes" type="hidden" value={sizes.join(",")} />
       <input name="variants_json" type="hidden" value={serializedVariants} />
       {featuredRemoved ? <input name="remove_featured_image" type="hidden" value="true" /> : null}
+      {youMayAlsoLikeRemoved ? <input name="remove_you_may_also_like_image" type="hidden" value="true" /> : null}
       {removedGalleryImageIds.map((id) => (
         <input key={id} name="remove_gallery_image_ids" type="hidden" value={id} />
       ))}
@@ -599,7 +602,7 @@ export function ProductForm({
 
       <section className="admin-card p-4">
         <h2 className="font-semibold">Media</h2>
-        <p className="admin-muted mt-1">Upload one featured product image and gallery images. Each image must be below {MAX_FILE_SIZE_MB} MB.</p>
+        <p className="admin-muted mt-1">Upload one featured product image, an optional You may also like image, and gallery images. Each image must be below {MAX_FILE_SIZE_MB} MB.</p>
         {featuredImageUrl || product?.product_images?.length ? (
           <div className="mt-4 grid gap-4 md:grid-cols-[180px_1fr]">
             <div className="grid gap-4">
@@ -648,6 +651,32 @@ export function ProductForm({
         ) : null}
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           {!featuredImageUrl ? <FilePreviewInput label="Featured image" name="featured_file" /> : null}
+          <div className="grid gap-3">
+            {youMayAlsoLikeImageUrl && !youMayAlsoLikeRemoved ? (
+              <ExistingImagePreview
+                label="Current You may also like image"
+                name={`${product?.name ?? "Product"} recommendation image`}
+                onRemove={() => setYouMayAlsoLikeRemoved(true)}
+                url={youMayAlsoLikeImageUrl}
+              />
+            ) : null}
+            <FilePreviewInput
+              label={
+                youMayAlsoLikeImageUrl && !youMayAlsoLikeRemoved
+                  ? "Replace You may also like image"
+                  : "You may also like image"
+              }
+              name="you_may_also_like_file"
+            />
+            <p className="admin-muted text-xs">
+              Leave this empty to use the featured image in the You may also like carousel.
+            </p>
+            {youMayAlsoLikeRemoved ? (
+              <p className="text-xs font-semibold text-red-600">
+                Custom You may also like image will be removed unless you upload a replacement.
+              </p>
+            ) : null}
+          </div>
           <FilePreviewInput label="Gallery images" multiple name="gallery_files" />
         </div>
       </section>

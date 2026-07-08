@@ -43,6 +43,8 @@ async function updateProduct(request: Request, id: string) {
     short_description: formData.get("short_description") || undefined,
     description: formData.get("description") || undefined,
     main_image_url: undefined,
+    you_may_also_like_image_url: undefined,
+    you_may_also_like_storage_path: undefined,
     category: formData.get("category") || "T-Shirts",
     product_status: getProductStatus(formData),
     stock_tracking_enabled: formData.get("stock_tracking_enabled") === "true",
@@ -80,15 +82,23 @@ async function updateProduct(request: Request, id: string) {
   }
 
   const supabase = getSupabaseAdminClient();
-  const updateData: typeof parsed.data & { main_image_url?: string | null } = {
+  const updateData: typeof parsed.data & {
+    main_image_url?: string | null;
+    you_may_also_like_image_url?: string | null;
+    you_may_also_like_storage_path?: string | null;
+  } = {
     ...parsed.data,
   };
   const removeFeaturedImage = formData.get("remove_featured_image") === "true";
+  const removeYouMayAlsoLikeImage = formData.get("remove_you_may_also_like_image") === "true";
   let uploadedFeaturedStoragePath: string | null = null;
+  let uploadedYouMayAlsoLikeStoragePath: string | null = null;
   let expectedFeaturedImageUrl: string | null | undefined;
+  let expectedYouMayAlsoLikeImageUrl: string | null | undefined;
+  let expectedYouMayAlsoLikeStoragePath: string | null | undefined;
   const { data: currentMedia, error: currentMediaError } = await supabase
     .from("products")
-    .select("main_image_url, product_images(image_url)")
+    .select("main_image_url, you_may_also_like_image_url, you_may_also_like_storage_path, product_images(image_url)")
     .eq("id", id)
     .maybeSingle();
   if (currentMediaError) {
@@ -101,10 +111,13 @@ async function updateProduct(request: Request, id: string) {
     (currentMedia?.product_images ?? []).map((image) => image.image_url),
   );
   let featuredStoragePathToRemove: string | null = null;
+  let youMayAlsoLikeStoragePathToRemove: string | null = null;
 
   try {
     const featuredFile = getImageFiles(formData, "featured_file")[0];
+    const youMayAlsoLikeFile = getImageFiles(formData, "you_may_also_like_file")[0];
     const currentFeaturedUrl = currentMedia?.main_image_url ?? null;
+    const currentYouMayAlsoLikeStoragePath = currentMedia?.you_may_also_like_storage_path ?? null;
 
     if (featuredFile) {
       const uploaded = await uploadProductImageFile({
@@ -127,12 +140,38 @@ async function updateProduct(request: Request, id: string) {
     ) {
       featuredStoragePathToRemove = getProductImageStoragePathFromUrl(currentFeaturedUrl);
     }
+
+    if (youMayAlsoLikeFile) {
+      const uploaded = await uploadProductImageFile({
+        file: youMayAlsoLikeFile,
+        productId: id,
+        prefix: "you-may-also-like",
+      });
+      updateData.you_may_also_like_image_url = uploaded.imageUrl;
+      updateData.you_may_also_like_storage_path = uploaded.storagePath;
+      uploadedYouMayAlsoLikeStoragePath = uploaded.storagePath;
+      expectedYouMayAlsoLikeImageUrl = uploaded.imageUrl;
+      expectedYouMayAlsoLikeStoragePath = uploaded.storagePath;
+    } else if (removeYouMayAlsoLikeImage) {
+      updateData.you_may_also_like_image_url = null;
+      updateData.you_may_also_like_storage_path = null;
+      expectedYouMayAlsoLikeImageUrl = null;
+      expectedYouMayAlsoLikeStoragePath = null;
+    }
+
+    if ((youMayAlsoLikeFile || removeYouMayAlsoLikeImage) && currentYouMayAlsoLikeStoragePath) {
+      youMayAlsoLikeStoragePathToRemove = currentYouMayAlsoLikeStoragePath;
+    }
   } catch (uploadError) {
+    await tryRemoveProductImageStoragePaths([
+      uploadedFeaturedStoragePath,
+      uploadedYouMayAlsoLikeStoragePath,
+    ]);
     return adminRedirect(request, `/admin/products/${id}/edit`, {
       error:
         uploadError instanceof Error
           ? uploadError.message
-          : "Featured image upload failed.",
+          : "Product image upload failed.",
     });
   }
 
@@ -140,11 +179,14 @@ async function updateProduct(request: Request, id: string) {
     .from("products")
     .update(updateData)
     .eq("id", id)
-    .select("main_image_url")
+    .select("main_image_url, you_may_also_like_image_url, you_may_also_like_storage_path")
     .single();
 
   if (error) {
-    await tryRemoveProductImageStoragePaths([uploadedFeaturedStoragePath]);
+    await tryRemoveProductImageStoragePaths([
+      uploadedFeaturedStoragePath,
+      uploadedYouMayAlsoLikeStoragePath,
+    ]);
     return adminRedirect(request, `/admin/products/${id}/edit`, {
       error: error.message,
     });
@@ -154,14 +196,34 @@ async function updateProduct(request: Request, id: string) {
     expectedFeaturedImageUrl !== undefined &&
     updatedProduct?.main_image_url !== expectedFeaturedImageUrl
   ) {
-    await tryRemoveProductImageStoragePaths([uploadedFeaturedStoragePath]);
+    await tryRemoveProductImageStoragePaths([
+      uploadedFeaturedStoragePath,
+      uploadedYouMayAlsoLikeStoragePath,
+    ]);
     return adminRedirect(request, `/admin/products/${id}/edit`, {
       error: "Featured image was uploaded but could not be verified in the database.",
     });
   }
 
+  if (
+    expectedYouMayAlsoLikeImageUrl !== undefined &&
+    (updatedProduct?.you_may_also_like_image_url !== expectedYouMayAlsoLikeImageUrl ||
+      updatedProduct?.you_may_also_like_storage_path !== expectedYouMayAlsoLikeStoragePath)
+  ) {
+    await tryRemoveProductImageStoragePaths([
+      uploadedFeaturedStoragePath,
+      uploadedYouMayAlsoLikeStoragePath,
+    ]);
+    return adminRedirect(request, `/admin/products/${id}/edit`, {
+      error: "You may also like image was uploaded but could not be verified in the database.",
+    });
+  }
+
   if (featuredStoragePathToRemove) {
     await tryRemoveProductImageStoragePaths([featuredStoragePathToRemove]);
+  }
+  if (youMayAlsoLikeStoragePathToRemove) {
+    await tryRemoveProductImageStoragePaths([youMayAlsoLikeStoragePathToRemove]);
   }
 
   try {

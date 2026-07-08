@@ -82,7 +82,7 @@ function NeverFoundProductPage({
   const relatedGalleryImages = related.map((item) => ({
     alt: item.alt,
     href: `/products/${item.slug ?? item.id}`,
-    src: item.image,
+    src: item.youMayAlsoLikeImage || item.image,
   }));
 
   return (

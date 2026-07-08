@@ -26,6 +26,8 @@ export type Database = {
           stock_quantity: number;
           show_stock_count: boolean;
           main_image_url: string | null;
+          you_may_also_like_image_url: string | null;
+          you_may_also_like_storage_path: string | null;
           category: string;
           product_status: "draft" | "published" | "inactive";
           stock_tracking_enabled: boolean;
