@@ -1,9 +1,16 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
-const galleryImages = [
+type NvrFndGalleryImage = {
+  alt: string;
+  href?: string;
+  src: string;
+};
+
+const galleryImages: NvrFndGalleryImage[] = [
   {
     alt: "Never Found gallery image 1",
     src: "/images/products/home-drop/never-found-tiger-lounge-tee.jpg",
@@ -21,11 +28,6 @@ const galleryImages = [
     src: "/images/products/home-drop/never-found-logo-tee.jpg",
   },
 ];
-
-type NvrFndGalleryImage = {
-  alt: string;
-  src: string;
-};
 
 // Gallery title font controls:
 // Uses the same Anton-based font as the mobile slide menu.
@@ -56,8 +58,14 @@ const gallerySectionControl = {
 
 export function NvrFndGallery({
   images = galleryImages,
+  lightbox = true,
+  title = "NVR FND GALLERY",
+  visibleSlides = gallerySectionControl.visibleSlides,
 }: {
   images?: NvrFndGalleryImage[];
+  lightbox?: boolean;
+  title?: string;
+  visibleSlides?: number;
 }) {
   const displayImages = images.length ? images : galleryImages;
   const loopedImages = useMemo(
@@ -145,7 +153,7 @@ export function NvrFndGallery({
   }, [keepStripInMiddleSet]);
 
   useEffect(() => {
-    if (activeIndex === null) return;
+    if (!lightbox || activeIndex === null) return;
 
     document.body.classList.add("nvr-gallery-lightbox-open");
     document.body.style.overflow = "hidden";
@@ -167,13 +175,13 @@ export function NvrFndGallery({
       document.body.style.overflow = "";
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [activeIndex, displayImages.length]);
+  }, [activeIndex, displayImages.length, lightbox]);
 
   useEffect(() => {
-    if (activeIndex === null) return;
+    if (!lightbox || activeIndex === null) return;
 
     syncStripToIndex(activeIndex, "smooth");
-  }, [activeIndex, syncStripToIndex]);
+  }, [activeIndex, lightbox, syncStripToIndex]);
 
   function syncModalIndex() {
     const node = modalRef.current;
@@ -198,7 +206,7 @@ export function NvrFndGallery({
           transform: `translate(${galleryTitleControl.xPx}px, ${galleryTitleControl.yPx}px)`,
         }}
       >
-        NVR FND GALLERY
+        {title}
       </h2>
       <div
         className="no-scrollbar flex touch-pan-x snap-x snap-mandatory overflow-x-auto bg-ink"
@@ -207,33 +215,55 @@ export function NvrFndGallery({
       >
         {loopedImages.map((image, index) => {
           const imageIndex = index % displayImages.length;
+          const slideStyle = {
+            flex: `0 0 calc(100% / ${visibleSlides})`,
+            height: `clamp(${gallerySectionControl.mobileHeightPx}px, 26vw, ${gallerySectionControl.desktopHeightPx}px)`,
+          };
+          const imageNode = (
+            <Image
+              alt={image.alt}
+              className="object-cover"
+              fill
+              sizes={`calc(100vw / ${visibleSlides})`}
+              src={image.src}
+              unoptimized
+            />
+          );
+
+          if (image.href) {
+            return (
+              <Link
+                aria-label={`View product ${imageIndex + 1}`}
+                className="relative snap-start overflow-hidden bg-ink"
+                data-gallery-slide
+                href={image.href}
+                key={`${image.src}-${index}`}
+                style={slideStyle}
+              >
+                {imageNode}
+              </Link>
+            );
+          }
+
           return (
             <button
               aria-label={`Open gallery image ${imageIndex + 1}`}
               className="relative snap-start overflow-hidden bg-ink"
               data-gallery-slide
               key={`${image.src}-${index}`}
-              onClick={() => setActiveIndex(imageIndex)}
-              style={{
-                flex: `0 0 calc(100% / ${gallerySectionControl.visibleSlides})`,
-                height: `clamp(${gallerySectionControl.mobileHeightPx}px, 26vw, ${gallerySectionControl.desktopHeightPx}px)`,
+              onClick={() => {
+                if (lightbox) setActiveIndex(imageIndex);
               }}
+              style={slideStyle}
               type="button"
             >
-              <Image
-                alt={image.alt}
-                className="object-cover"
-                fill
-                sizes={`calc(100vw / ${gallerySectionControl.visibleSlides})`}
-                src={image.src}
-                unoptimized
-              />
+              {imageNode}
             </button>
           );
         })}
       </div>
 
-      {activeIndex !== null ? (
+      {lightbox && activeIndex !== null ? (
         <div
           aria-modal="true"
           className="fixed inset-0 z-[90] bg-ink"

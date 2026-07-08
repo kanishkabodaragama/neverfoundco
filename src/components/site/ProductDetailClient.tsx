@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ChevronDown, Ruler } from "lucide-react";
+import { ChevronDown, Ruler, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode, TouchEvent } from "react";
 import { useCart } from "@/components/store/cart-provider";
@@ -17,6 +17,21 @@ const productGalleryLayoutControls = {
   thumbnailOffsetYpx: -12,
 };
 
+const sizeRows = [
+  ["S", "17", "26.5", "19.5", "8.5"],
+  ["M", "20", "27.5", "21", "9"],
+  ["L", "21", "28.5", "22", "9.5"],
+  ["XL", "22", "29.5", "23", "10"],
+  ["2XL", "23", "29.5", "24", "11.5"],
+];
+
+const sizeMeasurements = [
+  { label: "Shoulder", values: sizeRows.map((row) => row[1]) },
+  { label: "Height", values: sizeRows.map((row) => row[2]) },
+  { label: "Chest", values: sizeRows.map((row) => row[3]) },
+  { label: "Sleeve", values: sizeRows.map((row) => row[4]) },
+];
+
 export function ProductDetailClient({ product }: { product: MockProductDetail }) {
   const cart = useCart();
   const [requestedGender, setSelectedGender] = useState(product.genders[0]);
@@ -25,6 +40,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
   const [selectedImage, setSelectedImage] = useState(product.image);
   const [carouselPosition, setCarouselPosition] = useState(1);
   const [isCarouselResetting, setIsCarouselResetting] = useState(false);
+  const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
   const [added, setAdded] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const mobileThumbnailStrip = useRef<HTMLDivElement | null>(null);
@@ -124,6 +140,26 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
       inline: "nearest",
     });
   }, [activeGalleryIndex]);
+
+  useEffect(() => {
+    if (!isSizeChartOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsSizeChartOpen(false);
+      }
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [isSizeChartOpen]);
 
   function showGalleryIndex(index: number) {
     if (!galleryImages.length) return;
@@ -380,13 +416,14 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
           <OptionGroup
             label="Size"
             action={
-              <a
+              <button
                 className="flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-normal underline decoration-ink/60 underline-offset-4 transition-colors hover:text-rust"
-                href="#size-chart"
+                onClick={() => setIsSizeChartOpen(true)}
+                type="button"
               >
                 <Ruler className="h-4 w-4" />
                 Size Guide
-              </a>
+              </button>
             }
           >
             {availableSizes.map((size) => (
@@ -457,6 +494,75 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
             </section>
           ) : null}
         </div>
+      </div>
+      {isSizeChartOpen ? <SizeChartModal onClose={() => setIsSizeChartOpen(false)} /> : null}
+    </div>
+  );
+}
+
+function SizeChartModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div
+      aria-modal="true"
+      className="fixed inset-0 z-[95] flex items-center justify-center bg-ink/80 px-4 py-6 text-ink"
+      role="dialog"
+    >
+      <button
+        aria-label="Close size chart"
+        className="absolute inset-0 cursor-default"
+        onClick={onClose}
+        type="button"
+      />
+      <div className="relative z-10 max-h-full w-full max-w-3xl overflow-auto border-2 border-ink bg-acid p-5 shadow-[8px_8px_0_#111] sm:p-7">
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">
+            Size Chart
+          </h2>
+          <button
+            aria-label="Close size chart"
+            className="grid h-10 w-10 place-items-center border border-ink text-ink transition-colors hover:bg-ink hover:text-acid"
+            onClick={onClose}
+            type="button"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        <div className="mt-6 overflow-x-auto">
+          <table className="w-full min-w-[540px] table-fixed border-collapse text-center font-mono text-[10px] font-bold uppercase sm:text-xs">
+            <thead>
+              <tr>
+                <th className="border border-ink px-1.5 py-3 text-left uppercase sm:px-3">
+                  Measure
+                </th>
+                {sizeRows.map(([size]) => (
+                  <th className="border border-ink px-1.5 py-3 uppercase sm:px-3" key={size}>
+                    {size}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {sizeMeasurements.map((measurement) => (
+                <tr key={measurement.label}>
+                  <th className="border border-ink px-1.5 py-3 text-left uppercase sm:px-3">
+                    {measurement.label}
+                  </th>
+                  {measurement.values.map((value, index) => (
+                    <td
+                      className="border border-ink px-1.5 py-3 sm:px-3"
+                      key={`${measurement.label}-${sizeRows[index][0]}`}
+                    >
+                      {value}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="mt-4 font-mono text-[10px] font-bold uppercase tracking-wide">
+          * Measurements in inches
+        </p>
       </div>
     </div>
   );
