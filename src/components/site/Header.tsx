@@ -490,11 +490,25 @@ export function SiteHeader({
           </div>
           <button
             aria-label="Close cart"
-            className="grid h-10 w-10 place-items-center text-ink transition-opacity hover:opacity-65"
+            className="relative flex items-center justify-center text-ink transition-opacity hover:opacity-65"
             onClick={() => setCartOpen(false)}
+            style={{
+              height: `${mobileMenuTopBarControl.closeIconSizePx}px`,
+              transform: `scale(${mobileMenuTopBarControl.closeIconScale})`,
+              width: `${mobileMenuTopBarControl.closeIconSizePx}px`,
+            }}
             type="button"
           >
-            <CloseGlyph />
+            <span
+              aria-hidden="true"
+              className="absolute h-px rotate-45 bg-current"
+              style={{ width: `${mobileMenuTopBarControl.closeIconSizePx}px` }}
+            />
+            <span
+              aria-hidden="true"
+              className="absolute h-px -rotate-45 bg-current"
+              style={{ width: `${mobileMenuTopBarControl.closeIconSizePx}px` }}
+            />
           </button>
         </div>
 
@@ -602,29 +616,5 @@ export function SiteHeader({
         </div>
       </aside>
     </>
-  );
-}
-
-function CloseGlyph() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="h-8 w-8"
-      fill="none"
-      viewBox="0 0 44 44"
-    >
-      <path
-        d="M12 12L32 32M32 12L12 32"
-        className="stroke-current"
-        strokeLinecap="round"
-        strokeWidth="2"
-      />
-      <path
-        d="M22 5.5L26 9.5L22 13.5L18 9.5L22 5.5ZM22 38.5L18 34.5L22 30.5L26 34.5L22 38.5Z"
-        className="stroke-current opacity-70"
-        strokeLinejoin="round"
-        strokeWidth="1.4"
-      />
-    </svg>
   );
 }
