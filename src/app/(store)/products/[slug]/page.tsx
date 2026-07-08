@@ -26,6 +26,16 @@ const youMayAlsoLikeTitleControl = {
   fontSizeVw: 14.50,
 };
 
+function prepareRelatedGalleryImages(
+  images: Array<{ alt: string; href: string; src: string }>,
+) {
+  if (images.length <= 1) return [];
+  if (images.length === 2) return [images[0], images[1], images[0], images[1]];
+  if (images.length === 3) return [...images, images[0]];
+
+  return images.slice(0, 4);
+}
+
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
@@ -87,11 +97,13 @@ function NeverFoundProductPage({
   const related = relatedProducts
     .filter((item) => !item.soldOut && (item.slug ?? item.id) !== product.slug)
     .slice(0, 4);
-  const relatedGalleryImages = related.map((item) => ({
-    alt: item.alt,
-    href: `/products/${item.slug ?? item.id}`,
-    src: item.youMayAlsoLikeImage || item.image,
-  }));
+  const relatedGalleryImages = prepareRelatedGalleryImages(
+    related.map((item) => ({
+      alt: item.alt,
+      href: `/products/${item.slug ?? item.id}`,
+      src: item.youMayAlsoLikeImage || item.image,
+    })),
+  );
 
   return (
     <div className="min-h-screen w-full bg-acid text-ink">

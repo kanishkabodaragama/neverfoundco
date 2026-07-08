@@ -241,7 +241,7 @@ export function NvrFndGallery({
           const imageNode = (
             <Image
               alt={image.alt}
-              className="object-cover"
+              className="object-cover object-center"
               fill
               sizes={`calc(100vw / ${visibleSlides})`}
               src={image.src}
@@ -309,7 +309,7 @@ export function NvrFndGallery({
               >
                 <Image
                   alt={image.alt}
-                  className="object-contain p-4"
+                  className="object-contain object-center p-4"
                   fill
                   sizes="100vw"
                   src={image.src}

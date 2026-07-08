@@ -17,9 +17,11 @@ const rightFooterLinks = [
 ];
 
 // Footer controls:
+// footerPaddingTopPx adjusts space above the logo across the whole footer.
 // logoPaddingTopPx/logoPaddingBottomPx adjust space inside the logo area.
 // logoMarginBottomPx adjusts the gap after the logo area.
 const footerLayoutControls = {
+  footerPaddingTopPx: 0,
   logoPaddingTopPx: 0,
   logoPaddingBottomPx: -10,
   logoMarginBottomPx: -20,
@@ -28,7 +30,12 @@ const footerLayoutControls = {
 export function Footer({}: { graffiTexture?: boolean }) {
   return (
     <footer className="relative overflow-hidden border-0 bg-black text-acid shadow-none outline-none">
-      <div className="relative z-10 px-5 pb-5 md:px-8 md:pb-7">
+      <div
+        className="relative z-10 px-5 pb-5 md:px-8 md:pb-7"
+        style={{
+          paddingTop: `${footerLayoutControls.footerPaddingTopPx}px`,
+        }}
+      >
         <div
           style={{
             marginBottom: `${footerLayoutControls.logoMarginBottomPx}px`,

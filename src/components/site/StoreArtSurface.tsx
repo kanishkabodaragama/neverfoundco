@@ -35,6 +35,50 @@ const redLogoOverlayControl = {
   transparency: 0.02,
 };
 
+// Single product side graffiti controls:
+// xVw/yPx move each image, widthVw changes its base size,
+// scale changes final size, rotateDeg changes angle, opacity is 0 to 1.
+const productSideGraffiTextureControls = {
+  mobileSrc: "/images/textures/product-graffi-mobile.png",
+  desktopSrc: "/images/textures/product-graffi-desktop.png",
+  mobile: {
+    left: {
+      xVw: -34,
+      yPx: 34,
+      widthVw: 132,
+      scale: 1,
+      rotateDeg: 0,
+      opacity: 0.22,
+    },
+    right: {
+      xVw: 34,
+      yPx: 34,
+      widthVw: 132,
+      scale: 1,
+      rotateDeg: 0,
+      opacity: 0.22,
+    },
+  },
+  desktop: {
+    left: {
+      xVw: -48,
+      yPx: -90,
+      widthVw: 92,
+      scale: 1,
+      rotateDeg: 0,
+      opacity: 0.18,
+    },
+    right: {
+      xVw: 56,
+      yPx: -90,
+      widthVw: 92,
+      scale: 1,
+      rotateDeg: 0,
+      opacity: 0.18,
+    },
+  },
+};
+
 export function StoreArtSurface({
   children,
   homeGraffiTexture = false,
@@ -112,6 +156,26 @@ export function StoreArtSurface({
         ) : null}
         {productTexture ? (
           <>
+            <ProductSideGraffiTexture
+              className="md:hidden"
+              controls={productSideGraffiTextureControls.mobile.left}
+              src={productSideGraffiTextureControls.mobileSrc}
+            />
+            <ProductSideGraffiTexture
+              className="md:hidden"
+              controls={productSideGraffiTextureControls.mobile.right}
+              src={productSideGraffiTextureControls.mobileSrc}
+            />
+            <ProductSideGraffiTexture
+              className="hidden md:block"
+              controls={productSideGraffiTextureControls.desktop.left}
+              src={productSideGraffiTextureControls.desktopSrc}
+            />
+            <ProductSideGraffiTexture
+              className="hidden md:block"
+              controls={productSideGraffiTextureControls.desktop.right}
+              src={productSideGraffiTextureControls.desktopSrc}
+            />
             <Image
               alt=""
               aria-hidden="true"
@@ -135,5 +199,43 @@ export function StoreArtSurface({
         <div className="relative z-10">{children}</div>
       </div>
     </main>
+  );
+}
+
+function ProductSideGraffiTexture({
+  className,
+  controls,
+  src,
+}: {
+  className: string;
+  controls: {
+    opacity: number;
+    rotateDeg: number;
+    scale: number;
+    widthVw: number;
+    xVw: number;
+    yPx: number;
+  };
+  src: string;
+}) {
+  return (
+    <Image
+      alt=""
+      aria-hidden="true"
+      className={`pointer-events-none absolute z-[2] h-auto max-w-none object-contain object-center mix-blend-multiply ${className}`}
+      height={1400}
+      priority={false}
+      sizes={`${controls.widthVw}vw`}
+      src={src}
+      style={{
+        left: `${controls.xVw}vw`,
+        opacity: controls.opacity,
+        top: `${controls.yPx}px`,
+        transform: `rotate(${controls.rotateDeg}deg) scale(${controls.scale})`,
+        transformOrigin: "center center",
+        width: `${controls.widthVw}vw`,
+      }}
+      width={1400}
+    />
   );
 }
