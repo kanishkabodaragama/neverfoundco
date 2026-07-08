@@ -22,6 +22,29 @@ const productGalleryLayoutControls = {
   thumbnailImageScale: 1,
 };
 
+// Product title and price controls:
+// xPx/yPx move each text element. Font sizes are in pixels.
+const productTextControls = {
+  title: {
+    xPx: 0,
+    yPx: -20,
+    mobileFontSizePx: 35,
+    desktopFontSizePx: 60,
+    lineHeight: 1,
+    letterGapPx: 0,
+  },
+  price: {
+    xPx: 0,
+    yPx: -20,
+    fontFamily: "var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace",
+    fontWeight: 900,
+    mobileFontSizePx: 20,
+    desktopFontSizePx: 24,
+    lineHeight: 1.15,
+    letterGapPx: 0,
+  },
+};
+
 const sizeRows = [
   ["S", "17", "26.5", "19.5", "8.5"],
   ["M", "20", "27.5", "21", "9"],
@@ -382,10 +405,28 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
       </div>
 
       <div className="flex flex-col items-start justify-start text-left">
-        <h1 className="max-w-xl font-display text-5xl italic uppercase leading-none md:text-6xl">
+        <h1
+          className="max-w-xl font-display italic uppercase"
+          style={{
+            fontSize: `clamp(${productTextControls.title.mobileFontSizePx}px, 8vw, ${productTextControls.title.desktopFontSizePx}px)`,
+            letterSpacing: `${productTextControls.title.letterGapPx}px`,
+            lineHeight: productTextControls.title.lineHeight,
+            transform: `translate(${productTextControls.title.xPx}px, ${productTextControls.title.yPx}px)`,
+          }}
+        >
           {product.name}
         </h1>
-        <p className="mt-3 font-mono text-xl font-bold uppercase text-ink md:text-2xl">
+        <p
+          className="mt-3 uppercase text-ink"
+          style={{
+            fontFamily: productTextControls.price.fontFamily,
+            fontSize: `clamp(${productTextControls.price.mobileFontSizePx}px, 4vw, ${productTextControls.price.desktopFontSizePx}px)`,
+            fontWeight: productTextControls.price.fontWeight,
+            letterSpacing: `${productTextControls.price.letterGapPx}px`,
+            lineHeight: productTextControls.price.lineHeight,
+            transform: `translate(${productTextControls.price.xPx}px, ${productTextControls.price.yPx}px)`,
+          }}
+        >
           <StorePrice amountUsd={displayPrice} />
         </p>
         {shortDescription ? (
