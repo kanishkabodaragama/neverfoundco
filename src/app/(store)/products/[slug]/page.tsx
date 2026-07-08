@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { CSSProperties } from "react";
 import { Footer } from "@/components/site/Footer";
 import { ProductDetailClient } from "@/components/site/ProductDetailClient";
 import { ProductRecommendations } from "@/components/site/ProductRecommendations";
@@ -28,6 +28,10 @@ const sizeMeasurements = [
   { label: "Chest", values: sizeRows.map((row) => row[3]) },
   { label: "Sleeve", values: sizeRows.map((row) => row[4]) },
 ];
+
+const productPageLayoutControls = {
+  topSpacingPx: 12,
+};
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -95,20 +99,14 @@ function NeverFoundProductPage({
     <div className="min-h-screen w-full bg-acid text-ink">
       <SiteHeader active="shop" />
       <StoreArtSurface productTexture>
-        <section className="bg-acid px-5 py-8 md:px-8 md:py-10 xl:px-12">
-          <nav
-            aria-label="Breadcrumb"
-            className="flex flex-wrap items-center gap-3 font-mono text-[11px] uppercase tracking-[0.28em] text-ink/55"
-          >
-            <Link href="/">Home</Link>
-            <span>›</span>
-            <Link href="/shop">Shop</Link>
-            <span>›</span>
-            <Link href="/shop">{product.category}</Link>
-            <span>›</span>
-            <span>{product.name}</span>
-          </nav>
-
+        <section
+          className="bg-acid px-5 pb-8 pt-[var(--product-page-top-spacing)] md:px-8 md:pb-10 xl:px-12"
+          style={
+            {
+              "--product-page-top-spacing": `${productPageLayoutControls.topSpacingPx}px`,
+            } as CSSProperties
+          }
+        >
           <ProductDetailClient product={product} />
         </section>
 

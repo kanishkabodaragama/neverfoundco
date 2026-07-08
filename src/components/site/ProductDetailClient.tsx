@@ -10,6 +10,12 @@ import type { MockProductDetail } from "@/components/site/product-detail-data";
 import { isUuid } from "@/lib/ids";
 import { getVariantCombinationKey, uniqueVariantValues } from "@/lib/product-variants";
 
+const productGalleryLayoutControls = {
+  thumbnailVisibleCount: 6,
+  thumbnailGapPx: 12,
+  thumbnailOffsetYpx: -12,
+};
+
 export function ProductDetailClient({ product }: { product: MockProductDetail }) {
   const cart = useCart();
   const [requestedGender, setSelectedGender] = useState(product.genders[0]);
@@ -241,7 +247,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
   }
 
   return (
-    <div className="mt-8 grid w-full gap-6 lg:grid-cols-[55fr_45fr] lg:gap-4 xl:gap-5">
+    <div className="grid w-full gap-6 lg:grid-cols-[55fr_45fr] lg:gap-4 xl:gap-5">
       <div className="grid gap-5">
         <div
           className="no-scrollbar flex min-h-[430px] touch-auto snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain scroll-smooth bg-transparent md:min-h-[610px]"
@@ -272,8 +278,16 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
         </div>
 
         <div
-          className="no-scrollbar flex scroll-px-16 justify-start gap-4 overflow-x-auto scroll-smooth px-0 md:justify-center"
+          className="no-scrollbar grid grid-flow-col justify-start overflow-x-auto scroll-smooth px-0"
           ref={mobileThumbnailStrip}
+          style={{
+            gap: `${productGalleryLayoutControls.thumbnailGapPx}px`,
+            gridAutoColumns: `calc((100% - ${
+              (productGalleryLayoutControls.thumbnailVisibleCount - 1) *
+              productGalleryLayoutControls.thumbnailGapPx
+            }px) / ${productGalleryLayoutControls.thumbnailVisibleCount})`,
+            marginTop: `${productGalleryLayoutControls.thumbnailOffsetYpx}px`,
+          }}
         >
           {galleryImages.map((image, index) => (
             <GalleryThumb
@@ -430,7 +444,7 @@ function GalleryThumb({
   return (
     <button
       aria-label={`View product image ${index + 1}`}
-      className={`relative h-24 w-24 shrink-0 bg-transparent ${
+      className={`relative aspect-square w-full min-w-0 bg-transparent ${
         isSelected ? "border-2 border-rust" : "border border-transparent"
       }`}
       data-gallery-index={index}
