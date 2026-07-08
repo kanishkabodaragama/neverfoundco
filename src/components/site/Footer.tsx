@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { siteTextureSettings } from "@/components/site/site-texture-settings";
 
 const leftFooterLinks = [
   { label: "Privacy Policy", href: "/privacy" },
@@ -17,47 +16,39 @@ const rightFooterLinks = [
   { label: "About Us", href: "/about" },
 ];
 
-export function Footer({ graffiTexture = false }: { graffiTexture?: boolean }) {
-  return (
-    <footer className="relative overflow-hidden border-0 bg-ink text-acid shadow-none outline-none">
-      <Image
-        alt=""
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-0 object-cover mix-blend-screen"
-        fill
-        priority={false}
-        sizes="100vw"
-        src="/images/textures/main-background.jpg"
-        style={{ opacity: siteTextureSettings.footerTextureOpacity }}
-      />
-      {graffiTexture ? (
-        <Image
-          alt=""
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-[1] object-cover object-bottom mix-blend-screen"
-          fill
-          priority={false}
-          sizes="100vw"
-          src="/images/textures/graffi-mobile.png"
-          style={{ opacity: siteTextureSettings.homeGraffiTextureOpacity }}
-        />
-      ) : null}
-      <div className="relative z-10 px-5 pb-5 pt-7 md:px-8 md:pb-7 md:pt-8">
-        <Link
-          aria-label="Never Found home"
-          className="relative mx-auto block h-[76px] w-44 md:h-[78px] md:w-56"
-          href="/"
-        >
-          <Image
-            alt="Never Found"
-            className="object-contain object-center"
-            fill
-            sizes="(min-width: 768px) 120px, 144px"
-            src="/images/brand/footer-logo-white.png"
-          />
-        </Link>
+// Footer controls:
+// logoPaddingTopPx/logoPaddingBottomPx adjust space around the Never Found logo.
+const footerLayoutControls = {
+  logoPaddingTopPx: 1,
+  logoPaddingBottomPx: 1,
+};
 
-        <div className="mt-5 grid grid-cols-3 items-end gap-4 font-display text-[9px] font-black italic uppercase leading-relaxed tracking-normal md:mt-4 md:text-[11px]">
+export function Footer({}: { graffiTexture?: boolean }) {
+  return (
+    <footer className="relative overflow-hidden border-0 bg-black text-acid shadow-none outline-none">
+      <div className="relative z-10 px-5 pb-5 md:px-8 md:pb-7">
+        <div
+          style={{
+            paddingBottom: `${footerLayoutControls.logoPaddingBottomPx}px`,
+            paddingTop: `${footerLayoutControls.logoPaddingTopPx}px`,
+          }}
+        >
+          <Link
+            aria-label="Never Found home"
+            className="relative mx-auto block h-[76px] w-44 md:h-[78px] md:w-56"
+            href="/"
+          >
+            <Image
+              alt="Never Found"
+              className="object-contain object-center"
+              fill
+              sizes="(min-width: 768px) 120px, 144px"
+              src="/images/brand/footer-logo-white.png"
+            />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-3 items-end gap-4 font-display text-[9px] font-black italic uppercase leading-relaxed tracking-normal md:text-[11px]">
           <div className="grid justify-items-start gap-2">
             <Link
               aria-label="Instagram"
