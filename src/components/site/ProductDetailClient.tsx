@@ -472,6 +472,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
           <OptionGroup label="Color">
             {availableColors.map((color) => (
               <ColorOptionButton
+                colorName={color}
                 colorValue={product.colorSwatches[color] ?? color}
                 key={color}
                 onClick={() => selectColor(color)}
@@ -719,15 +720,19 @@ function OptionButton({
 
 function ColorOptionButton({
   children,
+  colorName,
   colorValue,
   onClick,
   selected,
 }: {
   children: ReactNode;
+  colorName: string;
   colorValue: string;
   onClick: () => void;
   selected: boolean;
 }) {
+  const isLightColor = isLightVariantColor(colorValue, colorName);
+
   return (
     <button
       className="min-w-20 rounded-full border-2 px-5 py-2 font-sans text-sm font-medium transition hover:opacity-80"
@@ -735,11 +740,51 @@ function ColorOptionButton({
       style={{
         backgroundColor: selected ? colorValue : "transparent",
         borderColor: colorValue,
-        color: selected ? "#f5f3ec" : colorValue,
+        color: isLightColor ? "#0a0a0a" : selected ? "#f5f3ec" : colorValue,
       }}
       type="button"
     >
       {children}
     </button>
   );
+}
+
+function isLightVariantColor(colorValue: string, colorName: string) {
+  const namedColor = `${colorName} ${colorValue}`.toLowerCase();
+  if (
+    /white|cream|ivory|bone|natural|beige|oat|ecru|pearl|ash|light|grey|gray/.test(
+      namedColor,
+    )
+  ) {
+    return true;
+  }
+
+  const hex = colorValue.trim().match(/^#?([a-f\d]{3}|[a-f\d]{6})$/i)?.[1];
+  if (hex) {
+    const fullHex =
+      hex.length === 3
+        ? hex
+            .split("")
+            .map((char) => char + char)
+            .join("")
+        : hex;
+    const red = parseInt(fullHex.slice(0, 2), 16);
+    const green = parseInt(fullHex.slice(2, 4), 16);
+    const blue = parseInt(fullHex.slice(4, 6), 16);
+
+    return getRelativeLuminance(red, green, blue) > 0.62;
+  }
+
+  const rgb = colorValue.match(
+    /^rgba?\(\s*(\d{1,3})[\s,]+(\d{1,3})[\s,]+(\d{1,3})/i,
+  );
+  if (rgb) {
+    return getRelativeLuminance(Number(rgb[1]), Number(rgb[2]), Number(rgb[3])) > 0.62;
+  }
+
+  return false;
+}
+
+function getRelativeLuminance(red: number, green: number, blue: number) {
+  return (0.2126 * red + 0.7152 * green + 0.0722 * blue) / 255;
 }

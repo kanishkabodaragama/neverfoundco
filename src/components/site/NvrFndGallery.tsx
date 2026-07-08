@@ -78,7 +78,7 @@ export function NvrFndGallery({
   titleYpx?: number;
   visibleSlides?: number;
 }) {
-  const displayImages = (images.length ? images : galleryImages).slice(0, 4);
+  const displayImages = images.length ? images : galleryImages;
   const loopedImages = useMemo(
     () => [...displayImages, ...displayImages, ...displayImages],
     [displayImages],
@@ -114,11 +114,14 @@ export function NvrFndGallery({
     if (setWidth <= 0) return;
 
     let nextScrollLeft = node.scrollLeft;
-    if (node.scrollLeft < slide.offsetWidth) {
-      nextScrollLeft = node.scrollLeft + setWidth;
-    } else if (node.scrollLeft >= setWidth * 2) {
-      nextScrollLeft = node.scrollLeft - setWidth;
-    } else {
+    while (nextScrollLeft < setWidth * 0.5) {
+      nextScrollLeft += setWidth;
+    }
+    while (nextScrollLeft >= setWidth * 2.5) {
+      nextScrollLeft -= setWidth;
+    }
+
+    if (nextScrollLeft === node.scrollLeft) {
       return;
     }
 
@@ -139,11 +142,14 @@ export function NvrFndGallery({
     if (setWidth <= 0) return;
 
     let nextScrollLeft = node.scrollLeft;
-    if (node.scrollLeft < node.clientWidth) {
-      nextScrollLeft = node.scrollLeft + setWidth;
-    } else if (node.scrollLeft >= setWidth * 2) {
-      nextScrollLeft = node.scrollLeft - setWidth;
-    } else {
+    while (nextScrollLeft < setWidth * 0.5) {
+      nextScrollLeft += setWidth;
+    }
+    while (nextScrollLeft >= setWidth * 2.5) {
+      nextScrollLeft -= setWidth;
+    }
+
+    if (nextScrollLeft === node.scrollLeft) {
       return;
     }
 

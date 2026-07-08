@@ -88,6 +88,50 @@ export async function uploadStorefrontGalleryImageFile({ file }: { file: File })
   };
 }
 
+export async function uploadYouMayAlsoLikeFeatureImageFile({
+  file,
+  productId,
+}: {
+  file: File;
+  productId: string;
+}) {
+  if (file.size > MAX_STOREFRONT_GALLERY_IMAGE_SIZE) {
+    throw new Error(
+      `Image must be ${MAX_STOREFRONT_GALLERY_IMAGE_SIZE_MB} MB or smaller.`,
+    );
+  }
+
+  const extension = file.name.split(".").pop() || "jpg";
+  const storagePath = `features/you-may-also-like/${productId}/item-${crypto.randomUUID()}.${extension}`;
+  const supabase = getSupabaseAdminClient();
+  const { error } = await supabase.storage
+    .from("product-images")
+    .upload(storagePath, file, {
+      contentType: file.type,
+      upsert: false,
+    });
+
+  if (error) throw new Error(error.message);
+
+  const { error: verifyError } = await supabase.storage
+    .from("product-images")
+    .createSignedUrl(storagePath, 60);
+
+  if (verifyError) {
+    await supabase.storage.from("product-images").remove([storagePath]);
+    throw new Error("Image upload could not be verified. Please try again.");
+  }
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("product-images").getPublicUrl(storagePath);
+
+  return {
+    imageUrl: publicUrl,
+    storagePath,
+  };
+}
+
 export async function removeProductImageStoragePaths(paths: Array<string | null | undefined>) {
   const storagePaths = paths.filter((path): path is string => Boolean(path));
   if (!storagePaths.length) return;

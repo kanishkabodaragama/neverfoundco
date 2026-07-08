@@ -112,14 +112,14 @@ const mobileMenuLogoControls: Record<"top" | "bottom", MobileMenuLogoControl> = 
     xPercent: 50,
     yPx: -110,
     rotateDeg: 10,
-    opacity: 0.82,
+    opacity: 0.5,
   },
   bottom: {
     scale: 1,
     xPercent: 40,
     yPx: -30,
     rotateDeg: 8,
-    opacity: 0.82,
+    opacity: 0.5,
   },
 };
 

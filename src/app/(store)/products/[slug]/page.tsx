@@ -9,10 +9,9 @@ import {
   getProductDetailBySlug,
   type MockProductDetail,
 } from "@/components/site/product-detail-data";
-import { mapDbProductToShopProduct, shopProducts, type ShopProduct } from "@/components/site/shop-data";
 import { SiteHeader } from "@/components/site/Header";
-import { listActiveProducts } from "@/lib/db/products";
 import { getProductRecommendationsEnabled } from "@/lib/db/site-settings";
+import { listStorefrontYouMayAlsoLikeItems } from "@/lib/db/you-may-also-like";
 
 const productPageLayoutControls = {
   topSpacingPx: 12,
@@ -25,16 +24,6 @@ const youMayAlsoLikeTitleControl = {
   yPx: 6,
   fontSizeVw: 14.50,
 };
-
-function prepareRelatedGalleryImages(
-  images: Array<{ alt: string; href: string; src: string }>,
-) {
-  if (images.length <= 1) return [];
-  if (images.length === 2) return [images[0], images[1], images[0], images[1]];
-  if (images.length === 3) return [...images, images[0]];
-
-  return images.slice(0, 4);
-}
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -70,40 +59,34 @@ export default async function ProductPage({
 
   if (!product) notFound();
 
-  const [dbProducts, recommendationsEnabled] = await Promise.all([
-    listActiveProducts(),
+  const [recommendationItems, recommendationsEnabled] = await Promise.all([
+    listStorefrontYouMayAlsoLikeItems(product.id),
     getProductRecommendationsEnabled(),
   ]);
-  const relatedProducts = dbProducts.length ? dbProducts.map(mapDbProductToShopProduct) : shopProducts;
 
   return (
     <NeverFoundProductPage
       product={product}
+      recommendationItems={recommendationItems}
       recommendationsEnabled={recommendationsEnabled}
-      relatedProducts={relatedProducts}
     />
   );
 }
 
 function NeverFoundProductPage({
   product,
+  recommendationItems,
   recommendationsEnabled,
-  relatedProducts,
 }: {
   product: MockProductDetail;
+  recommendationItems: Awaited<ReturnType<typeof listStorefrontYouMayAlsoLikeItems>>;
   recommendationsEnabled: boolean;
-  relatedProducts: ShopProduct[];
 }) {
-  const related = relatedProducts
-    .filter((item) => !item.soldOut && (item.slug ?? item.id) !== product.slug)
-    .slice(0, 4);
-  const relatedGalleryImages = prepareRelatedGalleryImages(
-    related.map((item) => ({
-      alt: item.alt,
-      href: `/products/${item.slug ?? item.id}`,
-      src: item.youMayAlsoLikeImage || item.image,
-    })),
-  );
+  const relatedGalleryImages = recommendationItems.map((item) => ({
+    alt: item.products?.name ?? "You May Also Like product",
+    href: item.products?.slug ? `/products/${item.products.slug}` : "/shop",
+    src: item.image_url,
+  }));
 
   return (
     <div className="min-h-screen w-full bg-acid text-ink">

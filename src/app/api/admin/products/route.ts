@@ -25,8 +25,6 @@ export async function POST(request: Request) {
     short_description: formData.get("short_description") || undefined,
     description: formData.get("description") || undefined,
     main_image_url: null,
-    you_may_also_like_image_url: null,
-    you_may_also_like_storage_path: null,
     category: formData.get("category") || "T-Shirts",
     product_status: getProductStatus(formData),
     stock_tracking_enabled: formData.get("stock_tracking_enabled") === "true",
@@ -106,36 +104,6 @@ export async function POST(request: Request) {
       if (featuredUpdate?.main_image_url !== uploaded.imageUrl) {
         await removeProductImageStoragePaths([uploaded.storagePath]);
         throw new Error("Featured image was uploaded but could not be verified in the database.");
-      }
-    }
-
-    const youMayAlsoLikeFile = getImageFiles(formData, "you_may_also_like_file")[0];
-    if (youMayAlsoLikeFile) {
-      const uploaded = await uploadProductImageFile({
-        file: youMayAlsoLikeFile,
-        productId: product.id,
-        prefix: "you-may-also-like",
-      });
-
-      const { data: recommendationUpdate, error: recommendationUpdateError } = await supabase
-        .from("products")
-        .update({
-          you_may_also_like_image_url: uploaded.imageUrl,
-          you_may_also_like_storage_path: uploaded.storagePath,
-        })
-        .eq("id", product.id)
-        .select("you_may_also_like_image_url, you_may_also_like_storage_path")
-        .single();
-      if (recommendationUpdateError) {
-        await removeProductImageStoragePaths([uploaded.storagePath]);
-        throw recommendationUpdateError;
-      }
-      if (
-        recommendationUpdate?.you_may_also_like_image_url !== uploaded.imageUrl ||
-        recommendationUpdate?.you_may_also_like_storage_path !== uploaded.storagePath
-      ) {
-        await removeProductImageStoragePaths([uploaded.storagePath]);
-        throw new Error("You may also like image was uploaded but could not be verified in the database.");
       }
     }
 
