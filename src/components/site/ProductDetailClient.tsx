@@ -20,7 +20,7 @@ const productGalleryLayoutControls = {
   thumbnailVisibleCount: 6,
   thumbnailGapPx: 20,
   thumbnailOffsetXpx: 0,
-  thumbnailOffsetYpx: -50,
+  thumbnailOffsetYpx: -40,
   thumbnailCardPaddingPx: 0,
   // Enlarges the thumbnail card and image together so the image is not cropped.
   thumbnailImageScale: 1.5,
