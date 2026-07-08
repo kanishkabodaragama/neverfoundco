@@ -22,7 +22,7 @@ const rightFooterLinks = [
 const footerLayoutControls = {
   logoPaddingTopPx: 1,
   logoPaddingBottomPx: -10,
-  logoMarginBottomPx: 0,
+  logoMarginBottomPx: -10,
 };
 
 export function Footer({}: { graffiTexture?: boolean }) {
