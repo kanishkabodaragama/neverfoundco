@@ -157,7 +157,7 @@ export function CartItems() {
             Your Items ({items.length})
           </h1>
           <button
-            className="font-mono text-xs font-bold uppercase tracking-[0.28em] text-rust transition hover:text-ink"
+            className="font-sans text-xs font-bold uppercase tracking-normal text-rust transition hover:text-ink"
             onClick={cart.clearCart}
             type="button"
           >

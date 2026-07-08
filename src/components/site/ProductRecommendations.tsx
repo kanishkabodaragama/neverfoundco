@@ -23,6 +23,12 @@ const youMayAlsoLikeTitleControl: {
   xPx: 0,
 };
 
+// Recommendation card layout controls:
+// columnGapPx changes the horizontal gap between every product card.
+const recommendationCardLayoutControl = {
+  columnGapPx: 20,
+};
+
 export function ProductRecommendations({
   products,
 }: {
@@ -40,7 +46,10 @@ export function ProductRecommendations({
     const slide = node?.querySelector<HTMLElement>("[data-recommendation-slide]");
     if (!node || !slide) return 0;
 
-    return Math.round(node.scrollLeft / slide.offsetWidth);
+    return Math.round(
+      node.scrollLeft /
+        (slide.offsetWidth + recommendationCardLayoutControl.columnGapPx),
+    );
   }
 
   function scrollSliderTo(index: number, behavior: ScrollBehavior = "smooth") {
@@ -49,7 +58,12 @@ export function ProductRecommendations({
     if (!node || !slide) return;
 
     const wrappedIndex = ((index % products.length) + products.length) % products.length;
-    node.scrollTo({ left: slide.offsetWidth * wrappedIndex, behavior });
+    node.scrollTo({
+      left:
+        (slide.offsetWidth + recommendationCardLayoutControl.columnGapPx) *
+        wrappedIndex,
+      behavior,
+    });
   }
 
   function loopSliderAtScrollEnd(event: UIEvent<HTMLDivElement>) {
@@ -120,7 +134,14 @@ export function ProductRecommendations({
           touchStartX.current = event.touches[0]?.clientX ?? null;
         }}
         ref={sliderRef}
-        style={usesSlider ? undefined : { gridTemplateColumns: `repeat(${products.length}, minmax(0, 1fr))` }}
+        style={{
+          columnGap: `${recommendationCardLayoutControl.columnGapPx}px`,
+          ...(usesSlider
+            ? {}
+            : {
+                gridTemplateColumns: `repeat(${products.length}, minmax(0, 1fr))`,
+              }),
+        }}
       >
         {products.map((product) => (
           <RelatedProductCard
@@ -150,10 +171,17 @@ function RelatedProductCard({
   return (
     <Link
       className={`group block snap-start text-center text-ink md:text-left ${
-        usesSlider ? "min-w-[50%] pr-4 md:min-w-[50%] md:pr-6" : ""
+        usesSlider ? "shrink-0" : ""
       }`}
       data-recommendation-slide
       href={`/products/${product.slug ?? product.id}`}
+      style={
+        usesSlider
+          ? {
+              width: `calc((100% - ${recommendationCardLayoutControl.columnGapPx}px) / 2)`,
+            }
+          : undefined
+      }
     >
       <div className="relative aspect-[4/5] overflow-hidden bg-transparent">
         <Image

@@ -27,12 +27,12 @@ export default async function AccountPage() {
       <div className="px-5 py-10 md:px-8 xl:px-12">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">Customer file</p>
+            <p className="font-sans text-[11px] font-bold uppercase tracking-normal text-rust">Customer file</p>
             <h1 className="mt-3 font-display text-5xl uppercase leading-none md:text-7xl">My orders</h1>
-            <p className="mt-2 font-mono text-xs font-bold uppercase tracking-wide text-ink/60">{email}</p>
+            <p className="mt-2 font-sans text-xs font-bold uppercase tracking-normal text-ink/60">{email}</p>
           </div>
           <form action="/api/account/logout" method="post">
-            <button className="border border-ink px-4 py-3 font-mono text-xs font-bold uppercase tracking-[0.28em] transition-colors hover:bg-ink hover:text-acid" type="submit">
+            <button className="border border-ink px-4 py-3 font-sans text-xs font-bold uppercase tracking-normal transition-colors hover:bg-ink hover:text-acid" type="submit">
               Logout
             </button>
           </form>
@@ -44,9 +44,9 @@ export default async function AccountPage() {
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <h2 className="font-display text-3xl uppercase leading-none">{order.order_number}</h2>
-                  <p className="mt-2 font-mono text-xs font-bold uppercase tracking-wide text-ink/60">{formatColomboDateTime(order.created_at)}</p>
+                  <p className="mt-2 font-sans text-xs font-bold uppercase tracking-normal text-ink/60">{formatColomboDateTime(order.created_at)}</p>
                 </div>
-                <div className="flex flex-wrap gap-2 font-mono text-[10px] font-bold uppercase tracking-wide">
+                <div className="flex flex-wrap gap-2 font-sans text-[10px] font-bold uppercase tracking-normal">
                   <span className="border border-ink/15 px-3 py-2">Payment: {order.payment_status}</span>
                   <span className="border border-rust px-3 py-2 text-rust">Order: {order.order_status}</span>
                 </div>
@@ -60,8 +60,8 @@ export default async function AccountPage() {
                 ))}
               </div>
               <div className="mt-5 flex flex-wrap items-center justify-between gap-4 pt-4">
-                <p className="font-mono text-sm font-bold uppercase">{formatMoney(Number(order.total), "USD")}</p>
-                <a className="bg-ink px-4 py-3 font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid transition-colors hover:bg-rust hover:text-ink" href={`/api/orders/${order.order_number}/receipt`}>
+                <p className="font-sans text-sm font-bold uppercase">{formatMoney(Number(order.total), "USD")}</p>
+                <a className="bg-ink px-4 py-3 font-sans text-xs font-bold uppercase tracking-normal text-acid transition-colors hover:bg-rust hover:text-ink" href={`/api/orders/${order.order_number}/receipt`}>
                   Download receipt
                 </a>
               </div>

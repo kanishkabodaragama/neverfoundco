@@ -111,12 +111,16 @@ const mobileMenuTopBarControl = {
   closeIconSizePx: 20,
 };
 
+// Main black header logo controls for mobile only:
+// widthPx/heightPx set its frame, scale changes its overall size,
+// topPaddingPx adds space above it, and xPx/yPx move it.
 const mobileHeaderLogoControl = {
-  xPx: 0,
-  yPx: 0,
-  scale: 1,
   widthPx: 192,
   heightPx: 80,
+  topPaddingPx: 0,
+  scale: 0.8,
+  xPx: 0,
+  yPx: 0,
 };
 
 const mobileMenuLogoBaseWidthPx = 605;
@@ -130,8 +134,6 @@ const mobileMenuItemsFontFamily =
 // itemGapPx changes the gap between all menu items at once.
 // topBar: xPx/yPx moves the Menu label and close button together.
 // topBar menuFontSizePx changes "Menu"; closeIconSizePx/closeIconScale changes close icon size.
-// mobileHeaderLogo: xPx/yPx moves the red top logo on mobile, scale changes its size.
-// The desktop top logo is hidden.
 // Per-item fontSizePx values above manually change each menu item's font size.
 // Per-item xPx: 0 = center, negative = left, positive = right.
 // textAlignment words: "left", "center", "right", "justify".
@@ -291,22 +293,41 @@ export function SiteHeader({
 
         <Link
           aria-label="Never Found home"
-          className="relative col-start-2 block justify-self-center md:hidden"
+          className="relative col-start-2 block justify-self-center md:h-20 md:w-40"
           href="/"
-          style={{
-            height: `${mobileHeaderLogoControl.heightPx}px`,
-            transform: `translate(${mobileHeaderLogoControl.xPx}px, ${mobileHeaderLogoControl.yPx}px) scale(${mobileHeaderLogoControl.scale})`,
-            width: `${mobileHeaderLogoControl.widthPx}px`,
-          }}
         >
-          <Image
-            alt="Never Found"
-            className="object-contain object-center"
-            fill
-            priority
-            sizes={`${mobileHeaderLogoControl.widthPx}px`}
-            src="/images/brand/logo-nvr-fnd.png"
-          />
+          <span
+            className="block md:hidden"
+            style={{
+              paddingTop: `${mobileHeaderLogoControl.topPaddingPx}px`,
+              transform: `translate(${mobileHeaderLogoControl.xPx}px, ${mobileHeaderLogoControl.yPx}px) scale(${mobileHeaderLogoControl.scale})`,
+              width: `${mobileHeaderLogoControl.widthPx}px`,
+            }}
+          >
+            <span
+              className="relative block w-full"
+              style={{ height: `${mobileHeaderLogoControl.heightPx}px` }}
+            >
+              <Image
+                alt="Never Found"
+                className="object-contain object-center"
+                fill
+                priority
+                sizes={`${mobileHeaderLogoControl.widthPx}px`}
+                src="/images/brand/logo-nvr-fnd.png"
+              />
+            </span>
+          </span>
+          <span className="relative hidden h-20 w-40 md:block">
+            <Image
+              alt="Never Found"
+              className="object-contain object-left"
+              fill
+              priority
+              sizes="160px"
+              src="/images/brand/logo-nvr-fnd.png"
+            />
+          </span>
         </Link>
 
         <nav className="hidden items-center gap-8 font-mono text-xs uppercase tracking-[0.28em] text-ink/75 md:flex">

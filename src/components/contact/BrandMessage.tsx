@@ -4,12 +4,12 @@ export function BrandMessage() {
   return (
     <section className="grid gap-6 bg-[#ead8bd] px-5 py-10 md:grid-cols-[0.8fr_1.2fr] md:px-8 lg:px-10 xl:px-12">
       <article className="landing-noise relative min-h-[330px] overflow-hidden bg-[#123f32] p-8 text-[#ead8bd]">
-        <p className="font-hand text-3xl lowercase tracking-wide text-[#d9532f]">
+        <p className="font-hand text-3xl lowercase tracking-normal text-[#d9532f]">
           no restocks.
         </p>
         <div className="mt-8 flex items-center gap-6">
           <p className="text-7xl">🌐</p>
-          <h2 className="font-black uppercase leading-[0.9] tracking-[-0.04em] text-[clamp(2.5rem,5vw,5rem)]">
+          <h2 className="font-black uppercase leading-[0.9] tracking-normal text-[clamp(2.5rem,5vw,5rem)]">
             Once
             <br />
             it&apos;s gone,

@@ -24,7 +24,7 @@ export function ContactForm() {
         <label className="block" key={name}>
           <span className="sr-only">{label}</span>
           <input
-            className="min-h-12 w-full border border-ink/25 bg-transparent px-4 font-mono text-sm uppercase text-ink outline-none placeholder:text-ink/45 focus:border-rust"
+            className="min-h-12 w-full border border-ink/25 bg-transparent px-4 font-sans text-sm uppercase text-ink outline-none placeholder:text-ink/45 focus:border-rust"
             name={name}
             placeholder={label}
             required
@@ -35,19 +35,19 @@ export function ContactForm() {
       <label className="block">
         <span className="sr-only">Your Message</span>
         <textarea
-          className="min-h-32 w-full resize-none border border-ink/25 bg-transparent px-4 py-4 font-mono text-sm uppercase text-ink outline-none placeholder:text-ink/45 focus:border-rust"
+          className="min-h-32 w-full resize-none border border-ink/25 bg-transparent px-4 py-4 font-sans text-sm uppercase text-ink outline-none placeholder:text-ink/45 focus:border-rust"
           name="message"
           placeholder="Your Message"
           required
         />
       </label>
       <button
-        className="bg-ink px-8 py-4 font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid transition-colors hover:bg-rust hover:text-ink"
+        className="bg-ink px-8 py-4 font-sans text-xs font-bold uppercase tracking-normal text-acid transition-colors hover:bg-rust hover:text-ink"
         type="submit"
       >
         Send Message
       </button>
-      {message ? <p className="font-mono text-xs font-bold uppercase tracking-wide text-rust">{message}</p> : null}
+      {message ? <p className="font-sans text-xs font-bold uppercase tracking-normal text-rust">{message}</p> : null}
     </form>
   );
 }

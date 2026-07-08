@@ -18,7 +18,7 @@ export function OrderSummary({
     <aside className="space-y-4">
       <div className="border border-ink p-5 text-ink">
         <h2 className="font-display text-3xl uppercase leading-none">Order Summary</h2>
-        <div className="mt-7 space-y-4 font-mono text-sm font-bold uppercase">
+        <div className="mt-7 space-y-4 font-sans text-sm font-bold uppercase">
           <div className="flex justify-between gap-4">
             <span>Subtotal</span>
             <span><StorePrice amountUsd={subtotal} /></span>
@@ -41,7 +41,7 @@ export function OrderSummary({
           </div>
         </div>
         <Link
-          className="mt-7 flex justify-center bg-ink px-6 py-4 font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid transition-colors hover:bg-rust hover:text-ink"
+          className="mt-7 flex justify-center bg-ink px-6 py-4 font-sans text-xs font-bold uppercase tracking-normal text-acid transition-colors hover:bg-rust hover:text-ink"
           href="/checkout"
         >
           Proceed To Checkout
@@ -56,14 +56,14 @@ export function OrderSummary({
           <div className="grid grid-cols-[50px_1fr] gap-4" key={title}>
             <span className="font-display text-4xl leading-none text-rust">{icon}</span>
             <div>
-              <h3 className="font-mono text-[11px] font-bold uppercase tracking-[0.28em]">{title}</h3>
+              <h3 className="font-sans text-[11px] font-bold uppercase tracking-normal">{title}</h3>
               <p className="mt-1 text-sm font-semibold leading-snug text-ink/65">{text}</p>
             </div>
           </div>
         ))}
       </div>
       <figure className="relative min-h-[120px] overflow-hidden border border-ink">
-        <p className="absolute bottom-3 left-5 bg-ink px-4 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-acid">
+        <p className="absolute bottom-3 left-5 bg-ink px-4 py-2 font-sans text-[10px] font-bold uppercase tracking-normal text-acid">
           Case open
         </p>
       </figure>

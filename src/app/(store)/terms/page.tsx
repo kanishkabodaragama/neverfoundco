@@ -45,7 +45,7 @@ export default function TermsPage() {
       <Header />
       <StoreArtSurface>
       <div className="w-full px-5 py-8 md:px-8 xl:px-12">
-        <p className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">Terms file</p>
+        <p className="font-sans text-[11px] font-bold uppercase tracking-normal text-rust">Terms file</p>
         <h1 className="mt-4 font-display text-5xl uppercase leading-none md:text-7xl">
           Terms and Conditions
         </h1>
@@ -61,7 +61,7 @@ export default function TermsPage() {
             </section>
           ))}
         </div>
-        <p className="mt-8 max-w-2xl font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-rust">
+        <p className="mt-8 max-w-2xl font-sans text-[10px] font-bold uppercase tracking-normal text-rust">
           Last updated: June 25, 2026
         </p>
       </div>

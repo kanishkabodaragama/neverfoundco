@@ -25,19 +25,19 @@ export function CartItemCard({
       </div>
       <div className="space-y-4 p-5">
         <h3 className="font-display text-2xl uppercase leading-none">{item.name}</h3>
-        <div className="font-mono text-xs uppercase tracking-wide text-ink/60">
+        <div className="font-sans text-xs uppercase tracking-normal text-ink/60">
           <p>{item.color}</p>
           <p>Size: {item.size}</p>
         </div>
-        <span className="inline-flex border border-ink px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-ink">
+        <span className="inline-flex border border-ink px-3 py-2 font-sans text-[10px] font-bold uppercase tracking-normal text-ink">
           {item.stockLabel}
         </span>
       </div>
-      <div className="flex items-start p-5 font-mono text-sm font-bold uppercase md:justify-center">
+      <div className="flex items-start p-5 font-sans text-sm font-bold uppercase md:justify-center">
         <StorePrice amountUsd={item.price} />
       </div>
       <div className="flex items-start p-5">
-        <div className="flex border border-ink font-mono text-sm font-bold">
+        <div className="flex border border-ink font-sans text-sm font-bold">
           <button
             className="px-4 py-2 transition hover:bg-ink hover:text-acid"
             onClick={() => onQuantityChange(item.id, item.quantity - 1)}

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { useCart } from "@/components/store/cart-provider";
@@ -15,12 +16,8 @@ type CheckoutItem = {
   quantity: number;
 };
 
-export function CheckoutExperience({
-  countries,
-  paymentTimeoutMinutes,
-}: {
+export function CheckoutExperience({ countries }: {
   countries: ShippingCountry[];
-  paymentTimeoutMinutes: number;
 }) {
   const cart = useCart();
   const { format, rateSource } = useStoreCurrency();
@@ -238,7 +235,6 @@ export function CheckoutExperience({
         | {
             expiresAt: string;
             payhere: PayHereCheckoutPayload;
-            paymentTimeoutMinutes: number;
           }
         | { error: string };
 
@@ -257,10 +253,10 @@ export function CheckoutExperience({
   }
 
   return (
-    <section className="grid w-full gap-8 bg-acid px-5 py-12 text-ink md:grid-cols-[1.1fr_0.9fr] md:px-8 md:py-16 xl:px-12">
+    <section className="grid w-full gap-8 bg-acid px-5 pb-12 pt-32 text-ink md:grid-cols-[1.1fr_0.9fr] md:px-8 md:pb-16 md:pt-32 xl:px-12">
       <form className="space-y-6" onSubmit={handleSubmit}>
         <div>
-          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-rust">
+          <p className="font-sans text-[11px] font-bold uppercase tracking-normal text-rust">
             Checkout
           </p>
           <h1 className="mt-4 font-display text-5xl uppercase leading-none md:text-7xl">
@@ -276,7 +272,7 @@ export function CheckoutExperience({
               <span className="sr-only">Phone Number</span>
               <span className="grid grid-cols-[120px_1fr] gap-3">
                 <select
-                  className="w-full border border-ink/25 bg-transparent px-3 py-4 font-mono text-sm font-bold uppercase outline-none focus:border-rust"
+                  className="w-full border border-ink/25 bg-transparent px-3 py-4 font-sans text-sm font-bold uppercase outline-none focus:border-rust"
                   onChange={(event) => setPhoneCode(event.target.value)}
                   value={phoneCode}
                 >
@@ -287,7 +283,7 @@ export function CheckoutExperience({
                   ))}
                 </select>
                 <input
-                  className="w-full border border-ink/25 bg-transparent px-4 py-4 font-mono text-sm font-bold uppercase outline-none placeholder:text-ink/45 focus:border-rust"
+                  className="w-full border border-ink/25 bg-transparent px-4 py-4 font-sans text-sm font-bold uppercase outline-none placeholder:text-ink/45 focus:border-rust"
                   name="customerPhone"
                   placeholder="Phone Number"
                   type="tel"
@@ -305,7 +301,7 @@ export function CheckoutExperience({
               <label className="block">
                 <span className="sr-only">Billing Country</span>
                 <select
-                  className="w-full border border-ink/25 bg-transparent px-4 py-4 font-mono text-sm font-bold uppercase outline-none focus:border-rust"
+                  className="w-full border border-ink/25 bg-transparent px-4 py-4 font-sans text-sm font-bold uppercase outline-none focus:border-rust"
                   onChange={(event) => {
                     setBillingCountryCode(event.target.value);
                     setPhoneCode(getCallingCode(event.target.value));
@@ -324,7 +320,7 @@ export function CheckoutExperience({
               <label className="block">
                 <span className="sr-only">Billing Region</span>
                 <select
-                  className="w-full border border-ink/25 bg-transparent px-4 py-4 font-mono text-sm font-bold uppercase outline-none focus:border-rust"
+                  className="w-full border border-ink/25 bg-transparent px-4 py-4 font-sans text-sm font-bold uppercase outline-none focus:border-rust"
                   onChange={(event) => {
                     setBillingRegion(event.target.value);
                     setShippingFee(null);
@@ -349,7 +345,7 @@ export function CheckoutExperience({
               <CheckoutInput label="Billing City" name="billingCity" />
               <CheckoutInput label="Billing Postal Code" name="billingPostalCode" />
             </div>
-            <label className="flex cursor-pointer items-start gap-3 border border-ink bg-transparent p-4 font-mono text-xs font-bold uppercase tracking-wide">
+            <label className="flex cursor-pointer items-start gap-3 border border-ink bg-transparent p-4 font-sans text-xs font-bold uppercase tracking-normal">
               <input
                 checked={deliverySameAsBilling}
                 className="mt-1 h-5 w-5 accent-acid"
@@ -375,7 +371,7 @@ export function CheckoutExperience({
                 <label className="block">
                   <span className="sr-only">Delivery Country</span>
                   <select
-                    className="w-full border border-ink/25 bg-transparent px-4 py-4 font-mono text-sm font-bold uppercase outline-none focus:border-rust"
+                    className="w-full border border-ink/25 bg-transparent px-4 py-4 font-sans text-sm font-bold uppercase outline-none focus:border-rust"
                     onChange={(event) => {
                       setDeliveryCountryCode(event.target.value);
                       setDeliveryRegion("");
@@ -393,7 +389,7 @@ export function CheckoutExperience({
                 <label className="block">
                   <span className="sr-only">Delivery Region</span>
                   <select
-                  className="w-full border border-ink/25 bg-transparent px-4 py-4 font-mono text-sm font-bold uppercase outline-none focus:border-rust"
+                  className="w-full border border-ink/25 bg-transparent px-4 py-4 font-sans text-sm font-bold uppercase outline-none focus:border-rust"
                     onChange={(event) => {
                       setDeliveryRegion(event.target.value);
                       setShippingFee(null);
@@ -422,50 +418,33 @@ export function CheckoutExperience({
           </Panel>
         ) : null}
 
-        <Panel title="Payment Option">
-          <label className="group block cursor-pointer border-2 border-ink bg-ink p-5 text-bone shadow-[6px_6px_0_#ff4d1c] transition hover:translate-x-0.5">
-            <span className="flex items-start gap-4">
-              <input
-                className="peer sr-only"
-                defaultChecked
-                name="payment"
-                type="radio"
-                value="payhere"
-              />
-              <span
-                aria-hidden="true"
-                className="mt-1 grid h-6 w-6 shrink-0 place-items-center rounded-full border-2 border-acid bg-transparent"
-              >
-                <span className="h-3 w-3 rounded-full bg-acid" />
-              </span>
-              <span>
-                <span className="block font-display text-3xl uppercase leading-none">
-                  PayHere
-                </span>
-                <span className="mt-2 block font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid">
-                  Visa / MasterCard card payments
-                </span>
-                <span className="mt-3 block max-w-xl text-sm font-semibold leading-relaxed text-bone/75">
-                  Orders are created on the server, then redirected to PayHere
-                  with a verified checkout hash.
-                </span>
-                <span className="mt-4 block w-fit border border-acid px-3 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-acid">
-                  Complete payment within {paymentTimeoutMinutes} min
-                </span>
-              </span>
-            </span>
+        <Panel bordered={false} title="Payment Option">
+          <label className="flex w-fit cursor-pointer items-center gap-4">
+            <input
+              className="h-5 w-5 accent-rust"
+              defaultChecked
+              name="payment"
+              type="radio"
+              value="payhere"
+            />
+            <Image
+              alt="PayHere"
+              height={150}
+              src="https://www.payhere.lk/downloads/images/payhere_square_banner_dark.png"
+              width={150}
+            />
           </label>
         </Panel>
 
         <button
-          className="bg-ink px-8 py-4 font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid transition-colors hover:bg-rust hover:text-ink"
+          className="bg-ink px-8 py-4 font-sans text-xs font-bold uppercase tracking-normal text-acid transition-colors hover:bg-rust hover:text-ink"
           disabled={isSubmitting || cart.items.length === 0}
           type="submit"
         >
           {isSubmitting ? "Preparing payment..." : "Continue With PayHere"}
         </button>
         {message ? (
-          <p className="font-mono text-xs font-bold uppercase tracking-wide text-rust">
+          <p className="font-sans text-xs font-bold uppercase tracking-normal text-rust">
             {message}
           </p>
         ) : null}
@@ -492,7 +471,7 @@ export function CheckoutExperience({
               </div>
             ))}
           </div>
-          <div className="mt-6 space-y-3 font-mono text-sm font-bold uppercase">
+          <div className="mt-6 space-y-3 font-sans text-sm font-bold uppercase">
             <SummaryRow label="Subtotal" value={format(subtotal)} />
             {appliedDiscount > 0 ? (
               <SummaryRow
@@ -565,16 +544,20 @@ function getFormValue(formData: FormData, name: string) {
 }
 
 function Panel({
+  bordered = true,
   title,
   children,
 }: {
+  bordered?: boolean;
   title: string;
   children: ReactNode;
 }) {
   return (
     <div className="space-y-4">
       <h2 className="font-display text-3xl uppercase leading-none">{title}</h2>
-      <div className="border border-ink bg-transparent p-4">{children}</div>
+      <div className={bordered ? "border border-ink bg-transparent p-4" : ""}>
+        {children}
+      </div>
     </div>
   );
 }
@@ -594,7 +577,7 @@ function CheckoutInput({
     <label className="block">
       <span className="sr-only">{label}</span>
       <input
-        className="w-full border border-ink/25 bg-transparent px-4 py-4 font-mono text-sm font-bold uppercase outline-none placeholder:text-ink/45 focus:border-rust"
+        className="w-full border border-ink/25 bg-transparent px-4 py-4 font-sans text-sm font-bold uppercase outline-none placeholder:text-ink/45 focus:border-rust"
         name={name}
         onChange={(event) => onChange?.(event.target.value)}
         placeholder={label}

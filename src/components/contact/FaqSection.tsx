@@ -26,7 +26,7 @@ export function FaqSection() {
     <section className="bg-[#ead8bd] px-5 py-10 md:px-8 lg:px-10 xl:px-12">
       <div className="grid gap-8 lg:grid-cols-[0.82fr_1fr] lg:items-start">
         <div>
-          <h2 className="mb-5 text-3xl font-black uppercase tracking-[-0.04em]">
+          <h2 className="mb-5 text-3xl font-black uppercase tracking-normal">
             FAQ
           </h2>
           <div className="grid gap-2">

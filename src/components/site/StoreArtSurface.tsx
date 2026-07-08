@@ -13,16 +13,17 @@ const mainTextureControl = {
   opacity: siteTextureSettings.yellowTextureOpacity,
 };
 
-// Red background logo controls:
+// Mobile red background logo controls for every storefront page:
 // xPercent: 50 is centered, lower moves left, higher moves right.
 // yPx: distance from the top of this page section in pixels.
 // widthVw/scale: size controls, rotateDeg: rotation angle, opacity: 0 to 1.
-const backgroundLogoControl = {
-  xPercent: 50,
-  yPx: -100,
+// This is the red logo above the texture layers, not the black header logo.
+const mobileRedLogoControl = {
+  xPercent: 44,
+  yPx: -40,
   widthVw: 92,
-  scale: 1.5,
-  rotateDeg: 5,
+  scale: 2.0,
+  rotateDeg: 0,
   opacity: 0.3,
 };
 
@@ -91,18 +92,19 @@ export function StoreArtSurface({
         <Image
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute z-[4] h-auto max-w-none object-contain"
-          height={220}
+          className="pointer-events-none absolute z-[9] h-auto max-w-none object-contain md:hidden"
+          height={2000}
           priority={false}
-          src="/images/brand/neverfound-red.png"
+          src="/images/brand/neverfound-red-original.png"
           style={{
-            left: `${backgroundLogoControl.xPercent}%`,
-            opacity: backgroundLogoControl.opacity,
-            top: `${backgroundLogoControl.yPx}px`,
-            transform: `translateX(-50%) rotate(${backgroundLogoControl.rotateDeg}deg) scale(${backgroundLogoControl.scale})`,
-            width: `${backgroundLogoControl.widthVw}vw`,
+            left: `${mobileRedLogoControl.xPercent}%`,
+            opacity: mobileRedLogoControl.opacity,
+            top: `${mobileRedLogoControl.yPx}px`,
+            transform: `translateX(-50%) rotate(${mobileRedLogoControl.rotateDeg}deg) scale(${mobileRedLogoControl.scale})`,
+            width: `${mobileRedLogoControl.widthVw}vw`,
           }}
-          width={500}
+          unoptimized
+          width={3375}
         />
         <div
           aria-hidden="true"
@@ -180,7 +182,7 @@ export function StoreArtSurface({
         <Image
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-[9] object-cover object-center"
+          className="pointer-events-none absolute inset-0 z-[8] object-cover object-center"
           fill
           priority={false}
           sizes="100vw"

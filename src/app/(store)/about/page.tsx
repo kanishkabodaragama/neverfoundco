@@ -16,7 +16,7 @@ export default function AboutPage() {
       <Header />
       <StoreArtSurface>
         <section className="w-full bg-acid px-5 py-12 text-ink md:px-8 md:py-20 xl:px-12">
-          <div className="font-mono text-[11px] uppercase tracking-[0.28em]">
+          <div className="font-sans text-[11px] uppercase tracking-normal">
             About Never Found
           </div>
           <h1 className="mt-7 max-w-5xl font-display text-[16vw] uppercase leading-[0.86] md:text-8xl lg:text-9xl">
@@ -29,7 +29,7 @@ export default function AboutPage() {
               everyone else does.
             </p>
             <Link
-              className="w-fit bg-ink px-6 py-4 font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid transition-colors hover:bg-rust hover:text-ink"
+              className="w-fit bg-ink px-6 py-4 font-sans text-xs font-bold uppercase tracking-normal text-acid transition-colors hover:bg-rust hover:text-ink"
               href="/shop"
             >
               Shop current file
@@ -38,7 +38,7 @@ export default function AboutPage() {
         </section>
         <section className="bg-acid px-5 py-12 md:px-8 md:py-20 xl:px-12">
           <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-rust">
+            <p className="font-sans text-[11px] uppercase tracking-normal text-rust">
               Our point of view
             </p>
             <p className="mt-6 max-w-5xl font-display text-[12vw] uppercase leading-[0.95] md:text-6xl lg:text-7xl">
@@ -54,7 +54,7 @@ export default function AboutPage() {
             ["03", "No restock culture", "When a product disappears, the next chapter starts."],
           ].map(([number, title, text]) => (
             <article className="border border-ink p-5" key={number}>
-              <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-rust">{number}</p>
+              <p className="font-sans text-[11px] uppercase tracking-normal text-rust">{number}</p>
               <h2 className="mt-4 font-display text-2xl uppercase leading-none">{title}</h2>
               <p className="mt-4 text-sm font-semibold leading-relaxed text-ink/70">{text}</p>
             </article>
@@ -62,7 +62,7 @@ export default function AboutPage() {
         </section>
         <section className="grid w-full gap-8 bg-acid px-5 pb-16 text-ink md:grid-cols-[0.8fr_1.2fr] md:px-8 xl:px-12">
           <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-rust">
+            <p className="font-sans text-[11px] uppercase tracking-normal text-rust">
               How we work
             </p>
             <h2 className="mt-4 font-display text-5xl uppercase leading-none md:text-7xl">

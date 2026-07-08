@@ -34,10 +34,10 @@ export function PromoCode({
         <div>
           <h2 className="font-display text-2xl uppercase leading-none">Got A Code?</h2>
           <p className="mt-1 text-sm font-semibold text-ink/65">Use it before you check out.</p>
-          {message ? <p className="mt-2 font-mono text-xs font-bold uppercase tracking-wide text-rust">{message}</p> : null}
+          {message ? <p className="mt-2 font-sans text-xs font-bold uppercase tracking-normal text-rust">{message}</p> : null}
           {appliedCode ? (
             <button
-              className="mt-2 font-mono text-xs font-bold uppercase tracking-wide text-ink/65 underline"
+              className="mt-2 font-sans text-xs font-bold uppercase tracking-normal text-ink/65 underline"
               onClick={() => {
                 setCode("");
                 onRemove();
@@ -54,7 +54,7 @@ export function PromoCode({
           Promo Code
         </label>
         <input
-          className="min-h-12 flex-1 border border-ink bg-transparent px-4 font-mono text-sm font-bold uppercase outline-none placeholder:text-ink/45 focus:border-rust"
+          className="min-h-12 flex-1 border border-ink bg-transparent px-4 font-sans text-sm font-bold uppercase outline-none placeholder:text-ink/45 focus:border-rust"
           id="promo-code"
           name="promoCode"
           onChange={(event) => setCode(event.target.value.toUpperCase())}
@@ -62,7 +62,7 @@ export function PromoCode({
           value={code}
         />
         <button
-          className="min-h-12 bg-ink px-8 font-mono text-xs font-bold uppercase tracking-[0.28em] text-acid transition hover:bg-rust hover:text-ink"
+          className="min-h-12 bg-ink px-8 font-sans text-xs font-bold uppercase tracking-normal text-acid transition hover:bg-rust hover:text-ink"
           disabled={disabled || isApplying}
           type="submit"
         >

@@ -19,7 +19,15 @@ const homeProductSectionControl = {
 // xPx/yPx move the title and price together.
 const homeProductCardInfoControl = {
   xPx: 0,
-  yPx: -20,
+  yPx: -35,
+};
+
+// Home product card price controls:
+// xPx/yPx move only the price, fontSizePx changes only its font size.
+const homeProductCardPriceControl = {
+  xPx: 0,
+  yPx: -5,
+  fontSizePx: 14,
 };
 
 // Home gallery controls:
@@ -110,10 +118,18 @@ function EvidenceProductCard({
         }}
       >
         <div>
-          <h3 className="font-display text-base uppercase leading-tight sm:text-xl">{product.name}</h3>
+          <h3 className="font-display text-base italic uppercase leading-tight sm:text-xl">{product.name}</h3>
         </div>
-        <div className="shrink-0 text-center md:pl-4 md:text-right">
-          <div className="font-display text-base uppercase leading-tight sm:text-xl">
+        <div
+          className="shrink-0 text-center md:pl-4 md:text-right"
+          style={{
+            transform: `translate(${homeProductCardPriceControl.xPx}px, ${homeProductCardPriceControl.yPx}px)`,
+          }}
+        >
+          <div
+            className="font-display uppercase leading-tight"
+            style={{ fontSize: `${homeProductCardPriceControl.fontSizePx}px` }}
+          >
             <StorePrice amountUsd={product.price} />
           </div>
         </div>

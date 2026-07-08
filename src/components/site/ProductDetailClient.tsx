@@ -20,8 +20,10 @@ const productGalleryLayoutControls = {
   thumbnailVisibleCount: 6,
   thumbnailGapPx: 20,
   thumbnailOffsetXpx: 0,
-  thumbnailOffsetYpx: -20,
-  thumbnailImageScale: 1,
+  thumbnailOffsetYpx: -50,
+  thumbnailCardPaddingPx: 0,
+  // Enlarges the thumbnail card and image together so the image is not cropped.
+  thumbnailImageScale: 1.5,
 };
 
 // Product title and price controls:
@@ -390,10 +392,15 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
           ref={mobileThumbnailStrip}
           style={{
             gap: `${productGalleryLayoutControls.thumbnailGapPx}px`,
-            gridAutoColumns: `calc((100% - ${
-              (productGalleryLayoutControls.thumbnailVisibleCount - 1) *
-              productGalleryLayoutControls.thumbnailGapPx
-            }px) / ${productGalleryLayoutControls.thumbnailVisibleCount})`,
+            gridAutoColumns: `calc(${
+              (100 / productGalleryLayoutControls.thumbnailVisibleCount) *
+              productGalleryLayoutControls.thumbnailImageScale
+            }% - ${
+              (((productGalleryLayoutControls.thumbnailVisibleCount - 1) *
+                productGalleryLayoutControls.thumbnailGapPx) /
+                productGalleryLayoutControls.thumbnailVisibleCount) *
+              productGalleryLayoutControls.thumbnailImageScale
+            }px)`,
             marginTop: `${productGalleryLayoutControls.thumbnailOffsetYpx}px`,
             transform: `translateX(${productGalleryLayoutControls.thumbnailOffsetXpx}px)`,
           }}
@@ -406,6 +413,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
               key={`${image}-${index}`}
               onClick={() => selectGalleryImage(image, index)}
               productName={product.name}
+              showSelectedBorder={galleryImages.length > 1}
             />
           ))}
         </div>
@@ -644,18 +652,22 @@ function GalleryThumb({
   isSelected,
   onClick,
   productName,
+  showSelectedBorder,
 }: {
   image: string;
   index: number;
   isSelected: boolean;
   onClick: () => void;
   productName: string;
+  showSelectedBorder: boolean;
 }) {
   return (
     <button
       aria-label={`View product image ${index + 1}`}
       className={`relative aspect-square w-full min-w-0 bg-transparent ${
-        isSelected ? "border-2 border-rust" : "border border-transparent"
+        isSelected && showSelectedBorder
+          ? "border-2 border-rust"
+          : "border border-transparent"
       }`}
       data-gallery-index={index}
       onClick={onClick}
@@ -667,7 +679,9 @@ function GalleryThumb({
         fill
         sizes="96px"
         src={image}
-        style={{ transform: `scale(${productGalleryLayoutControls.thumbnailImageScale})` }}
+        style={{
+          padding: `${productGalleryLayoutControls.thumbnailCardPaddingPx}px`,
+        }}
         unoptimized
       />
     </button>

@@ -45,7 +45,7 @@ export function ShopProductCard({ product }: { product: ShopProduct }) {
           unoptimized
         />
         <span
-          className={`absolute top-3 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.28em] ${
+          className={`absolute top-3 px-2 py-1 font-sans text-[10px] uppercase tracking-normal ${
             product.soldOut
               ? "right-3 bg-rust font-black text-bone"
               : "left-3 bg-acid text-ink"
@@ -65,7 +65,7 @@ export function ShopProductCard({ product }: { product: ShopProduct }) {
         </div>
         {!product.soldOut && defaultVariant ? (
           <button
-            className="border border-ink px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] transition hover:bg-ink hover:text-acid sm:mt-0"
+            className="border border-ink px-3 py-2 font-sans text-[10px] font-bold uppercase tracking-normal transition hover:bg-ink hover:text-acid sm:mt-0"
             onClick={addToCart}
             type="button"
           >

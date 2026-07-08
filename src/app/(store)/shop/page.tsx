@@ -25,7 +25,7 @@ export default async function ShopPage() {
       <SiteHeader active="shop" />
       <StoreArtSurface>
         <section className="w-full bg-acid px-5 py-12 text-ink md:px-8 md:py-16 xl:px-12">
-          <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.28em]">
+          <div className="flex items-center justify-between font-sans text-[11px] uppercase tracking-normal">
             <span>Evidence room / drops</span>
             <span>{products.length.toString().padStart(2, "0")} logged</span>
           </div>

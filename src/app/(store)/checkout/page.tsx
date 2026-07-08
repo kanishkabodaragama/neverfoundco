@@ -4,7 +4,6 @@ import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
 import { StoreArtSurface } from "@/components/site/StoreArtSurface";
 import { listCheckoutCountries } from "@/lib/db/shipping";
-import { getCheckoutPaymentTimeoutMinutes } from "@/lib/db/site-settings";
 
 export const metadata: Metadata = {
   title: "Checkout",
@@ -16,19 +15,13 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function CheckoutPage() {
-  const [countries, paymentTimeoutMinutes] = await Promise.all([
-    listCheckoutCountries(),
-    getCheckoutPaymentTimeoutMinutes(),
-  ]);
+  const countries = await listCheckoutCountries();
 
   return (
     <div className="min-h-screen w-full bg-acid text-ink">
       <Header />
       <StoreArtSurface>
-        <CheckoutExperience
-          countries={countries}
-          paymentTimeoutMinutes={paymentTimeoutMinutes}
-        />
+        <CheckoutExperience countries={countries} />
       </StoreArtSurface>
       <Footer />
     </div>

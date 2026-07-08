@@ -22,7 +22,7 @@ const rightFooterLinks = [
 // logoMarginBottomPx adjusts the gap after the logo area.
 const footerLayoutControls = {
   footerPaddingTopPx: 0,
-  logoPaddingTopPx: 0,
+  logoPaddingTopPx: 10,
   logoPaddingBottomPx: -10,
   logoMarginBottomPx: -20,
 };

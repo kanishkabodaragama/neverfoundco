@@ -4,10 +4,10 @@ export function CartHero() {
   return (
     <section className="grid gap-6 bg-[#123f32] px-5 py-10 text-[#ead8bd] md:min-h-[610px] md:grid-cols-[0.9fr_1.1fr] md:px-8 lg:px-10 xl:px-12">
       <div className="relative flex min-h-[480px] flex-col justify-center overflow-hidden py-8 md:min-h-[610px]">
-        <h1 className="font-black uppercase leading-[0.78] tracking-[-0.07em] text-[clamp(4rem,8.5vw,9rem)]">
+        <h1 className="font-black uppercase leading-[0.78] tracking-normal text-[clamp(4rem,8.5vw,9rem)]">
           Your Cart
         </h1>
-        <p className="font-hand mt-6 max-w-lg text-2xl uppercase leading-tight tracking-wide text-[#d9532f] md:text-3xl">
+        <p className="font-hand mt-6 max-w-lg text-2xl uppercase leading-tight tracking-normal text-[#d9532f] md:text-3xl">
           Good choices. No rush.
           <br />
           Check it. Love it. Get it.
