@@ -32,7 +32,7 @@ const mobileNavItems: MobileNavItem[] = [
   {
     label: "Home",
     href: "/",
-    fontSizePx: 175,
+    fontSizePx: 180,
     xPx: -12,
     textAlignment: "center",
     rowVerticalAlignment: "center",
@@ -42,7 +42,7 @@ const mobileNavItems: MobileNavItem[] = [
   {
     label: "Contact Us",
     href: "/contact",
-    fontSizePx: 90,
+    fontSizePx: 92,
     xPx: -10,
     textAlignment: "center",
     rowVerticalAlignment: "center",
@@ -52,7 +52,7 @@ const mobileNavItems: MobileNavItem[] = [
   {
     label: "About Us",
     href: "/about",
-    fontSizePx: 105,
+    fontSizePx: 108,
     xPx: -8,
     textAlignment: "center",
     rowVerticalAlignment: "center",
@@ -63,7 +63,7 @@ const mobileNavItems: MobileNavItem[] = [
     label: "Login",
     href: "/account/login",
     fontSizePx: 180,
-    xPx: -12,
+    xPx: -20,
     textAlignment: "center",
     rowVerticalAlignment: "center",
     wordClass: "scale-x-[1]",
@@ -77,6 +77,14 @@ type MobileMenuLogoControl = {
   yPx: number;
   rotateDeg: number;
   opacity: number;
+};
+
+const mobileMenuDesignControl = {
+  widthPx: 390,
+  heightPx: 844,
+  xPercent: 50,
+  yPercent: 50,
+  scale: 1,
 };
 
 const mobileMenuItemsControl: {
@@ -93,13 +101,15 @@ const mobileMenuItemsControl: {
   rowVerticalAlignment: "center",
 };
 
-const mobileMenuLogoBaseWidthVw = 155;
+const mobileMenuLogoBaseWidthPx = 605;
 const mobileMenuItemsFontFamily =
   "var(--font-display), Anton, Impact, sans-serif";
 
 // Manual mobile menu controls:
+// design: widthPx/heightPx are the fixed mobile design canvas, scale changes all menu art at once.
 // logos: scale = size, xPercent/xPx = left/right, yPx = up/down, rotateDeg = angle.
-// menuItems: shared xPx/yPx above moves every item as one group.
+// menuItems: shared xPx/yPx above moves every item as one group inside the fixed canvas.
+// Per-item fontSizePx values above manually change each menu item's font size.
 // Per-item xPx: 0 = center, negative = left, positive = right.
 // textAlignment words: "left", "center", "right", "justify".
 // rowVerticalAlignment words: "top", "center", "bottom".
@@ -162,7 +172,7 @@ function MobileMenuRedLogo({ position }: { position: "top" | "bottom" }) {
         left: `${controls.xPercent}%`,
         opacity: controls.opacity,
         transform: `translateX(-50%) rotate(${controls.rotateDeg}deg) scale(${controls.scale})`,
-        width: `${mobileMenuLogoBaseWidthVw}vw`,
+        width: `${mobileMenuLogoBaseWidthPx}px`,
       }}
       width={1600}
     />
@@ -180,12 +190,40 @@ export function SiteHeader({
 }) {
   const [open, setOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const [mobileMenuViewport, setMobileMenuViewport] = useState({
+    height: mobileMenuDesignControl.heightPx,
+    width: mobileMenuDesignControl.widthPx,
+  });
   const cart = useCart();
   const cartCount = cart.items.reduce((total, item) => total + item.quantity, 0);
   const subtotal = cart.items.reduce(
     (total, item) => total + item.unitPrice * item.quantity,
     0,
   );
+  const mobileMenuScale =
+    Math.min(
+      mobileMenuViewport.width / mobileMenuDesignControl.widthPx,
+      mobileMenuViewport.height / mobileMenuDesignControl.heightPx,
+    ) * mobileMenuDesignControl.scale;
+
+  useEffect(() => {
+    function syncMobileMenuViewport() {
+      setMobileMenuViewport({
+        height: window.innerHeight,
+        width: window.innerWidth,
+      });
+    }
+
+    syncMobileMenuViewport();
+    window.addEventListener("resize", syncMobileMenuViewport);
+    window.addEventListener("orientationchange", syncMobileMenuViewport);
+
+    return () => {
+      window.removeEventListener("resize", syncMobileMenuViewport);
+      window.removeEventListener("orientationchange", syncMobileMenuViewport);
+    };
+  }, []);
+
   useEffect(() => {
     if (!open) {
       return;
@@ -309,30 +347,20 @@ export function SiteHeader({
           src="/images/textures/main-background.jpg"
         />
         <div className="absolute inset-0 z-[1] bg-black/35" />
-        <MobileMenuRedLogo position="top" />
-        <MobileMenuRedLogo position="bottom" />
 
-        <div className="relative z-10 flex h-full flex-col px-6 pt-8">
-          <div className="relative z-20 flex items-center justify-between">
-            <span className="font-display text-[20px] uppercase leading-none tracking-normal text-bone">
-              Menu
-            </span>
-            <button
-              aria-label="Close menu"
-              className="relative flex h-8 w-8 items-center justify-center text-bone transition-opacity hover:opacity-70"
-              onClick={() => setOpen(false)}
-              type="button"
-            >
-              <span
-                aria-hidden="true"
-                className="absolute h-px w-8 rotate-45 bg-current"
-              />
-              <span
-                aria-hidden="true"
-                className="absolute h-px w-8 -rotate-45 bg-current"
-              />
-            </button>
-          </div>
+        <div
+          className="absolute z-10 overflow-visible"
+          style={{
+            height: `${mobileMenuDesignControl.heightPx}px`,
+            left: `${mobileMenuDesignControl.xPercent}%`,
+            top: `${mobileMenuDesignControl.yPercent}%`,
+            transform: `translate(-50%, -50%) scale(${mobileMenuScale})`,
+            transformOrigin: "center center",
+            width: `${mobileMenuDesignControl.widthPx}px`,
+          }}
+        >
+          <MobileMenuRedLogo position="top" />
+          <MobileMenuRedLogo position="bottom" />
 
           <div
             className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 px-6"
@@ -377,6 +405,29 @@ export function SiteHeader({
                 </Link>
               );
             })}
+          </div>
+        </div>
+
+        <div className="relative z-20 flex h-full flex-col px-6 pt-8">
+          <div className="relative z-20 flex items-center justify-between">
+            <span className="font-display text-[20px] uppercase leading-none tracking-normal text-bone">
+              Menu
+            </span>
+            <button
+              aria-label="Close menu"
+              className="relative flex h-8 w-8 items-center justify-center text-bone transition-opacity hover:opacity-70"
+              onClick={() => setOpen(false)}
+              type="button"
+            >
+              <span
+                aria-hidden="true"
+                className="absolute h-px w-8 rotate-45 bg-current"
+              />
+              <span
+                aria-hidden="true"
+                className="absolute h-px w-8 -rotate-45 bg-current"
+              />
+            </button>
           </div>
 
           <div className="absolute inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+20px)] z-20 flex justify-center px-6">
