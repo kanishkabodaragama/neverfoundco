@@ -32,51 +32,29 @@ const backgroundLogoControl = {
 const redLogoOverlayControl = {
   yPx: 0,
   src: "/images/textures/menu-overlay.png",
-  transparency: 0.02,
+  transparency: 1,
 };
 
-// Single product side graffiti controls:
-// xVw/yPx move each image, widthVw changes its base size,
-// scale changes final size, rotateDeg changes angle, opacity is 0 to 1.
-const productSideGraffiTextureControls = {
-  mobileSrc: "/images/textures/product-graffi-mobile.png",
-  desktopSrc: "/images/textures/product-graffi-desktop.png",
-  mobile: {
-    left: {
-      xVw: -34,
-      yPx: 34,
-      widthVw: 132,
-      scale: 1,
-      rotateDeg: 0,
-      opacity: 0.22,
-    },
-    right: {
-      xVw: 34,
-      yPx: 34,
-      widthVw: 132,
-      scale: 1,
-      rotateDeg: 0,
-      opacity: 0.22,
-    },
-  },
-  desktop: {
-    left: {
-      xVw: -48,
-      yPx: -90,
-      widthVw: 92,
-      scale: 1,
-      rotateDeg: 0,
-      opacity: 0.18,
-    },
-    right: {
-      xVw: 56,
-      yPx: -90,
-      widthVw: 92,
-      scale: 1,
-      rotateDeg: 0,
-      opacity: 0.18,
-    },
-  },
+// Top page texture controls:
+// This layer sits above all texture/art layers and behind the content.
+// scale changes the cover size, opacity changes transparency from 0 to 1.
+const topTextureControl = {
+  src: "/images/textures/main-background-top-texture.jpg",
+  scale: 1,
+  opacity: 0.15,
+};
+
+// Single product graffiti texture controls:
+// xVw/yPx move it, widthVw changes the base size, scale changes final size,
+// rotateDeg changes angle, opacity changes transparency from 0 to 1.
+const productGraffiTextureControl = {
+  src: "/images/textures/product-graffi-desktop.png",
+  xVw: 8,
+  yPx: -100,
+  widthVw: 100,
+  scale: 1.8,
+  rotateDeg: 0,
+  opacity: 1,
 };
 
 export function StoreArtSurface({
@@ -156,25 +134,28 @@ export function StoreArtSurface({
         ) : null}
         {productTexture ? (
           <>
-            <ProductSideGraffiTexture
-              className="md:hidden"
-              controls={productSideGraffiTextureControls.mobile.left}
-              src={productSideGraffiTextureControls.mobileSrc}
-            />
-            <ProductSideGraffiTexture
-              className="md:hidden"
-              controls={productSideGraffiTextureControls.mobile.right}
-              src={productSideGraffiTextureControls.mobileSrc}
-            />
-            <ProductSideGraffiTexture
-              className="hidden md:block"
-              controls={productSideGraffiTextureControls.desktop.left}
-              src={productSideGraffiTextureControls.desktopSrc}
-            />
-            <ProductSideGraffiTexture
-              className="hidden md:block"
-              controls={productSideGraffiTextureControls.desktop.right}
-              src={productSideGraffiTextureControls.desktopSrc}
+            <Image
+              alt=""
+              aria-hidden="true"
+              className="pointer-events-none absolute z-[2] h-auto max-w-none border-0 bg-transparent object-contain object-center shadow-none outline-none"
+              height={500}
+              priority={false}
+              sizes={`${productGraffiTextureControl.widthVw}vw`}
+              src={productGraffiTextureControl.src}
+              style={{
+                backgroundColor: "transparent",
+                border: 0,
+                boxShadow: "none",
+                left: `${productGraffiTextureControl.xVw}vw`,
+                top: `${productGraffiTextureControl.yPx}px`,
+                opacity: productGraffiTextureControl.opacity,
+                outline: "none",
+                transform: `rotate(${productGraffiTextureControl.rotateDeg}deg) scale(${productGraffiTextureControl.scale})`,
+                transformOrigin: "top center",
+                width: `${productGraffiTextureControl.widthVw}vw`,
+              }}
+              unoptimized
+              width={400}
             />
             <Image
               alt=""
@@ -196,46 +177,21 @@ export function StoreArtSurface({
             />
           </>
         ) : null}
+        <Image
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-[9] object-cover object-center"
+          fill
+          priority={false}
+          sizes="100vw"
+          src={topTextureControl.src}
+          style={{
+            opacity: topTextureControl.opacity,
+            transform: `scale(${topTextureControl.scale})`,
+          }}
+        />
         <div className="relative z-10">{children}</div>
       </div>
     </main>
-  );
-}
-
-function ProductSideGraffiTexture({
-  className,
-  controls,
-  src,
-}: {
-  className: string;
-  controls: {
-    opacity: number;
-    rotateDeg: number;
-    scale: number;
-    widthVw: number;
-    xVw: number;
-    yPx: number;
-  };
-  src: string;
-}) {
-  return (
-    <Image
-      alt=""
-      aria-hidden="true"
-      className={`pointer-events-none absolute z-[2] h-auto max-w-none object-contain object-center mix-blend-multiply ${className}`}
-      height={1400}
-      priority={false}
-      sizes={`${controls.widthVw}vw`}
-      src={src}
-      style={{
-        left: `${controls.xVw}vw`,
-        opacity: controls.opacity,
-        top: `${controls.yPx}px`,
-        transform: `rotate(${controls.rotateDeg}deg) scale(${controls.scale})`,
-        transformOrigin: "center center",
-        width: `${controls.widthVw}vw`,
-      }}
-      width={1400}
-    />
   );
 }
