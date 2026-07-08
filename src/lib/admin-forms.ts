@@ -27,35 +27,7 @@ function getAdminRedirectOrigin(request: Request, targetUrl: URL) {
     return targetUrl.origin;
   }
 
-  const requestUrl = new URL(request.url);
-  const canonicalEnvUrl = getNonLocalOrigin(process.env.NEXT_PUBLIC_APP_URL);
-
-  if (canonicalEnvUrl) return canonicalEnvUrl;
-  if (requestUrl.hostname.endsWith("--nerverfoundco.netlify.app")) {
-    return "https://nerverfoundco.netlify.app";
-  }
-
-  return requestUrl.origin;
-}
-
-function getNonLocalOrigin(value: string | undefined) {
-  if (!value) return null;
-
-  try {
-    const url = new URL(value);
-    if (url.hostname.endsWith("--nerverfoundco.netlify.app")) {
-      return "https://nerverfoundco.netlify.app";
-    }
-
-    const isLocal =
-      url.hostname === "localhost" ||
-      url.hostname === "127.0.0.1" ||
-      url.hostname === "::1";
-
-    return isLocal ? null : url.origin;
-  } catch {
-    return null;
-  }
+  return new URL(request.url).origin;
 }
 
 export function getFormString(formData: FormData, key: string) {
