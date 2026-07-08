@@ -35,11 +35,11 @@ type NvrFndGalleryImage = {
 const galleryTitleControl = {
   fontFamily: "var(--font-display), Anton, Impact, sans-serif",
   minFontSizePx: 10,
-  fontSizeVw: 15,
+  fontSizeVw: 15.7,
   maxFontSizePx: 128,
   letterGapPx: 0,
-  xPx: -20,
-  yPx: 0,
+  xPx: -25,
+  yPx: 6,
   textAlign: "left" as "left" | "center" | "right",
 };
 
