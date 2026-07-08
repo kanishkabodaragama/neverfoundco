@@ -2,6 +2,17 @@ import Image from "next/image";
 import type { ReactNode } from "react";
 import { siteTextureSettings } from "@/components/site/site-texture-settings";
 
+// Main page texture controls:
+// xPercent/yPercent move the texture focal point, scale changes size,
+// rotateDeg changes angle, opacity changes transparency from 0 to 1.
+const mainTextureControl = {
+  xPercent: 50,
+  yPercent: 50,
+  scale: 1,
+  rotateDeg: 0,
+  opacity: siteTextureSettings.yellowTextureOpacity,
+};
+
 // Red background logo controls:
 // xPercent: 50 is centered, lower moves left, higher moves right.
 // yPx: distance from the top of this page section in pixels.
@@ -44,7 +55,11 @@ export function StoreArtSurface({
           priority={false}
           sizes="100vw"
           src="/images/textures/main-background.jpg"
-          style={{ opacity: siteTextureSettings.yellowTextureOpacity }}
+          style={{
+            objectPosition: `${mainTextureControl.xPercent}% ${mainTextureControl.yPercent}%`,
+            opacity: mainTextureControl.opacity,
+            transform: `rotate(${mainTextureControl.rotateDeg}deg) scale(${mainTextureControl.scale})`,
+          }}
         />
         <div
           aria-hidden="true"

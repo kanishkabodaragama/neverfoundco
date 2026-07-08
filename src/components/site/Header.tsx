@@ -206,7 +206,7 @@ export function SiteHeader({
 
   return (
     <>
-    <header className="site-header relative z-20 border-0 bg-acid text-ink shadow-none outline-none">
+    <header className="site-header absolute inset-x-0 top-0 z-20 border-0 bg-transparent text-ink shadow-none outline-none">
       <div className="relative grid min-h-24 grid-cols-[3rem_1fr_3rem] items-center px-3 py-2 md:flex md:min-h-24 md:justify-between md:px-8 md:py-2">
         <button
           aria-expanded={open}
