@@ -17,10 +17,12 @@ const rightFooterLinks = [
 ];
 
 // Footer controls:
-// logoPaddingTopPx/logoPaddingBottomPx adjust space around the Never Found logo.
+// logoPaddingTopPx/logoPaddingBottomPx adjust space inside the logo area.
+// logoMarginBottomPx adjusts the gap after the logo area.
 const footerLayoutControls = {
   logoPaddingTopPx: 1,
   logoPaddingBottomPx: -10,
+  logoMarginBottomPx: 0,
 };
 
 export function Footer({}: { graffiTexture?: boolean }) {
@@ -29,6 +31,7 @@ export function Footer({}: { graffiTexture?: boolean }) {
       <div className="relative z-10 px-5 pb-5 md:px-8 md:pb-7">
         <div
           style={{
+            marginBottom: `${footerLayoutControls.logoMarginBottomPx}px`,
             paddingBottom: `${footerLayoutControls.logoPaddingBottomPx}px`,
             paddingTop: `${footerLayoutControls.logoPaddingTopPx}px`,
           }}
