@@ -189,7 +189,7 @@ function MobileMenuRedLogo({ position }: { position: "top" | "bottom" }) {
       alt=""
       aria-hidden="true"
       className="pointer-events-none absolute z-[3] h-auto max-w-none object-contain"
-      height={800}
+      height={1200}
       priority={false}
       src="/images/brand/neverfound-red-menu-source.png"
       style={{
@@ -199,7 +199,8 @@ function MobileMenuRedLogo({ position }: { position: "top" | "bottom" }) {
         transform: `translateX(-50%) rotate(${controls.rotateDeg}deg) scale(${controls.scale})`,
         width: `${mobileMenuLogoBaseWidthPx}px`,
       }}
-      width={1600}
+      unoptimized
+      width={2400}
     />
   );
 }
