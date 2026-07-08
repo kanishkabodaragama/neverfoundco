@@ -20,9 +20,9 @@ const rightFooterLinks = [
 // logoPaddingTopPx/logoPaddingBottomPx adjust space inside the logo area.
 // logoMarginBottomPx adjusts the gap after the logo area.
 const footerLayoutControls = {
-  logoPaddingTopPx: 1,
+  logoPaddingTopPx: 0,
   logoPaddingBottomPx: -10,
-  logoMarginBottomPx: -10,
+  logoMarginBottomPx: -20,
 };
 
 export function Footer({}: { graffiTexture?: boolean }) {
