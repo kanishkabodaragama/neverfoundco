@@ -111,6 +111,14 @@ const mobileMenuTopBarControl = {
   closeIconSizePx: 20,
 };
 
+const mobileHeaderLogoControl = {
+  xPx: 0,
+  yPx: 0,
+  scale: 1,
+  widthPx: 192,
+  heightPx: 80,
+};
+
 const mobileMenuLogoBaseWidthPx = 605;
 const mobileMenuItemsFontFamily =
   "var(--font-display), Anton, Impact, sans-serif";
@@ -122,6 +130,8 @@ const mobileMenuItemsFontFamily =
 // itemGapPx changes the gap between all menu items at once.
 // topBar: xPx/yPx moves the Menu label and close button together.
 // topBar menuFontSizePx changes "Menu"; closeIconSizePx/closeIconScale changes close icon size.
+// mobileHeaderLogo: xPx/yPx moves the red top logo on mobile, scale changes its size.
+// The desktop top logo is hidden.
 // Per-item fontSizePx values above manually change each menu item's font size.
 // Per-item xPx: 0 = center, negative = left, positive = right.
 // textAlignment words: "left", "center", "right", "justify".
@@ -281,15 +291,20 @@ export function SiteHeader({
 
         <Link
           aria-label="Never Found home"
-          className="relative col-start-2 block h-20 w-48 justify-self-center md:relative md:left-auto md:top-auto md:h-20 md:w-40 md:translate-x-0 md:translate-y-0"
+          className="relative col-start-2 block justify-self-center md:hidden"
           href="/"
+          style={{
+            height: `${mobileHeaderLogoControl.heightPx}px`,
+            transform: `translate(${mobileHeaderLogoControl.xPx}px, ${mobileHeaderLogoControl.yPx}px) scale(${mobileHeaderLogoControl.scale})`,
+            width: `${mobileHeaderLogoControl.widthPx}px`,
+          }}
         >
           <Image
             alt="Never Found"
-            className="object-contain object-center md:object-left"
+            className="object-contain object-center"
             fill
             priority
-            sizes="(min-width: 768px) 160px, 192px"
+            sizes={`${mobileHeaderLogoControl.widthPx}px`}
             src="/images/brand/logo-nvr-fnd.png"
           />
         </Link>
