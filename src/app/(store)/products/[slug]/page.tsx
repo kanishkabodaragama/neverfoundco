@@ -104,6 +104,7 @@ function NeverFoundProductPage({
           <NvrFndGallery
             images={relatedGalleryImages}
             lightbox={false}
+            slideHeightPx={217}
             title="YOU MAY ALSO LIKE"
             visibleSlides={4}
           />

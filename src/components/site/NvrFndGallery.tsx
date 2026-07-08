@@ -59,11 +59,13 @@ const gallerySectionControl = {
 export function NvrFndGallery({
   images = galleryImages,
   lightbox = true,
+  slideHeightPx,
   title = "NVR FND GALLERY",
   visibleSlides = gallerySectionControl.visibleSlides,
 }: {
   images?: NvrFndGalleryImage[];
   lightbox?: boolean;
+  slideHeightPx?: number;
   title?: string;
   visibleSlides?: number;
 }) {
@@ -217,7 +219,9 @@ export function NvrFndGallery({
           const imageIndex = index % displayImages.length;
           const slideStyle = {
             flex: `0 0 calc(100% / ${visibleSlides})`,
-            height: `clamp(${gallerySectionControl.mobileHeightPx}px, 26vw, ${gallerySectionControl.desktopHeightPx}px)`,
+            height: slideHeightPx
+              ? `${slideHeightPx}px`
+              : `clamp(${gallerySectionControl.mobileHeightPx}px, 26vw, ${gallerySectionControl.desktopHeightPx}px)`,
           };
           const imageNode = (
             <Image
