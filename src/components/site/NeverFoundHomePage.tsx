@@ -90,7 +90,7 @@ function EvidenceProductCard({
           <h3 className="font-display text-base uppercase leading-tight sm:text-xl">{product.name}</h3>
         </div>
         <div className="shrink-0 text-center md:pl-4 md:text-right">
-          <div className="font-mono text-xs font-bold sm:text-sm">
+          <div className="font-display text-base uppercase leading-tight sm:text-xl">
             <StorePrice amountUsd={product.price} />
           </div>
         </div>

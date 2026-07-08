@@ -61,7 +61,7 @@ export function ShopProductCard({ product }: { product: ShopProduct }) {
               {product.name}
             </Link>
           </h3>
-          <p className="mt-1 font-mono text-sm font-bold"><StorePrice amountUsd={product.price} /></p>
+          <p className="font-display text-xl uppercase leading-tight"><StorePrice amountUsd={product.price} /></p>
         </div>
         {!product.soldOut && defaultVariant ? (
           <button

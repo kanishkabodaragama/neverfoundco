@@ -193,7 +193,7 @@ function RelatedProductCard({
             {product.sizes.length} size{product.sizes.length === 1 ? "" : "s"}
           </p>
         </div>
-        <div className="shrink-0 font-mono text-xs font-bold md:pl-3 md:text-right">
+        <div className="shrink-0 font-display text-xl uppercase leading-none md:pl-3 md:text-right">
           <StorePrice amountUsd={product.price} />
         </div>
       </div>
