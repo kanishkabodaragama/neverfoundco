@@ -32,8 +32,8 @@ const mobileNavItems: MobileNavItem[] = [
   {
     label: "Home",
     href: "/",
-    fontSizePx: 180,
-    xPx: -12,
+    fontSizePx: 215,
+    xPx: -20,
     textAlignment: "center",
     rowVerticalAlignment: "center",
     wordClass: "scale-x-[1.02]",
@@ -42,8 +42,8 @@ const mobileNavItems: MobileNavItem[] = [
   {
     label: "Contact Us",
     href: "/contact",
-    fontSizePx: 92,
-    xPx: -10,
+    fontSizePx: 112,
+    xPx: -15,
     textAlignment: "center",
     rowVerticalAlignment: "center",
     wordClass: "scale-x-[0.98]",
@@ -52,8 +52,8 @@ const mobileNavItems: MobileNavItem[] = [
   {
     label: "About Us",
     href: "/about",
-    fontSizePx: 108,
-    xPx: -8,
+    fontSizePx: 132,
+    xPx: -12,
     textAlignment: "center",
     rowVerticalAlignment: "center",
     wordClass: "scale-x-[1.02]",
@@ -62,7 +62,7 @@ const mobileNavItems: MobileNavItem[] = [
   {
     label: "Login",
     href: "/account/login",
-    fontSizePx: 180,
+    fontSizePx: 220,
     xPx: -20,
     textAlignment: "center",
     rowVerticalAlignment: "center",
@@ -93,12 +93,22 @@ const mobileMenuItemsControl: {
   textAlignment: MobileMenuTextAlignment;
   rowHeightScale: number;
   rowVerticalAlignment: MobileMenuRowVerticalAlignment;
+  itemGapPx: number;
 } = {
   xPx: 0,
   yPx: 0,
   textAlignment: "center",
   rowHeightScale: 1,
   rowVerticalAlignment: "center",
+  itemGapPx: 4,
+};
+
+const mobileMenuTopBarControl = {
+  xPx: 0,
+  yPx: -20,
+  menuFontSizePx: 15,
+  closeIconScale: 1,
+  closeIconSizePx: 20,
 };
 
 const mobileMenuLogoBaseWidthPx = 605;
@@ -109,6 +119,9 @@ const mobileMenuItemsFontFamily =
 // design: widthPx/heightPx are the fixed mobile design canvas, scale changes all menu art at once.
 // logos: scale = size, xPercent/xPx = left/right, yPx = up/down, rotateDeg = angle.
 // menuItems: shared xPx/yPx above moves every item as one group inside the fixed canvas.
+// itemGapPx changes the gap between all menu items at once.
+// topBar: xPx/yPx moves the Menu label and close button together.
+// topBar menuFontSizePx changes "Menu"; closeIconSizePx/closeIconScale changes close icon size.
 // Per-item fontSizePx values above manually change each menu item's font size.
 // Per-item xPx: 0 = center, negative = left, positive = right.
 // textAlignment words: "left", "center", "right", "justify".
@@ -363,8 +376,9 @@ export function SiteHeader({
           <MobileMenuRedLogo position="bottom" />
 
           <div
-            className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 px-6"
+            className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6"
             style={{
+              gap: `${mobileMenuItemsControl.itemGapPx}px`,
               textAlign: mobileMenuItemsControl.textAlignment,
               transform: `translate(${mobileMenuItemsControl.xPx}px, ${mobileMenuItemsControl.yPx}px)`,
             }}
@@ -409,23 +423,38 @@ export function SiteHeader({
         </div>
 
         <div className="relative z-20 flex h-full flex-col px-6 pt-8">
-          <div className="relative z-20 flex items-center justify-between">
-            <span className="font-display text-[20px] uppercase leading-none tracking-normal text-bone">
+          <div
+            className="relative z-20 flex items-center justify-between"
+            style={{
+              transform: `translate(${mobileMenuTopBarControl.xPx}px, ${mobileMenuTopBarControl.yPx}px)`,
+            }}
+          >
+            <span
+              className="font-display uppercase leading-none tracking-normal text-bone"
+              style={{ fontSize: `${mobileMenuTopBarControl.menuFontSizePx}px` }}
+            >
               Menu
             </span>
             <button
               aria-label="Close menu"
-              className="relative flex h-8 w-8 items-center justify-center text-bone transition-opacity hover:opacity-70"
+              className="relative flex items-center justify-center text-bone transition-opacity hover:opacity-70"
               onClick={() => setOpen(false)}
+              style={{
+                height: `${mobileMenuTopBarControl.closeIconSizePx}px`,
+                transform: `scale(${mobileMenuTopBarControl.closeIconScale})`,
+                width: `${mobileMenuTopBarControl.closeIconSizePx}px`,
+              }}
               type="button"
             >
               <span
                 aria-hidden="true"
-                className="absolute h-px w-8 rotate-45 bg-current"
+                className="absolute h-px rotate-45 bg-current"
+                style={{ width: `${mobileMenuTopBarControl.closeIconSizePx}px` }}
               />
               <span
                 aria-hidden="true"
-                className="absolute h-px w-8 -rotate-45 bg-current"
+                className="absolute h-px -rotate-45 bg-current"
+                style={{ width: `${mobileMenuTopBarControl.closeIconSizePx}px` }}
               />
             </button>
           </div>
