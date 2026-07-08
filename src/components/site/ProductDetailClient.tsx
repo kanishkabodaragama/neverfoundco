@@ -20,7 +20,7 @@ const productGalleryLayoutControls = {
   thumbnailVisibleCount: 6,
   thumbnailGapPx: 20,
   thumbnailOffsetXpx: 0,
-  thumbnailOffsetYpx: -60,
+  thumbnailOffsetYpx: -20,
   thumbnailImageScale: 1,
 };
 
