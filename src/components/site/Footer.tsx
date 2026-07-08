@@ -29,7 +29,10 @@ const footerLayoutControls = {
 
 export function Footer({}: { graffiTexture?: boolean }) {
   return (
-    <footer className="relative overflow-hidden border-0 bg-black text-acid shadow-none outline-none">
+    <footer
+      className="relative overflow-hidden border-0 bg-black shadow-none outline-none"
+      style={{ color: "#c1ff72" }}
+    >
       <div
         className="relative z-10 px-5 pb-5 md:px-8 md:pb-7"
         style={{
@@ -67,13 +70,20 @@ export function Footer({}: { graffiTexture?: boolean }) {
               rel="noreferrer"
               target="_blank"
             >
-              <Image
-                alt=""
+              <span
                 aria-hidden="true"
-                className="h-5 w-5 object-contain [filter:brightness(0)_saturate(100%)_invert(88%)_sepia(99%)_saturate(1760%)_hue-rotate(14deg)_brightness(108%)_contrast(111%)]"
-                height={20}
-                src="/images/icons/instagram.png"
-                width={20}
+                className="block h-5 w-5"
+                style={{
+                  backgroundColor: "#c1ff72",
+                  WebkitMaskImage: "url(/images/icons/instagram.png)",
+                  WebkitMaskPosition: "center",
+                  WebkitMaskRepeat: "no-repeat",
+                  WebkitMaskSize: "contain",
+                  maskImage: "url(/images/icons/instagram.png)",
+                  maskPosition: "center",
+                  maskRepeat: "no-repeat",
+                  maskSize: "contain",
+                }}
               />
             </Link>
             <p>&copy; {new Date().getFullYear()}, Never Found.</p>
@@ -98,7 +108,7 @@ function FooterLinkList({
   return (
     <nav aria-label="Footer navigation" className={`grid gap-1.5 ${className}`}>
       {links.map((item) => (
-        <Link className="transition-colors hover:text-bone" href={item.href} key={item.label}>
+        <Link className="transition-opacity hover:opacity-70" href={item.href} key={item.label}>
           {item.label}
         </Link>
       ))}

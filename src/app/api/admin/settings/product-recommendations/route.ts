@@ -7,13 +7,14 @@ export async function POST(request: Request) {
   if (auth.response) return auth.response;
 
   const formData = await request.formData();
+  const redirectTo = String(formData.get("redirect_to") || "/admin/settings");
 
   try {
     await updateProductRecommendationsEnabled(
       formData.get("product_recommendations_enabled") === "on",
     );
   } catch (error) {
-    return adminRedirect(request, "/admin/settings", {
+    return adminRedirect(request, redirectTo, {
       error:
         error instanceof Error
           ? error.message
@@ -21,8 +22,7 @@ export async function POST(request: Request) {
     });
   }
 
-  return adminRedirect(request, "/admin/settings", {
+  return adminRedirect(request, redirectTo, {
     success: "Product recommendation setting saved.",
   });
 }
-

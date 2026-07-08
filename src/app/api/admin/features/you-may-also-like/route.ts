@@ -14,6 +14,7 @@ export async function POST(request: Request) {
   const formData = await request.formData();
   const productId = String(formData.get("product_id") ?? "");
   const file = getImageFiles(formData, "file")[0];
+  const displayOrder = Math.max(1, Number(formData.get("display_order") ?? 0));
 
   if (!productId) {
     return adminRedirect(request, "/admin/features", {
@@ -61,7 +62,9 @@ export async function POST(request: Request) {
       exclude_current_product: formData.get("exclude_current_product") === "on",
       image_url: uploaded.imageUrl,
       product_id: productId,
-      sort_order: count ?? 0,
+      sort_order: Number.isFinite(displayOrder)
+        ? displayOrder - 1
+        : count ?? 0,
       storage_path: uploaded.storagePath,
     });
 
