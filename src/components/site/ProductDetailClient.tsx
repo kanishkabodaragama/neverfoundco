@@ -540,7 +540,7 @@ function SizeChartModal({ onClose }: { onClose: () => void }) {
           <table className="w-full min-w-[540px] table-fixed border-collapse text-center font-mono text-[10px] font-bold uppercase sm:text-xs">
             <thead>
               <tr>
-                <th className="border border-ink px-1.5 py-3 text-left uppercase sm:px-3">
+                <th className="sticky left-0 z-20 border border-ink bg-acid px-1.5 py-3 text-left uppercase sm:px-3">
                   Measure
                 </th>
                 {sizeRows.map(([size]) => (
@@ -553,7 +553,7 @@ function SizeChartModal({ onClose }: { onClose: () => void }) {
             <tbody>
               {sizeMeasurements.map((measurement) => (
                 <tr key={measurement.label}>
-                  <th className="border border-ink px-1.5 py-3 text-left uppercase sm:px-3">
+                  <th className="sticky left-0 z-10 border border-ink bg-acid px-1.5 py-3 text-left uppercase sm:px-3">
                     {measurement.label}
                   </th>
                   {measurement.values.map((value, index) => (

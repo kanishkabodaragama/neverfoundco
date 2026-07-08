@@ -63,6 +63,9 @@ export function NvrFndGallery({
   slideAspectRatio,
   slideHeightPx,
   title = "NVR FND GALLERY",
+  titleFontSizeVw = galleryTitleControl.fontSizeVw,
+  titleXpx = galleryTitleControl.xPx,
+  titleYpx = galleryTitleControl.yPx,
   visibleSlides = gallerySectionControl.visibleSlides,
 }: {
   images?: NvrFndGalleryImage[];
@@ -70,6 +73,9 @@ export function NvrFndGallery({
   slideAspectRatio?: string;
   slideHeightPx?: number;
   title?: string;
+  titleFontSizeVw?: number;
+  titleXpx?: number;
+  titleYpx?: number;
   visibleSlides?: number;
 }) {
   const displayImages = (images.length ? images : galleryImages).slice(0, 4);
@@ -204,11 +210,11 @@ export function NvrFndGallery({
         className="whitespace-nowrap px-5 uppercase leading-none md:px-8"
         style={{
           fontFamily: galleryTitleControl.fontFamily,
-          fontSize: `clamp(${galleryTitleControl.minFontSizePx}px, ${galleryTitleControl.fontSizeVw}vw, ${galleryTitleControl.maxFontSizePx}px)`,
+          fontSize: `clamp(${galleryTitleControl.minFontSizePx}px, ${titleFontSizeVw}vw, ${galleryTitleControl.maxFontSizePx}px)`,
           fontStyle: "italic",
           letterSpacing: `${galleryTitleControl.letterGapPx}px`,
           textAlign: galleryTitleControl.textAlign,
-          transform: `translate(${galleryTitleControl.xPx}px, ${galleryTitleControl.yPx}px)`,
+          transform: `translate(${titleXpx}px, ${titleYpx}px)`,
         }}
       >
         {title}

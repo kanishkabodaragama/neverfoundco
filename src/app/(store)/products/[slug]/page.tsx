@@ -18,6 +18,14 @@ const productPageLayoutControls = {
   topSpacingPx: 12,
 };
 
+// You May Also Like title controls:
+// xPx/yPx move the title. fontSizeVw changes its responsive font size.
+const youMayAlsoLikeTitleControl = {
+  xPx: -40,
+  yPx: 6,
+  fontSizeVw: 14.50,
+};
+
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
@@ -106,6 +114,9 @@ function NeverFoundProductPage({
             lightbox={false}
             slideAspectRatio="1.18 / 1"
             title="YOU MAY ALSO LIKE"
+            titleFontSizeVw={youMayAlsoLikeTitleControl.fontSizeVw}
+            titleXpx={youMayAlsoLikeTitleControl.xPx}
+            titleYpx={youMayAlsoLikeTitleControl.yPx}
             visibleSlides={4}
           />
         ) : null}
