@@ -191,33 +191,22 @@ export function SiteHeader({
       return;
     }
 
-    const scrollY = window.scrollY;
     const { body, documentElement } = document;
     const originalBodyOverflow = body.style.overflow;
-    const originalBodyPosition = body.style.position;
-    const originalBodyTop = body.style.top;
-    const originalBodyWidth = body.style.width;
     const originalHtmlOverscrollBehavior = documentElement.style.overscrollBehavior;
 
     body.style.overflow = "hidden";
-    body.style.position = "fixed";
-    body.style.top = `-${scrollY}px`;
-    body.style.width = "100%";
     documentElement.style.overscrollBehavior = "none";
 
     return () => {
       body.style.overflow = originalBodyOverflow;
-      body.style.position = originalBodyPosition;
-      body.style.top = originalBodyTop;
-      body.style.width = originalBodyWidth;
       documentElement.style.overscrollBehavior = originalHtmlOverscrollBehavior;
-      window.scrollTo(0, scrollY);
     };
   }, [open]);
 
   return (
     <>
-    <header className="site-header fixed inset-x-0 top-0 z-40 translate-y-0 border-0 bg-transparent text-ink shadow-none outline-none">
+    <header className="site-header border-0 bg-transparent text-ink shadow-none outline-none">
       <div className="relative grid grid-cols-[3rem_1fr_3rem] items-center px-3 py-0 md:flex md:justify-between md:px-8 md:py-1.5">
         <button
           aria-expanded={open}
