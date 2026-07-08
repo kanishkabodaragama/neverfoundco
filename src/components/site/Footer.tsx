@@ -20,7 +20,7 @@ const rightFooterLinks = [
 // logoPaddingTopPx/logoPaddingBottomPx adjust space around the Never Found logo.
 const footerLayoutControls = {
   logoPaddingTopPx: 1,
-  logoPaddingBottomPx: 1,
+  logoPaddingBottomPx: -10,
 };
 
 export function Footer({}: { graffiTexture?: boolean }) {
