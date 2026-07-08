@@ -2,11 +2,11 @@ import Image from "next/image";
 import type { ReactNode } from "react";
 import { siteTextureSettings } from "@/components/site/site-texture-settings";
 
-// Fixed red background logo controls:
+// Red background logo controls:
 // xPercent: 50 is centered, lower moves left, higher moves right.
-// yPx: distance from the top of the viewport in pixels.
+// yPx: distance from the top of this page section in pixels.
 // widthVw/scale: size controls, rotateDeg: rotation angle, opacity: 0 to 1.
-const fixedBackgroundLogoControl = {
+const backgroundLogoControl = {
   xPercent: 50,
   yPx: -100,
   widthVw: 92,
@@ -54,16 +54,16 @@ export function StoreArtSurface({
         <Image
           alt=""
           aria-hidden="true"
-          className="pointer-events-none fixed z-[4] h-auto max-w-none object-contain"
+          className="pointer-events-none absolute z-[4] h-auto max-w-none object-contain"
           height={220}
           priority={false}
           src="/images/brand/neverfound-red.png"
           style={{
-            left: `${fixedBackgroundLogoControl.xPercent}%`,
-            opacity: fixedBackgroundLogoControl.opacity,
-            top: `${fixedBackgroundLogoControl.yPx}px`,
-            transform: `translateX(-50%) rotate(${fixedBackgroundLogoControl.rotateDeg}deg) scale(${fixedBackgroundLogoControl.scale})`,
-            width: `${fixedBackgroundLogoControl.widthVw}vw`,
+            left: `${backgroundLogoControl.xPercent}%`,
+            opacity: backgroundLogoControl.opacity,
+            top: `${backgroundLogoControl.yPx}px`,
+            transform: `translateX(-50%) rotate(${backgroundLogoControl.rotateDeg}deg) scale(${backgroundLogoControl.scale})`,
+            width: `${backgroundLogoControl.widthVw}vw`,
           }}
           width={500}
         />
