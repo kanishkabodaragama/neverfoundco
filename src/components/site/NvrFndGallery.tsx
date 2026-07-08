@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 const galleryImages = [
   {
@@ -31,7 +31,7 @@ type NvrFndGalleryImage = {
 // Uses the same Anton-based font as the mobile slide menu.
 // fontSizeVw controls mobile scaling, maxFontSizePx caps desktop size.
 // letterGapPx adjusts letter spacing in pixels.
-// xPx moves the title horizontally: 0 = original, negative = left, positive = right.
+// xPx/yPx move the title. textAlign controls left, center, or right alignment.
 const galleryTitleControl = {
   fontFamily: "var(--font-display), Anton, Impact, sans-serif",
   minFontSizePx: 10,
@@ -39,6 +39,8 @@ const galleryTitleControl = {
   maxFontSizePx: 128,
   letterGapPx: 0,
   xPx: -20,
+  yPx: 0,
+  textAlign: "left" as "left" | "center" | "right",
 };
 
 // Gallery section controls:
@@ -93,9 +95,9 @@ export function NvrFndGallery({
     if (setWidth <= 0) return;
 
     let nextScrollLeft = node.scrollLeft;
-    if (node.scrollLeft < setWidth * 0.5) {
+    if (node.scrollLeft < slide.offsetWidth) {
       nextScrollLeft = node.scrollLeft + setWidth;
-    } else if (node.scrollLeft >= setWidth * 1.5) {
+    } else if (node.scrollLeft >= setWidth * 2) {
       nextScrollLeft = node.scrollLeft - setWidth;
     } else {
       return;
@@ -118,9 +120,9 @@ export function NvrFndGallery({
     if (setWidth <= 0) return;
 
     let nextScrollLeft = node.scrollLeft;
-    if (node.scrollLeft < setWidth * 0.5) {
+    if (node.scrollLeft < node.clientWidth) {
       nextScrollLeft = node.scrollLeft + setWidth;
-    } else if (node.scrollLeft >= setWidth * 1.5) {
+    } else if (node.scrollLeft >= setWidth * 2) {
       nextScrollLeft = node.scrollLeft - setWidth;
     } else {
       return;
@@ -133,9 +135,14 @@ export function NvrFndGallery({
     });
   }, [displayImages.length]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     syncStripToIndex(0);
   }, [syncStripToIndex]);
+
+  useEffect(() => {
+    window.addEventListener("resize", keepStripInMiddleSet);
+    return () => window.removeEventListener("resize", keepStripInMiddleSet);
+  }, [keepStripInMiddleSet]);
 
   useEffect(() => {
     if (activeIndex === null) return;
@@ -187,13 +194,14 @@ export function NvrFndGallery({
           fontSize: `clamp(${galleryTitleControl.minFontSizePx}px, ${galleryTitleControl.fontSizeVw}vw, ${galleryTitleControl.maxFontSizePx}px)`,
           fontStyle: "italic",
           letterSpacing: `${galleryTitleControl.letterGapPx}px`,
-          transform: `translateX(${galleryTitleControl.xPx}px)`,
+          textAlign: galleryTitleControl.textAlign,
+          transform: `translate(${galleryTitleControl.xPx}px, ${galleryTitleControl.yPx}px)`,
         }}
       >
         NVR FND GALLERY
       </h2>
       <div
-        className="no-scrollbar flex touch-pan-x snap-x snap-mandatory overflow-x-auto scroll-smooth bg-ink"
+        className="no-scrollbar flex touch-pan-x snap-x snap-mandatory overflow-x-auto bg-ink"
         onScroll={keepStripInMiddleSet}
         ref={stripRef}
       >
@@ -241,7 +249,7 @@ export function NvrFndGallery({
             <span className="absolute h-9 w-0.5 -rotate-45 bg-acid" />
           </button>
           <div
-            className="no-scrollbar flex h-full snap-x snap-mandatory overflow-x-auto scroll-smooth"
+            className="no-scrollbar flex h-full snap-x snap-mandatory overflow-x-auto"
             onScroll={syncModalIndex}
             ref={modalRef}
           >
