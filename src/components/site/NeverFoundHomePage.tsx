@@ -38,11 +38,19 @@ const homeGalleryControl = {
 };
 
 export async function NeverFoundHomePage({
+  productLimit = 4,
   products = shopProducts,
+  showSoldOut = false,
 }: {
+  productLimit?: number;
   products?: ShopProduct[];
+  showSoldOut?: boolean;
 }) {
-  const featuredProducts = products.filter((product) => !product.soldOut).slice(0, 4);
+  const availableProducts = showSoldOut
+    ? products
+    : products.filter((product) => !product.soldOut);
+  const featuredProducts =
+    productLimit > 0 ? availableProducts.slice(0, productLimit) : availableProducts;
   const galleryImages = (await listStorefrontGalleryImages()).map((image, index) => ({
     alt: image.alt_text ?? `Never Found gallery image ${index + 1}`,
     src: image.image_url,
