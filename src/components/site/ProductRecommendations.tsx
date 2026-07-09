@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRef } from "react";
-import type { UIEvent } from "react";
+import type { CSSProperties, UIEvent } from "react";
 import { StorePrice } from "@/components/site/StorePrice";
 import type { ShopProduct } from "@/components/site/shop-data";
 
@@ -100,6 +101,23 @@ export function ProductRecommendations({
     }
   }
 
+  function navigateRecommendationSlider(direction: -1 | 1) {
+    const currentIndex = getCurrentSliderIndex();
+    const lastDesktopStartIndex = Math.max(0, products.length - 4);
+
+    if (direction === 1 && currentIndex >= lastDesktopStartIndex) {
+      scrollSliderTo(0);
+      return;
+    }
+
+    if (direction === -1 && currentIndex <= 0) {
+      scrollSliderTo(lastDesktopStartIndex);
+      return;
+    }
+
+    scrollSliderTo(currentIndex + direction);
+  }
+
   return (
     <section className="bg-acid px-5 py-10 text-ink md:px-8 md:py-14 xl:px-12">
       <div className="flex items-center justify-between gap-4">
@@ -122,34 +140,59 @@ export function ProductRecommendations({
         </Link>
       </div>
 
-      <div
-        className={
-          usesSlider
-            ? "no-scrollbar mt-8 flex touch-pan-x snap-x snap-mandatory overflow-x-auto scroll-smooth"
-            : "mt-8 grid gap-x-5 gap-y-10"
-        }
-        onScroll={loopSliderAtScrollEnd}
-        onTouchEnd={(event) => loopSliderOnEdgeSwipe(event.changedTouches[0]?.clientX ?? 0)}
-        onTouchStart={(event) => {
-          touchStartX.current = event.touches[0]?.clientX ?? null;
-        }}
-        ref={sliderRef}
-        style={{
-          columnGap: `${recommendationCardLayoutControl.columnGapPx}px`,
-          ...(usesSlider
-            ? {}
-            : {
-                gridTemplateColumns: `repeat(${products.length}, minmax(0, 1fr))`,
-              }),
-        }}
-      >
-        {products.map((product) => (
-          <RelatedProductCard
-            key={product.id}
-            product={product}
-            usesSlider={usesSlider}
-          />
-        ))}
+      <div className="relative">
+        <div
+          className={
+            usesSlider
+              ? "no-scrollbar mt-8 flex touch-pan-x snap-x snap-mandatory overflow-x-auto scroll-smooth"
+              : "mt-8 grid gap-y-10"
+          }
+          onScroll={loopSliderAtScrollEnd}
+          onTouchEnd={(event) => loopSliderOnEdgeSwipe(event.changedTouches[0]?.clientX ?? 0)}
+          onTouchStart={(event) => {
+            touchStartX.current = event.touches[0]?.clientX ?? null;
+          }}
+          ref={sliderRef}
+          style={
+            {
+              "--recommendation-column-gap": `${recommendationCardLayoutControl.columnGapPx}px`,
+              columnGap: `${recommendationCardLayoutControl.columnGapPx}px`,
+              ...(usesSlider
+                ? {}
+                : {
+                    gridTemplateColumns: `repeat(${products.length}, minmax(0, 1fr))`,
+                  }),
+            } as CSSProperties
+          }
+        >
+          {products.map((product) => (
+            <RelatedProductCard
+              key={product.id}
+              product={product}
+              usesSlider={usesSlider}
+            />
+          ))}
+        </div>
+        {products.length > 4 ? (
+          <>
+            <button
+              aria-label="Previous recommended product"
+              className="absolute left-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-ink/80 text-bone transition hover:bg-ink lg:grid"
+              onClick={() => navigateRecommendationSlider(-1)}
+              type="button"
+            >
+              <ChevronLeft aria-hidden="true" className="h-6 w-6" />
+            </button>
+            <button
+              aria-label="Next recommended product"
+              className="absolute right-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-ink/80 text-bone transition hover:bg-ink lg:grid"
+              onClick={() => navigateRecommendationSlider(1)}
+              type="button"
+            >
+              <ChevronRight aria-hidden="true" className="h-6 w-6" />
+            </button>
+          </>
+        ) : null}
       </div>
     </section>
   );
@@ -171,17 +214,10 @@ function RelatedProductCard({
   return (
     <Link
       className={`group block snap-start text-center text-ink md:text-left ${
-        usesSlider ? "shrink-0" : ""
+        usesSlider ? "recommendation-slider-card shrink-0" : ""
       }`}
       data-recommendation-slide
       href={`/products/${product.slug ?? product.id}`}
-      style={
-        usesSlider
-          ? {
-              width: `calc((100% - ${recommendationCardLayoutControl.columnGapPx}px) / 2)`,
-            }
-          : undefined
-      }
     >
       <div className="relative aspect-[4/5] overflow-hidden bg-transparent">
         <Image

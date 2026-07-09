@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 
@@ -207,6 +208,17 @@ export function NvrFndGallery({
     keepModalInMiddleSet();
   }
 
+  function scrollGallery(direction: -1 | 1) {
+    const node = stripRef.current;
+    const slide = node?.querySelector<HTMLElement>("[data-gallery-slide]");
+    if (!node || !slide) return;
+
+    node.scrollBy({
+      behavior: "smooth",
+      left: slide.offsetWidth * direction,
+    });
+  }
+
   return (
     <section
       className="overflow-hidden bg-transparent text-ink"
@@ -225,12 +237,13 @@ export function NvrFndGallery({
       >
         {title}
       </h2>
-      <div
-        className="no-scrollbar flex w-full touch-pan-x snap-x snap-mandatory overflow-x-auto bg-ink"
-        onScroll={keepStripInMiddleSet}
-        ref={stripRef}
-      >
-        {loopedImages.map((image, index) => {
+      <div className="relative">
+        <div
+          className="no-scrollbar flex w-full touch-pan-x snap-x snap-mandatory overflow-x-auto bg-ink"
+          onScroll={keepStripInMiddleSet}
+          ref={stripRef}
+        >
+          {loopedImages.map((image, index) => {
           const imageIndex = index % displayImages.length;
           const slideStyle: CSSProperties = {
             flex: `0 0 calc(100% / ${visibleSlides})`,
@@ -285,7 +298,28 @@ export function NvrFndGallery({
               {imageNode}
             </button>
           );
-        })}
+          })}
+        </div>
+        {displayImages.length > 1 ? (
+          <>
+            <button
+              aria-label="Previous gallery image"
+              className="absolute left-4 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-ink/80 text-bone transition hover:bg-ink lg:grid"
+              onClick={() => scrollGallery(-1)}
+              type="button"
+            >
+              <ChevronLeft aria-hidden="true" className="h-6 w-6" />
+            </button>
+            <button
+              aria-label="Next gallery image"
+              className="absolute right-4 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-ink/80 text-bone transition hover:bg-ink lg:grid"
+              onClick={() => scrollGallery(1)}
+              type="button"
+            >
+              <ChevronRight aria-hidden="true" className="h-6 w-6" />
+            </button>
+          </>
+        ) : null}
       </div>
 
       {lightbox && activeIndex !== null ? (

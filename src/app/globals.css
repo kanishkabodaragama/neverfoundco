@@ -105,6 +105,23 @@ body.nvr-gallery-lightbox-open .site-header {
   display: none;
 }
 
+.recommendation-slider-card {
+  width: calc((100% - var(--recommendation-column-gap)) / 2);
+}
+
+@media (min-width: 1024px) {
+  .recommendation-slider-card {
+    width: calc(
+      (
+          100% - var(--recommendation-column-gap) -
+            var(--recommendation-column-gap) -
+            var(--recommendation-column-gap)
+        ) /
+        4
+    );
+  }
+}
+
 .cart-pixel-alert {
   animation: cart-pixel-blink 2.8s steps(2, jump-none) infinite;
   image-rendering: pixelated;

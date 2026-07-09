@@ -53,7 +53,7 @@ export async function NeverFoundHomePage({
       <Header />
       <StoreArtSurface homeGraffiTexture>
         <section
-          className="bg-acid px-5 pb-12 pt-[calc(1.5rem+var(--home-product-top-padding))] text-ink md:px-8 md:pb-20 md:pt-[calc(6rem+var(--home-product-top-padding))]"
+          className="bg-acid px-5 pb-12 pt-[calc(1.5rem+var(--home-product-top-padding))] text-ink md:px-8 md:pb-20 md:pt-[calc(4rem+var(--home-product-top-padding))]"
           style={
             {
               "--home-product-top-padding": `${homeProductSectionControl.topPaddingPx}px`,
@@ -112,7 +112,7 @@ function EvidenceProductCard({
       </div>
 
       <div
-        className="mt-0.5 flex flex-col items-center gap-1 text-center md:mt-1 md:flex-row md:items-start md:justify-between md:text-left"
+        className="mt-0.5 flex flex-col items-center gap-1 text-center md:mt-1 lg:items-center lg:text-center"
         style={{
           transform: `translate(${homeProductCardInfoControl.xPx}px, ${homeProductCardInfoControl.yPx}px)`,
         }}
@@ -121,7 +121,7 @@ function EvidenceProductCard({
           <h3 className="font-display text-base italic uppercase leading-tight sm:text-xl">{product.name}</h3>
         </div>
         <div
-          className="shrink-0 text-center md:pl-4 md:text-right"
+          className="shrink-0 text-center"
           style={{
             transform: `translate(${homeProductCardPriceControl.xPx}px, ${homeProductCardPriceControl.yPx}px)`,
           }}

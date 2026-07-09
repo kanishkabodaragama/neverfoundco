@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ChevronDown, Ruler, X } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, Ruler, X } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
@@ -300,37 +300,59 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
         className="grid gap-5"
         style={{ marginTop: `${productGalleryLayoutControls.mainImageSectionOffsetYpx}px` }}
       >
-        <div
-          className="min-h-[430px] touch-pan-y overflow-hidden bg-transparent md:min-h-[610px]"
-          ref={mainGalleryRef}
-          style={{ touchAction: "pan-y" }}
-        >
-          <div className="flex touch-pan-y">
-            {galleryImages.map((image, index) => (
-              <div
-                className="relative min-h-[430px] min-w-full touch-pan-y overflow-hidden md:min-h-[610px]"
-                key={`${image}-${index}`}
-              >
-                <Image
-                  alt={product.alt}
-                  className="pointer-events-none select-none object-contain px-3 pb-3 pt-[var(--main-product-image-top-padding)] md:px-4 md:pb-4 md:pt-[var(--main-product-image-desktop-top-padding)]"
-                  draggable={false}
-                  fill
-                  priority={index === 1}
-                  sizes="(min-width: 1024px) 50vw, 100vw"
-                  src={image}
-                  style={
-                    {
-                      "--main-product-image-desktop-top-padding": `${productGalleryLayoutControls.mainImageDesktopTopPaddingPx}px`,
-                      "--main-product-image-top-padding": `${productGalleryLayoutControls.mainImageTopPaddingPx}px`,
-                      transform: `translate(${productGalleryLayoutControls.mainImageXpx}px, ${productGalleryLayoutControls.mainImageYpx}px) scale(${productGalleryLayoutControls.mainImageScale})`,
-                    } as CSSProperties
-                  }
-                  unoptimized
-                />
-              </div>
-            ))}
+        <div className="relative">
+          <div
+            className="min-h-[430px] touch-pan-y overflow-hidden bg-transparent md:min-h-[610px]"
+            ref={mainGalleryRef}
+            style={{ touchAction: "pan-y" }}
+          >
+            <div className="flex touch-pan-y">
+              {galleryImages.map((image, index) => (
+                <div
+                  className="relative min-h-[430px] min-w-full touch-pan-y overflow-hidden md:min-h-[610px]"
+                  key={`${image}-${index}`}
+                >
+                  <Image
+                    alt={product.alt}
+                    className="pointer-events-none select-none object-contain px-3 pb-3 pt-[var(--main-product-image-top-padding)] md:px-4 md:pb-4 md:pt-[var(--main-product-image-desktop-top-padding)]"
+                    draggable={false}
+                    fill
+                    priority={index === 1}
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                    src={image}
+                    style={
+                      {
+                        "--main-product-image-desktop-top-padding": `${productGalleryLayoutControls.mainImageDesktopTopPaddingPx}px`,
+                        "--main-product-image-top-padding": `${productGalleryLayoutControls.mainImageTopPaddingPx}px`,
+                        transform: `translate(${productGalleryLayoutControls.mainImageXpx}px, ${productGalleryLayoutControls.mainImageYpx}px) scale(${productGalleryLayoutControls.mainImageScale})`,
+                      } as CSSProperties
+                    }
+                    unoptimized
+                  />
+                </div>
+              ))}
+            </div>
           </div>
+          {galleryImages.length > 1 ? (
+            <>
+              <button
+                aria-label="Previous product image"
+                className="absolute left-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-ink/80 text-bone transition hover:bg-ink lg:grid"
+                onClick={() => mainGalleryApi?.scrollPrev()}
+                type="button"
+              >
+                <ChevronLeft aria-hidden="true" className="h-6 w-6" />
+              </button>
+              <button
+                aria-label="Next product image"
+                className="absolute right-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-ink/80 text-bone transition hover:bg-ink lg:grid"
+                onClick={() => mainGalleryApi?.scrollNext()}
+                type="button"
+              >
+                <ChevronRight aria-hidden="true" className="h-6 w-6" />
+              </button>
+            </>
+          ) : null}
         </div>
 
         <div
