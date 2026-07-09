@@ -27,6 +27,12 @@ const productGalleryLayoutControls = {
   thumbnailImageScale: 1.5,
 };
 
+// Desktop product information column controls:
+// desktopTopPaddingPx moves the entire right column down below the header.
+const productInformationLayoutControls = {
+  desktopTopPaddingPx: 120,
+};
+
 // Product title and price controls:
 // xPx/yPx move each text element. Font sizes and gaps are in pixels.
 const productTextControls = {
@@ -388,8 +394,13 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
       </div>
 
       <div
-        className="flex flex-col items-start justify-start text-left"
-        style={{ rowGap: `${productTextControls.itemGapPx}px` }}
+        className="flex flex-col items-start justify-start text-left lg:items-center lg:pt-[var(--product-info-desktop-top-padding)] lg:text-center"
+        style={
+          {
+            "--product-info-desktop-top-padding": `${productInformationLayoutControls.desktopTopPaddingPx}px`,
+            rowGap: `${productTextControls.itemGapPx}px`,
+          } as CSSProperties
+        }
       >
         <h1
           className="max-w-xl font-display italic uppercase"
@@ -530,7 +541,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
           </button>
 
           {description ? (
-            <section className="pt-8 text-left">
+            <section className="pt-8 text-left lg:text-center">
               <h2 className="font-sans text-2xl font-black italic uppercase tracking-normal text-ink">
                 Description
               </h2>
@@ -666,12 +677,12 @@ function OptionGroup({
   label: string;
 }) {
   return (
-    <div className="text-left">
-      <div className="flex items-center justify-between gap-4">
+    <div className="text-left lg:text-center">
+      <div className="flex items-center justify-between gap-4 lg:justify-center">
         <p className="font-mono text-[13px] font-black uppercase tracking-normal">{label}</p>
         {action}
       </div>
-      <div className="mt-3 flex flex-wrap justify-start gap-3">{children}</div>
+      <div className="mt-3 flex flex-wrap justify-start gap-3 lg:justify-center">{children}</div>
     </div>
   );
 }
