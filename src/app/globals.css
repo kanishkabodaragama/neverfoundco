@@ -66,6 +66,10 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+.admin-font {
+  font-family: var(--font-admin), "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
 body.nvr-gallery-lightbox-open .site-header {
   display: none;
 }

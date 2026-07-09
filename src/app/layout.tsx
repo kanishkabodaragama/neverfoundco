@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { CartProvider } from "@/components/store/cart-provider";
 import { CurrencyProvider } from "@/components/store/currency-provider";
 import "./globals.css";
-import { Anton, Space_Mono } from "next/font/google";
+import { Anton, Inter, Space_Mono } from "next/font/google";
 import { cn } from "@/lib/utils";
 
 const display = Anton({
@@ -16,6 +16,12 @@ const mono = Space_Mono({
   subsets: ["latin"],
   weight: ["400", "700"],
   variable: "--font-mono",
+  display: "swap",
+});
+
+const admin = Inter({
+  subsets: ["latin"],
+  variable: "--font-admin",
   display: "swap",
 });
 
@@ -41,6 +47,7 @@ export default function RootLayout({
       lang="en"
       className={cn(
         "h-full antialiased",
+        admin.variable,
         display.variable,
         mono.variable,
       )}

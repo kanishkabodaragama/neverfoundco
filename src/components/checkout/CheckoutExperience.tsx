@@ -429,9 +429,11 @@ export function CheckoutExperience({ countries }: {
             />
             <Image
               alt="PayHere"
-              height={150}
-              src="https://www.payhere.lk/downloads/images/payhere_square_banner_dark.png"
-              width={150}
+              className="h-auto w-[150px]"
+              height={252}
+              sizes="150px"
+              src="/images/payments/payhere-square-banner-dark.png"
+              width={494}
             />
           </label>
         </Panel>
