@@ -272,7 +272,7 @@ export function CheckoutExperience({ countries }: {
               <span className="sr-only">Phone Number</span>
               <span className="grid grid-cols-[120px_1fr] gap-3">
                 <select
-                  className="w-full border border-ink/25 bg-transparent px-3 py-4 font-sans text-sm font-bold uppercase outline-none focus:border-rust"
+                  className="w-full border border-ink/25 bg-transparent px-3 py-4 font-sans text-sm font-normal uppercase outline-none focus:border-rust"
                   onChange={(event) => setPhoneCode(event.target.value)}
                   value={phoneCode}
                 >
@@ -283,7 +283,7 @@ export function CheckoutExperience({ countries }: {
                   ))}
                 </select>
                 <input
-                  className="w-full border border-ink/25 bg-transparent px-4 py-4 font-sans text-sm font-bold uppercase outline-none placeholder:text-ink/45 focus:border-rust"
+                  className="w-full border border-ink/25 bg-transparent px-4 py-4 font-sans text-sm font-normal uppercase outline-none placeholder:text-ink/45 focus:border-rust"
                   name="customerPhone"
                   placeholder="Phone Number"
                   type="tel"
@@ -301,7 +301,7 @@ export function CheckoutExperience({ countries }: {
               <label className="block">
                 <span className="sr-only">Billing Country</span>
                 <select
-                  className="w-full border border-ink/25 bg-transparent px-4 py-4 font-sans text-sm font-bold uppercase outline-none focus:border-rust"
+                  className="w-full border border-ink/25 bg-transparent px-4 py-4 font-sans text-sm font-normal uppercase outline-none focus:border-rust"
                   onChange={(event) => {
                     setBillingCountryCode(event.target.value);
                     setPhoneCode(getCallingCode(event.target.value));
@@ -320,7 +320,7 @@ export function CheckoutExperience({ countries }: {
               <label className="block">
                 <span className="sr-only">Billing Region</span>
                 <select
-                  className="w-full border border-ink/25 bg-transparent px-4 py-4 font-sans text-sm font-bold uppercase outline-none focus:border-rust"
+                  className="w-full border border-ink/25 bg-transparent px-4 py-4 font-sans text-sm font-normal uppercase outline-none focus:border-rust"
                   onChange={(event) => {
                     setBillingRegion(event.target.value);
                     setShippingFee(null);
@@ -371,7 +371,7 @@ export function CheckoutExperience({ countries }: {
                 <label className="block">
                   <span className="sr-only">Delivery Country</span>
                   <select
-                    className="w-full border border-ink/25 bg-transparent px-4 py-4 font-sans text-sm font-bold uppercase outline-none focus:border-rust"
+                    className="w-full border border-ink/25 bg-transparent px-4 py-4 font-sans text-sm font-normal uppercase outline-none focus:border-rust"
                     onChange={(event) => {
                       setDeliveryCountryCode(event.target.value);
                       setDeliveryRegion("");
@@ -389,7 +389,7 @@ export function CheckoutExperience({ countries }: {
                 <label className="block">
                   <span className="sr-only">Delivery Region</span>
                   <select
-                  className="w-full border border-ink/25 bg-transparent px-4 py-4 font-sans text-sm font-bold uppercase outline-none focus:border-rust"
+                  className="w-full border border-ink/25 bg-transparent px-4 py-4 font-sans text-sm font-normal uppercase outline-none focus:border-rust"
                     onChange={(event) => {
                       setDeliveryRegion(event.target.value);
                       setShippingFee(null);
@@ -579,7 +579,7 @@ function CheckoutInput({
     <label className="block">
       <span className="sr-only">{label}</span>
       <input
-        className="w-full border border-ink/25 bg-transparent px-4 py-4 font-sans text-sm font-bold uppercase outline-none placeholder:text-ink/45 focus:border-rust"
+        className="w-full border border-ink/25 bg-transparent px-4 py-4 font-sans text-sm font-normal uppercase outline-none placeholder:text-ink/45 focus:border-rust"
         name={name}
         onChange={(event) => onChange?.(event.target.value)}
         placeholder={label}
