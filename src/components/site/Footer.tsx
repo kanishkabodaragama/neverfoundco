@@ -3,11 +3,11 @@ import Link from "next/link";
 
 const leftFooterLinks = [
   { label: "Privacy Policy", href: "/privacy" },
-  { label: "Refund Policy", href: "/returns" },
+  { label: "Return Policy", href: "/returns" },
 ];
 
 const centerFooterLinks = [
-  { label: "Refund Policy", href: "/returns" },
+  { label: "Terms and Conditions", href: "/terms" },
   { label: "Contact Us", href: "/contact" },
 ];
 
@@ -65,7 +65,7 @@ export function Footer({}: { graffiTexture?: boolean }) {
             <Link
               aria-label="Instagram"
               className="inline-flex h-7 w-7 items-center justify-center transition-opacity hover:opacity-70"
-              href="https://www.instagram.com/"
+              href="https://www.instagram.com/neverfoundco"
               rel="noreferrer"
               target="_blank"
             >
