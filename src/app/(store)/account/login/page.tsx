@@ -15,10 +15,10 @@ export default async function CustomerLoginPage({
   const { error } = await searchParams;
 
   return (
-    <div className="min-h-screen bg-acid text-ink">
+    <div className="flex min-h-screen flex-col overflow-x-hidden bg-ink text-ink">
       <Header />
-      <StoreArtSurface>
-      <div className="mx-auto grid min-h-[70vh] w-full max-w-xl place-items-center px-5 py-12">
+      <StoreArtSurface homeGraffiTexture>
+      <div className="mx-auto grid min-h-[70vh] w-full max-w-xl place-items-center px-5 pb-12 pt-[calc(1.5rem+60px)] md:pb-20 md:pt-[calc(4rem+60px)]">
         <form action="/api/account/login" className="w-full border border-ink bg-transparent p-6" method="post">
           <p className="font-sans text-[11px] font-bold uppercase tracking-normal text-rust">Customer file</p>
           <h1 className="mt-4 font-display text-5xl uppercase leading-none">Order login</h1>
@@ -42,7 +42,7 @@ export default async function CustomerLoginPage({
         </form>
       </div>
       </StoreArtSurface>
-      <Footer />
+      <Footer graffiTexture />
     </div>
   );
 }

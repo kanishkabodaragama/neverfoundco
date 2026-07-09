@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useCart } from "@/components/store/cart-provider";
 import { CartLink } from "@/components/site/CartLink";
@@ -214,7 +215,9 @@ export function SiteHeader({
 }: {
   active?: "home" | "shop" | "about" | "contact";
 }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [pendingMobileHref, setPendingMobileHref] = useState<string | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
   const [mobileMenuViewport, setMobileMenuViewport] = useState({
     height: mobileMenuDesignControl.heightPx,
@@ -267,6 +270,19 @@ export function SiteHeader({
       documentElement.style.overscrollBehavior = originalHtmlOverscrollBehavior;
     };
   }, [open]);
+
+  useEffect(() => {
+    if (open || !pendingMobileHref) {
+      return;
+    }
+
+    const navigationTimer = window.setTimeout(() => {
+      router.push(pendingMobileHref);
+      setPendingMobileHref(null);
+    }, 500);
+
+    return () => window.clearTimeout(navigationTimer);
+  }, [open, pendingMobileHref, router]);
 
   return (
     <>
@@ -432,7 +448,11 @@ export function SiteHeader({
                   className={`flex w-full whitespace-nowrap uppercase leading-[0.86] tracking-normal transition-colors hover:text-rust active:text-rust ${item.colorClass}`}
                   href={item.href}
                   key={item.label}
-                  onClick={() => setOpen(false)}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    setPendingMobileHref(item.href);
+                    setOpen(false);
+                  }}
                   style={{
                     alignItems: getMenuItemAlignItems(rowVerticalAlignment),
                     fontFamily: mobileMenuItemsFontFamily,
@@ -459,9 +479,9 @@ export function SiteHeader({
           </div>
         </div>
 
-        <div className="relative z-20 flex h-full flex-col px-6 pt-8">
+        <div className="pointer-events-none relative z-20 flex h-full flex-col px-6 pt-8">
           <div
-            className="relative z-20 flex items-center justify-between"
+            className="pointer-events-auto relative z-20 flex items-center justify-between"
             style={{
               transform: `translate(${mobileMenuTopBarControl.xPx}px, ${mobileMenuTopBarControl.yPx}px)`,
             }}
@@ -496,7 +516,7 @@ export function SiteHeader({
             </button>
           </div>
 
-          <div className="absolute inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+20px)] z-20 flex justify-center px-6">
+          <div className="pointer-events-auto absolute inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+20px)] z-20 flex justify-center px-6">
             <CurrencySelector tone="dark" />
           </div>
         </div>

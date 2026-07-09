@@ -13,10 +13,10 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen w-full bg-acid text-ink">
+    <div className="flex min-h-screen flex-col overflow-x-hidden bg-ink text-ink">
       <Header />
-      <StoreArtSurface>
-        <section className="w-full bg-acid px-5 py-12 text-ink md:px-8 md:py-20 xl:px-12">
+      <StoreArtSurface homeGraffiTexture>
+        <section className="w-full bg-acid px-5 pb-12 pt-[calc(1.5rem+60px)] text-ink md:px-8 md:pb-20 md:pt-[calc(4rem+60px)] xl:px-12">
           <p className="font-sans text-[11px] uppercase tracking-normal">Support file</p>
           <h1 className="mt-7 font-display text-[18vw] uppercase leading-[0.82] md:text-8xl lg:text-9xl">
             Contact
@@ -49,7 +49,7 @@ export default function ContactPage() {
           <ContactInfo />
         </section>
       </StoreArtSurface>
-      <Footer />
+      <Footer graffiTexture />
     </div>
   );
 }
