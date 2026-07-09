@@ -90,8 +90,8 @@ export function Footer({}: { graffiTexture?: boolean }) {
             <FooterLinkList links={leftFooterLinks} />
           </div>
 
-          <FooterLinkList className="justify-self-center text-center" links={centerFooterLinks} />
-          <FooterLinkList className="justify-self-end text-right" links={rightFooterLinks} />
+          <FooterLinkList className="justify-self-start text-left" links={centerFooterLinks} />
+          <FooterLinkList className="justify-self-start text-left" links={rightFooterLinks} />
         </div>
       </div>
     </footer>

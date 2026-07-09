@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import { ChevronDown, Ruler, X } from "lucide-react";
+import useEmblaCarousel from "embla-carousel-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { CSSProperties, ReactNode, TouchEvent } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { useCart } from "@/components/store/cart-provider";
 import { StorePrice } from "@/components/site/StorePrice";
 import type { MockProductDetail } from "@/components/site/product-detail-data";
@@ -71,14 +72,10 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
   const [requestedColor, setSelectedColor] = useState(product.colors[0]);
   const [requestedSize, setSelectedSize] = useState(product.sizes[0]);
   const [selectedImage, setSelectedImage] = useState(product.image);
-  const [carouselPosition, setCarouselPosition] = useState(1);
-  const [isCarouselResetting, setIsCarouselResetting] = useState(false);
   const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
   const [added, setAdded] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const mobileThumbnailStrip = useRef<HTMLDivElement | null>(null);
-  const carouselTouchStart = useRef<{ x: number; y: number } | null>(null);
-  const isCarouselAnimating = useRef(false);
   const availableGenders = useMemo(
     () => uniqueVariantValues(product.variants.map((variant) => variant.gender)),
     [product.variants],
@@ -136,6 +133,13 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
       ].filter((image, index, list): image is string => Boolean(image) && list.indexOf(image) === index),
     [product.gallery, product.image, product.variants],
   );
+  const [mainGalleryRef, mainGalleryApi] = useEmblaCarousel({
+    align: "start",
+    dragThreshold: 5,
+    duration: 24,
+    loop: galleryImages.length > 1,
+    watchDrag: galleryImages.length > 1,
+  });
   const displayImage = galleryImages.includes(selectedImage)
     ? selectedImage
     : galleryImages[0] ?? selectedImage;
@@ -146,14 +150,6 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
   );
   const displayImageIndex = galleryImages.indexOf(displayImage);
   const activeGalleryIndex = Math.max(0, displayImageIndex);
-  const carouselSlides = useMemo(
-    () =>
-      galleryImages.length > 1
-        ? [galleryImages[galleryImages.length - 1], ...galleryImages, galleryImages[0]]
-        : galleryImages,
-    [galleryImages],
-  );
-  const displayedCarouselPosition = galleryImages.length > 1 ? carouselPosition : 0;
   const shortDescription = product.shortDescription?.trim();
   const description = product.description?.trim();
   const maxQuantity =
@@ -173,6 +169,24 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
       inline: "nearest",
     });
   }, [activeGalleryIndex]);
+
+  useEffect(() => {
+    if (!mainGalleryApi) return;
+    const api = mainGalleryApi;
+
+    function syncSelectedImage() {
+      const image = galleryImages[api.selectedScrollSnap()];
+      if (image) setSelectedImage(image);
+    }
+
+    api.on("select", syncSelectedImage);
+    api.on("reInit", syncSelectedImage);
+
+    return () => {
+      api.off("select", syncSelectedImage);
+      api.off("reInit", syncSelectedImage);
+    };
+  }, [galleryImages, mainGalleryApi]);
 
   useEffect(() => {
     if (!isSizeChartOpen) return;
@@ -202,73 +216,12 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
     if (!image) return;
 
     setSelectedImage(image);
-    isCarouselAnimating.current = false;
-    setIsCarouselResetting(false);
-    setCarouselPosition(galleryImages.length > 1 ? wrappedIndex + 1 : 0);
-  }
-
-  function rotateGallery(direction: 1 | -1) {
-    if (galleryImages.length < 2 || isCarouselAnimating.current) return;
-
-    const nextIndex = (activeGalleryIndex + direction + galleryImages.length) % galleryImages.length;
-    isCarouselAnimating.current = true;
-    setSelectedImage(galleryImages[nextIndex]);
-    setIsCarouselResetting(false);
-    setCarouselPosition((currentPosition) => currentPosition + direction);
+    mainGalleryApi?.scrollTo(wrappedIndex);
   }
 
   function selectGalleryImage(image: string, index: number) {
     setSelectedImage(image);
     showGalleryIndex(index);
-  }
-
-  function settleLoopedCarousel() {
-    if (galleryImages.length < 2) return;
-
-    if (carouselPosition === 0) {
-      setIsCarouselResetting(true);
-      setCarouselPosition(galleryImages.length);
-    } else if (carouselPosition === galleryImages.length + 1) {
-      setIsCarouselResetting(true);
-      setCarouselPosition(1);
-    }
-
-    isCarouselAnimating.current = false;
-  }
-
-  function handleCarouselTouchStart(event: TouchEvent<HTMLDivElement>) {
-    const touch = event.touches[0];
-    if (!touch) return;
-
-    carouselTouchStart.current = {
-      x: touch.clientX,
-      y: touch.clientY,
-    };
-  }
-
-  function handleCarouselTouchMove(event: TouchEvent<HTMLDivElement>) {
-    const start = carouselTouchStart.current;
-    const touch = event.touches[0];
-    if (!start || !touch) return;
-
-    const deltaX = touch.clientX - start.x;
-    const deltaY = touch.clientY - start.y;
-
-    if (Math.abs(deltaX) > 8 && Math.abs(deltaX) > Math.abs(deltaY)) {
-      event.preventDefault();
-    }
-  }
-
-  function handleCarouselTouchEnd(event: TouchEvent<HTMLDivElement>) {
-    const start = carouselTouchStart.current;
-    const touch = event.changedTouches[0];
-    carouselTouchStart.current = null;
-    if (!start || !touch || galleryImages.length < 2) return;
-
-    const deltaX = touch.clientX - start.x;
-    if (Math.abs(deltaX) < 40) return;
-
-    rotateGallery(deltaX < 0 ? 1 : -1);
   }
 
   function clampQuantity(value: number) {
@@ -349,25 +302,18 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
       >
         <div
           className="min-h-[430px] touch-pan-y overflow-hidden bg-transparent md:min-h-[610px]"
-          onTouchEnd={handleCarouselTouchEnd}
-          onTouchMove={handleCarouselTouchMove}
-          onTouchStart={handleCarouselTouchStart}
+          ref={mainGalleryRef}
+          style={{ touchAction: "pan-y" }}
         >
-          <div
-            className={`flex ${
-              isCarouselResetting ? "" : "transition-transform duration-300 ease-out"
-            }`}
-            onTransitionEnd={settleLoopedCarousel}
-            style={{ transform: `translate3d(-${displayedCarouselPosition * 100}%, 0, 0)` }}
-          >
-            {carouselSlides.map((image, index) => (
+          <div className="flex touch-pan-y">
+            {galleryImages.map((image, index) => (
               <div
                 className="relative min-h-[430px] min-w-full touch-pan-y overflow-hidden md:min-h-[610px]"
                 key={`${image}-${index}`}
               >
                 <Image
                   alt={product.alt}
-                  className="object-contain px-3 pb-3 pt-[var(--main-product-image-top-padding)] md:px-4 md:pb-4 md:pt-[var(--main-product-image-desktop-top-padding)]"
+                  className="pointer-events-none select-none object-contain px-3 pb-3 pt-[var(--main-product-image-top-padding)] md:px-4 md:pb-4 md:pt-[var(--main-product-image-desktop-top-padding)]"
                   draggable={false}
                   fill
                   priority={index === 1}
