@@ -12,7 +12,6 @@ const centerFooterLinks = [
 ];
 
 const rightFooterLinks = [
-  { label: "Shipping Policy", href: "/returns" },
   { label: "About Us", href: "/about" },
 ];
 

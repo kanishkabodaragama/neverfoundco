@@ -14,9 +14,11 @@ import { getVariantCombinationKey, uniqueVariantValues } from "@/lib/product-var
 const productGalleryLayoutControls = {
   mainImageSectionOffsetYpx: 14,
   mainImageTopPaddingPx: 100,
-  mainImageDesktopTopPaddingPx: 16,
+  mainImageDesktopTopPaddingPx: 56,
   mainImageXpx: 0,
   mainImageYpx: 0,
+  mainImageDesktopXpx: 0,
+  mainImageDesktopYpx: 0,
   mainImageScale: 1.03,
   thumbnailVisibleCount: 6,
   thumbnailGapPx: 20,
@@ -28,9 +30,12 @@ const productGalleryLayoutControls = {
 };
 
 // Desktop product information column controls:
-// desktopTopPaddingPx moves the entire right column down below the header.
+// desktopTopPaddingPx adds space above the column.
+// desktopXpx/desktopYpx move the complete column left/right or up/down.
 const productInformationLayoutControls = {
   desktopTopPaddingPx: 120,
+  desktopXpx: 0,
+  desktopYpx: 0,
 };
 
 // Product title and price controls:
@@ -320,7 +325,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
                 >
                   <Image
                     alt={product.alt}
-                    className="pointer-events-none select-none object-contain px-3 pb-3 pt-[var(--main-product-image-top-padding)] md:px-4 md:pb-4 md:pt-[var(--main-product-image-desktop-top-padding)]"
+                    className="main-product-image pointer-events-none select-none object-contain px-3 pb-3 pt-[var(--main-product-image-top-padding)] md:px-4 md:pb-4 md:pt-[var(--main-product-image-desktop-top-padding)]"
                     draggable={false}
                     fill
                     priority={index === 1}
@@ -329,8 +334,12 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
                     style={
                       {
                         "--main-product-image-desktop-top-padding": `${productGalleryLayoutControls.mainImageDesktopTopPaddingPx}px`,
+                        "--main-product-image-desktop-x": `${productGalleryLayoutControls.mainImageDesktopXpx}px`,
+                        "--main-product-image-desktop-y": `${productGalleryLayoutControls.mainImageDesktopYpx}px`,
                         "--main-product-image-top-padding": `${productGalleryLayoutControls.mainImageTopPaddingPx}px`,
-                        transform: `translate(${productGalleryLayoutControls.mainImageXpx}px, ${productGalleryLayoutControls.mainImageYpx}px) scale(${productGalleryLayoutControls.mainImageScale})`,
+                        "--main-product-image-x": `${productGalleryLayoutControls.mainImageXpx}px`,
+                        "--main-product-image-y": `${productGalleryLayoutControls.mainImageYpx}px`,
+                        "--main-product-image-scale": productGalleryLayoutControls.mainImageScale,
                       } as CSSProperties
                     }
                     unoptimized
@@ -394,10 +403,12 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
       </div>
 
       <div
-        className="flex flex-col items-start justify-start text-left lg:items-center lg:pt-[var(--product-info-desktop-top-padding)] lg:text-center"
+        className="product-information-column flex flex-col items-start justify-start text-left lg:items-center lg:pt-[var(--product-info-desktop-top-padding)] lg:text-center"
         style={
           {
             "--product-info-desktop-top-padding": `${productInformationLayoutControls.desktopTopPaddingPx}px`,
+            "--product-info-desktop-x": `${productInformationLayoutControls.desktopXpx}px`,
+            "--product-info-desktop-y": `${productInformationLayoutControls.desktopYpx}px`,
             rowGap: `${productTextControls.itemGapPx}px`,
           } as CSSProperties
         }

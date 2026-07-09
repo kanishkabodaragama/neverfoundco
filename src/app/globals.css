@@ -96,6 +96,14 @@ body.nvr-gallery-lightbox-open .site-header {
   animation-name: product-gallery-previous;
 }
 
+.main-product-image {
+  transform: translate(
+      var(--main-product-image-x),
+      var(--main-product-image-y)
+    )
+    scale(var(--main-product-image-scale));
+}
+
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -110,6 +118,21 @@ body.nvr-gallery-lightbox-open .site-header {
 }
 
 @media (min-width: 1024px) {
+  .main-product-image {
+    transform: translate(
+        var(--main-product-image-desktop-x),
+        var(--main-product-image-desktop-y)
+      )
+      scale(var(--main-product-image-scale));
+  }
+
+  .product-information-column {
+    transform: translate(
+      var(--product-info-desktop-x),
+      var(--product-info-desktop-y)
+    );
+  }
+
   .recommendation-slider-card {
     width: calc(
       (
