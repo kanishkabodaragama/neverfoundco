@@ -262,9 +262,9 @@ export function NvrFndGallery({
               alt={image.alt}
               className="object-cover object-center"
               fill
+              quality={100}
               sizes={`calc(100vw / ${visibleSlides})`}
               src={image.src}
-              unoptimized
             />
           );
 
@@ -351,9 +351,9 @@ export function NvrFndGallery({
                   alt={image.alt}
                   className="object-contain object-center p-4"
                   fill
+                  quality={100}
                   sizes="100vw"
                   src={image.src}
-                  unoptimized
                 />
               </div>
             ))}

@@ -224,9 +224,9 @@ function RelatedProductCard({
           alt={product.alt}
           className="object-contain p-5 transition-transform duration-300 group-hover:scale-[1.03] sm:p-6 md:p-7"
           fill
+          quality={100}
           sizes={usesSlider ? "50vw" : "(min-width: 768px) 45vw, 100vw"}
           src={product.image}
-          unoptimized
         />
       </div>
       {previewImages.length > 1 ? (
@@ -241,9 +241,9 @@ function RelatedProductCard({
                 aria-hidden="true"
                 className="object-contain"
                 fill
+                quality={100}
                 sizes="48px"
                 src={image}
-                unoptimized
               />
             </span>
           ))}

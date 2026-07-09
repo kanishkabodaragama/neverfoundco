@@ -75,7 +75,8 @@ export function StoreArtSurface({
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 z-0 object-cover mix-blend-multiply"
           fill
-          priority={false}
+          preload
+          quality={100}
           sizes="100vw"
           src="/images/textures/main-background.jpg"
           style={{

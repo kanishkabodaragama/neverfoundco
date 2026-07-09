@@ -13,6 +13,7 @@ const centerFooterLinks = [
 
 const rightFooterLinks = [
   { label: "About Us", href: "/about" },
+  { label: "Sitemap", href: "/sitemap" },
 ];
 
 // Footer controls:

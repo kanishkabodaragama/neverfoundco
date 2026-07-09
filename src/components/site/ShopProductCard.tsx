@@ -40,9 +40,9 @@ export function ShopProductCard({ product }: { product: ShopProduct }) {
           alt={product.alt}
           className="object-contain p-5 transition-transform duration-300 group-hover:scale-[1.03] sm:p-6 md:p-7"
           fill
+          quality={100}
           sizes="(min-width: 1280px) 22vw, (min-width: 768px) 31vw, 90vw"
           src={product.image}
-          unoptimized
         />
         <span
           className={`absolute top-3 px-2 py-1 font-sans text-[10px] uppercase tracking-normal ${

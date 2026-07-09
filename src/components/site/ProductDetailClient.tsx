@@ -329,6 +329,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
                     draggable={false}
                     fill
                     priority={index === 1}
+                    quality={100}
                     sizes="(min-width: 1024px) 50vw, 100vw"
                     src={image}
                     style={
@@ -342,7 +343,6 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
                         "--main-product-image-scale": productGalleryLayoutControls.mainImageScale,
                       } as CSSProperties
                     }
-                    unoptimized
                   />
                 </div>
               ))}
@@ -667,12 +667,12 @@ function GalleryThumb({
         alt={`${productName} thumbnail ${index + 1}`}
         className="object-contain"
         fill
+        quality={100}
         sizes="96px"
         src={image}
         style={{
           padding: `${productGalleryLayoutControls.thumbnailCardPaddingPx}px`,
         }}
-        unoptimized
       />
     </button>
   );

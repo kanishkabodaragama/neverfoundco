@@ -100,9 +100,9 @@ function EvidenceProductCard({
           alt={product.alt}
           className="object-contain p-5 transition-transform duration-300 group-hover:scale-[1.03] sm:p-6 md:p-7"
           fill
+          quality={100}
           sizes="(min-width: 768px) 45vw, 50vw"
           src={product.image}
-          unoptimized
         />
         {product.soldOut ? (
           <span className="absolute right-1 top-1 z-10 bg-rust px-2 py-1 font-mono text-[9px] font-black uppercase tracking-[0.18em] text-bone sm:right-2 sm:top-2 sm:text-[10px]">
