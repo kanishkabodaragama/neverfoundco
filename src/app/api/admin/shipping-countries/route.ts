@@ -3,21 +3,21 @@ import { requireAdminApi } from "@/lib/admin-auth";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { shippingCountrySchema } from "@/lib/validation/admin";
 
-const countryChoices: Record<string, { name: string; currency: string }> = {
-  US: { name: "United States", currency: "USD" },
-  LK: { name: "Sri Lanka", currency: "USD" },
-  GB: { name: "United Kingdom", currency: "GBP" },
-  CA: { name: "Canada", currency: "CAD" },
-  AU: { name: "Australia", currency: "AUD" },
-  IN: { name: "India", currency: "INR" },
-  AE: { name: "United Arab Emirates", currency: "AED" },
-  SG: { name: "Singapore", currency: "SGD" },
-  MY: { name: "Malaysia", currency: "MYR" },
-  DE: { name: "Germany", currency: "EUR" },
-  FR: { name: "France", currency: "EUR" },
-  IT: { name: "Italy", currency: "EUR" },
-  NL: { name: "Netherlands", currency: "EUR" },
-  JP: { name: "Japan", currency: "JPY" },
+const countryChoices: Record<string, { name: string }> = {
+  US: { name: "United States" },
+  LK: { name: "Sri Lanka" },
+  GB: { name: "United Kingdom" },
+  CA: { name: "Canada" },
+  AU: { name: "Australia" },
+  IN: { name: "India" },
+  AE: { name: "United Arab Emirates" },
+  SG: { name: "Singapore" },
+  MY: { name: "Malaysia" },
+  DE: { name: "Germany" },
+  FR: { name: "France" },
+  IT: { name: "Italy" },
+  NL: { name: "Netherlands" },
+  JP: { name: "Japan" },
 };
 
 export async function POST(request: Request) {
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     country_name: countryChoice?.name || formData.get("country_name"),
     country_code: countryCode,
     default_fee: formData.get("default_fee"),
-    currency: formData.get("currency") || countryChoice?.currency || "USD",
+    currency: "LKR",
     is_active: formData.get("is_active") === "true",
   });
 

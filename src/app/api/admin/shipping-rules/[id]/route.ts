@@ -29,7 +29,7 @@ export async function POST(
     country_id: formData.get("country_id") || null,
     region_ids: regionIds,
     fee: formData.get("fee"),
-    currency: formData.get("currency") || "USD",
+    currency: "LKR",
     is_active: formData.get("is_active") !== "false",
   });
 

@@ -115,10 +115,10 @@ function FilterPanel({
         <input
           aria-label="Maximum price"
           className="w-full accent-[#d9532f]"
-          max="100"
+          max="30000"
           min="0"
           onChange={(event) => setMaxPrice(Number(event.target.value))}
-          step="5"
+          step="500"
           type="range"
           value={maxPrice}
         />
@@ -146,7 +146,7 @@ export function ShopCatalog() {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
-  const [maxPrice, setMaxPrice] = useState(100);
+  const [maxPrice, setMaxPrice] = useState(30000);
   const [sortMode, setSortMode] = useState<SortMode>("Newest");
   const [activePage, setActivePage] = useState(1);
 
@@ -170,7 +170,7 @@ export function ShopCatalog() {
     setSelectedCategory("All");
     setSelectedSizes([]);
     setSelectedColors([]);
-    setMaxPrice(100);
+    setMaxPrice(30000);
     setSortMode("Newest");
     setActivePage(1);
   }

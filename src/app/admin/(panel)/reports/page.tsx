@@ -64,8 +64,8 @@ export default async function AdminReportsPage({
           <CsvDownloadButton
             columns={[
               { key: "date", label: "Date" },
-              { key: "sales", label: "Sales" },
-              { key: "profit", label: "Profit" },
+              { key: "sales", label: "Sales (LKR)" },
+              { key: "profit", label: "Profit (LKR)" },
               { key: "orders", label: "Orders" },
             ]}
             filename={`neverfoundco-daily-report-${report.start}-to-${report.end}`}
@@ -95,7 +95,7 @@ export default async function AdminReportsPage({
               { key: "date", label: "Date" },
               { key: "customer", label: "Customer" },
               { key: "email", label: "Email" },
-              { key: "total", label: "Total" },
+              { key: "total", label: "Total (LKR)" },
               { key: "payment", label: "Payment" },
               { key: "status", label: "Order Status" },
             ]}
@@ -112,7 +112,7 @@ export default async function AdminReportsPage({
                 <th>Order</th>
                 <th>Date</th>
                 <th>Customer</th>
-                <th>Total</th>
+                <th>Total (LKR)</th>
                 <th>Payment</th>
                 <th>Status</th>
               </tr>

@@ -317,16 +317,16 @@ export function ProductForm({
             />
           </label>
           <label className="grid gap-2 font-semibold">
-            General price (USD)
-            <input className="admin-input" defaultValue={product?.price ?? "0"} name="price" step="0.01" type="number" />
+            General price (LKR)
+            <input className="admin-input" defaultValue={product?.price ?? "0"} min="0" name="price" step="0.01" type="number" />
           </label>
           <label className="grid gap-2 font-semibold">
-            General sale price (USD)
-            <input className="admin-input" defaultValue={product?.sale_price ?? ""} name="sale_price" step="0.01" type="number" />
+            General sale price (LKR)
+            <input className="admin-input" defaultValue={product?.sale_price ?? ""} min="0" name="sale_price" step="0.01" type="number" />
           </label>
           <label className="grid gap-2 font-semibold">
-            Unit cost (USD)
-            <input className="admin-input" defaultValue={product?.unit_cost ?? ""} name="unit_cost" placeholder="Used for profit reports" step="0.01" type="number" />
+            Unit cost (LKR)
+            <input className="admin-input" defaultValue={product?.unit_cost ?? ""} min="0" name="unit_cost" placeholder="Used for profit reports" step="0.01" type="number" />
           </label>
         </div>
         <div className="mt-4 grid gap-3 rounded-md border border-[#ece7df] p-4 md:grid-cols-4">
@@ -459,9 +459,9 @@ export function ProductForm({
                     <th>Size</th>
                     <th>Image</th>
                     <th>Stock amount</th>
-                    <th>Variant price</th>
-                    <th>Sale price</th>
-                    <th>Unit cost</th>
+                    <th>Variant price (LKR)</th>
+                    <th>Sale price (LKR)</th>
+                    <th>Unit cost (LKR)</th>
                     <th />
                   </tr>
                 </thead>
@@ -561,13 +561,13 @@ export function ProductForm({
                           />
                         </td>
                         <td>
-                          <input className="admin-input w-28" onChange={(event) => updateVariantField(variant.key, "price", event.target.value)} placeholder="USD" step="0.01" type="number" value={variant.price} />
+                          <input className="admin-input w-28" min="0" onChange={(event) => updateVariantField(variant.key, "price", event.target.value)} placeholder="LKR" step="0.01" type="number" value={variant.price} />
                         </td>
                         <td>
-                          <input className="admin-input w-28" onChange={(event) => updateVariantField(variant.key, "sale_price", event.target.value)} placeholder="USD" step="0.01" type="number" value={variant.sale_price} />
+                          <input className="admin-input w-28" min="0" onChange={(event) => updateVariantField(variant.key, "sale_price", event.target.value)} placeholder="LKR" step="0.01" type="number" value={variant.sale_price} />
                         </td>
                         <td>
-                          <input className="admin-input w-28" onChange={(event) => updateVariantField(variant.key, "unit_cost", event.target.value)} placeholder="USD" step="0.01" type="number" value={variant.unit_cost} />
+                          <input className="admin-input w-28" min="0" onChange={(event) => updateVariantField(variant.key, "unit_cost", event.target.value)} placeholder="LKR" step="0.01" type="number" value={variant.unit_cost} />
                         </td>
                         <td className="text-right">
                           <button

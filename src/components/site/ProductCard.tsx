@@ -34,7 +34,7 @@ export function ProductCard({ product }: { product: DropProduct }) {
             {product.name}
           </Link>
         </h3>
-        <p><StorePrice amountUsd={product.price} /></p>
+        <p><StorePrice amountLkr={product.price} /></p>
       </div>
     </article>
   );

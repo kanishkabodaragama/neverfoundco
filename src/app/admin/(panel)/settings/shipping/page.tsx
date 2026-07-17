@@ -5,24 +5,25 @@ import { AdminModal } from "@/components/admin/admin-modal";
 import { ShippingRuleForm } from "@/components/admin/shipping-rule-form";
 import { requireAdmin } from "@/lib/admin-auth";
 import { listShippingCountries, listShippingRules, type ShippingCountry, type ShippingRule } from "@/lib/db/shipping";
+import { formatCurrency } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 const countryChoices = [
-  ["US", "United States", "USD"],
-  ["LK", "Sri Lanka", "USD"],
-  ["GB", "United Kingdom", "GBP"],
-  ["CA", "Canada", "CAD"],
-  ["AU", "Australia", "AUD"],
-  ["IN", "India", "INR"],
-  ["AE", "United Arab Emirates", "AED"],
-  ["SG", "Singapore", "SGD"],
-  ["MY", "Malaysia", "MYR"],
-  ["DE", "Germany", "EUR"],
-  ["FR", "France", "EUR"],
-  ["IT", "Italy", "EUR"],
-  ["NL", "Netherlands", "EUR"],
-  ["JP", "Japan", "JPY"],
+  ["US", "United States"],
+  ["LK", "Sri Lanka"],
+  ["GB", "United Kingdom"],
+  ["CA", "Canada"],
+  ["AU", "Australia"],
+  ["IN", "India"],
+  ["AE", "United Arab Emirates"],
+  ["SG", "Singapore"],
+  ["MY", "Malaysia"],
+  ["DE", "Germany"],
+  ["FR", "France"],
+  ["IT", "Italy"],
+  ["NL", "Netherlands"],
+  ["JP", "Japan"],
 ] as const;
 
 export default async function ShippingSettingsPage({
@@ -105,7 +106,7 @@ function ShippingRulesPanel({
               { key: "rule", label: "Rule" },
               { key: "country", label: "Country" },
               { key: "regions", label: "Regions" },
-              { key: "fee", label: "Fee" },
+              { key: "fee", label: "Fee (LKR)" },
               { key: "currency", label: "Currency" },
               { key: "status", label: "Status" },
             ]}
@@ -133,7 +134,7 @@ function ShippingRulesPanel({
               <th>Rule</th>
               <th>Country</th>
               <th>Regions</th>
-              <th>Fee</th>
+              <th>Fee (LKR)</th>
               <th>Status</th>
               <th className="text-right">Actions</th>
             </tr>
@@ -150,7 +151,7 @@ function ShippingRulesPanel({
                   <td>{formatRuleType(rule.rule_type)}</td>
                   <td>{rule.rule_type === "international_default" ? "All other countries" : country?.country_name ?? "-"}</td>
                   <td>{regionNames?.length ? regionNames.join(", ") : "-"}</td>
-                  <td>{rule.currency} {Number(rule.fee).toFixed(2)}</td>
+                  <td>{formatCurrency(Number(rule.fee))}</td>
                   <td>{rule.is_active ? "Active" : "Inactive"}</td>
                   <td className="text-right">
                     <details className="relative z-20 inline-block">
@@ -302,7 +303,7 @@ function CountryForm({ country }: { country?: ShippingCountry }) {
         </select>
       </label>
       <input name="country_name" type="hidden" value={country?.country_name ?? ""} />
-      <input name="currency" type="hidden" value={country?.currency ?? "USD"} />
+      <input name="currency" type="hidden" value="LKR" />
       <input name="default_fee" type="hidden" value={country?.default_fee ?? 0} />
       <label className="grid gap-2 text-xs font-semibold uppercase text-[#81796f]">
         Regions

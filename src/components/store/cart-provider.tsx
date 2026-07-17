@@ -35,7 +35,7 @@ type CartContextValue = {
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
-const STORAGE_KEY = "neverfoundco-cart";
+const STORAGE_KEY = "neverfoundco-cart-lkr-v1";
 const COUPON_STORAGE_KEY = "neverfoundco-coupon";
 
 export function CartProvider({ children }: { children: ReactNode }) {
@@ -146,10 +146,14 @@ function getCartItemKey(
 
 function normalizeStoredCartItems(items: CartItem[]) {
   return items
-    .filter((item) => isUuid(item.productId))
+    .filter(
+      (item) =>
+        isUuid(item.productId) &&
+        Number.isFinite(item.unitPrice) &&
+        item.unitPrice >= 0,
+    )
     .map((item) => ({
       ...item,
       variantId: isUuid(item.variantId) ? item.variantId : undefined,
-      unitPrice: item.unitPrice > 1000 ? 100 : item.unitPrice,
     }));
 }

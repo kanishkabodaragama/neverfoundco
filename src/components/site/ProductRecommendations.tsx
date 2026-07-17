@@ -258,7 +258,7 @@ function RelatedProductCard({
           </p>
         </div>
         <div className="shrink-0 font-display text-xl uppercase leading-none md:pl-3 md:text-right">
-          <StorePrice amountUsd={product.price} />
+          <StorePrice amountLkr={product.price} />
         </div>
       </div>
     </Link>

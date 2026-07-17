@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     const [firstName, ...rest] = order.customer_name.trim().split(" ");
     const { payhere, quote } = await createPayHerePayload({
       orderNumber: order.order_number,
-      amountUsd: Number(order.total),
+      amountLkr: Number(order.total),
       publicOrigin,
       firstName,
       lastName: rest.join(" ") || firstName,

@@ -57,8 +57,8 @@ export default async function AdminProductsPage({
               { key: "sku", label: "SKU" },
               { key: "name", label: "Product" },
               { key: "category", label: "Category" },
-              { key: "price", label: "Price" },
-              { key: "sale_price", label: "Sale Price" },
+              { key: "price", label: "Price (LKR)" },
+              { key: "sale_price", label: "Sale Price (LKR)" },
               { key: "stock", label: "Stock" },
               { key: "status", label: "Status" },
               { key: "updated", label: "Updated" },
@@ -90,7 +90,7 @@ export default async function AdminProductsPage({
                 <th>SKU</th>
                 <th>Product</th>
                 <th>Category</th>
-                <th>Price</th>
+                <th>Price (LKR)</th>
                 <th>Stock</th>
                 <th>Status</th>
                 <th>Updated</th>

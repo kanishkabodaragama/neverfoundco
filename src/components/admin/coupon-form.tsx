@@ -42,7 +42,7 @@ export function CouponForm({
           </select>
         </label>
         <Field
-          label="Discount value"
+          label="Discount value (LKR for flat discounts)"
           name="discount_value"
           placeholder="500"
           type="number"

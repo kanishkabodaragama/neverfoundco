@@ -79,7 +79,7 @@ export function ShippingRuleForm({
         )}
 
         <label className={labelClass()}>
-          Fee
+          Fee (LKR)
           <input
             className="admin-input"
             defaultValue={rule?.fee ?? ""}
@@ -92,7 +92,7 @@ export function ShippingRuleForm({
         </label>
       </div>
 
-      <input name="currency" type="hidden" value="USD" />
+      <input name="currency" type="hidden" value="LKR" />
 
       {ruleType === "country_region_override" ? (
         <div className="rounded-md border border-[#ece7df] p-4">

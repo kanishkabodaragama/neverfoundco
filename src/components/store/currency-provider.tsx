@@ -17,14 +17,14 @@ export const currencyOptions: Array<{
   flag: string;
   label: string;
 }> = [
-  { code: "USD", country: "US", flag: "🇺🇸", label: "USD" },
   { code: "LKR", country: "LK", flag: "🇱🇰", label: "LKR" },
+  { code: "USD", country: "US", flag: "🇺🇸", label: "USD" },
 ];
 
 type CurrencyContextValue = {
   currency: StoreCurrency;
   setCurrency: (currency: StoreCurrency) => void;
-  format: (amountUsd: number) => string;
+  format: (amountLkr: number) => string;
   selectedOption: (typeof currencyOptions)[number];
   rateSource: string;
   rateUpdatedAt: string | null;
@@ -32,16 +32,16 @@ type CurrencyContextValue = {
 };
 
 const CurrencyContext = createContext<CurrencyContextValue | null>(null);
-const STORAGE_KEY = "neverfoundco-currency";
+const STORAGE_KEY = "neverfoundco-currency-lkr-base-v1";
 const DEFAULT_RATES: Record<StoreCurrency, number> = {
-  USD: 1,
-  LKR: 300,
+  LKR: 1,
+  USD: 1 / 300,
 };
 const RATE_DISCLAIMER =
-  "Converted amounts use Google currency rates. Actual bank buying and selling rates may differ slightly.";
+  "USD display amounts use live currency rates. Checkout and all calculations remain in LKR.";
 
 export function CurrencyProvider({ children }: { children: ReactNode }) {
-  const [currency, setCurrency] = useState<StoreCurrency>("USD");
+  const [currency, setCurrency] = useState<StoreCurrency>("LKR");
   const [rates, setRates] = useState<Record<StoreCurrency, number>>(DEFAULT_RATES);
   const [rateSource, setRateSource] = useState("Google Finance");
   const [rateUpdatedAt, setRateUpdatedAt] = useState<string | null>(null);
@@ -69,8 +69,8 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
         window.setTimeout(() => {
           if (!isMounted) return;
           setRates({
-            USD: Number(data.rates?.USD ?? 1),
-            LKR: Number(data.rates?.LKR ?? DEFAULT_RATES.LKR),
+            LKR: Number(data.rates?.LKR ?? 1),
+            USD: Number(data.rates?.USD ?? DEFAULT_RATES.USD),
           });
           setRateSource(data.source ?? "Google Finance");
           setRateUpdatedAt(data.updatedAt ?? null);
@@ -102,13 +102,14 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
       rateSource,
       rateUpdatedAt,
       rateDisclaimer: RATE_DISCLAIMER,
-      format(amountUsd) {
-        return new Intl.NumberFormat("en-US", {
+      format(amountLkr) {
+        return new Intl.NumberFormat(currency === "LKR" ? "en-LK" : "en-US", {
           style: "currency",
           currency,
-          minimumFractionDigits: currency === "LKR" ? 0 : 2,
-          maximumFractionDigits: currency === "LKR" ? 0 : 2,
-        }).format(amountUsd * rate);
+          currencyDisplay: "code",
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(amountLkr * rate);
       },
     };
   }, [currency, rateSource, rateUpdatedAt, rates]);

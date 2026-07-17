@@ -2,7 +2,7 @@
 
 import { useStoreCurrency } from "@/components/store/currency-provider";
 
-export function StorePrice({ amountUsd }: { amountUsd: number }) {
+export function StorePrice({ amountLkr }: { amountLkr: number }) {
   const { format } = useStoreCurrency();
-  return <>{format(amountUsd)}</>;
+  return <>{format(amountLkr)}</>;
 }

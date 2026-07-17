@@ -6,18 +6,22 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatCurrency(amount: number) {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("en-LK", {
     style: "currency",
-    currency: "USD",
+    currency: "LKR",
+    currencyDisplay: "code",
     minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(amount);
 }
 
-export function formatMoney(amount: number, currency = "USD") {
-  return new Intl.NumberFormat("en-US", {
+export function formatMoney(amount: number, currency = "LKR") {
+  return new Intl.NumberFormat(currency === "LKR" ? "en-LK" : "en-US", {
     style: "currency",
     currency,
+    currencyDisplay: "code",
     minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(amount);
 }
 

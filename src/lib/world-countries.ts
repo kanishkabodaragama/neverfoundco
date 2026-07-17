@@ -18,23 +18,6 @@ const callingCodes: Record<string, string> = {
   US: "+1",
 };
 
-const currencies: Record<string, string> = {
-  AE: "AED",
-  AU: "AUD",
-  CA: "CAD",
-  DE: "EUR",
-  FR: "EUR",
-  GB: "GBP",
-  IN: "INR",
-  IT: "EUR",
-  JP: "JPY",
-  LK: "USD",
-  MY: "MYR",
-  NL: "EUR",
-  SG: "SGD",
-  US: "USD",
-};
-
 export type WorldCountry = {
   country_code: string;
   country_name: string;
@@ -48,7 +31,7 @@ export function getWorldCountries() {
   return countryCodes.split(" ").map((country_code) => ({
     country_code,
     country_name: names.of(country_code) ?? country_code,
-    currency: currencies[country_code] ?? "USD",
+    currency: "LKR",
     calling_code: callingCodes[country_code] ?? "+",
   }));
 }

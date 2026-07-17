@@ -8,15 +8,15 @@ export async function GET() {
 
   return NextResponse.json(
     {
-      base: "USD",
+      base: "LKR",
       rates: {
-        USD: 1,
-        LKR: rate,
+        LKR: 1,
+        USD: 1 / rate,
       },
       source,
       updatedAt,
       disclaimer:
-        "Converted amounts use live currency rates. Actual bank buying and selling rates may differ slightly.",
+        "USD display amounts use live currency rates. Checkout and all calculations remain in LKR.",
     },
     {
       headers: {

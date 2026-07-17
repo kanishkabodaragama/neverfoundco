@@ -601,7 +601,7 @@ export function SiteHeader({
                           {item.size ? <p>Size: {item.size}</p> : null}
                         </div>
                         <p className="mt-1 font-mono text-[11px] font-bold">
-                          <StorePrice amountUsd={item.unitPrice} />
+                          <StorePrice amountLkr={item.unitPrice} />
                         </p>
                       </div>
 
@@ -660,7 +660,7 @@ export function SiteHeader({
           <div className="flex items-center justify-between font-mono text-xs font-bold uppercase tracking-[0.2em]">
             <span>Subtotal</span>
             <span>
-              <StorePrice amountUsd={subtotal} />
+              <StorePrice amountLkr={subtotal} />
             </span>
           </div>
           <Link

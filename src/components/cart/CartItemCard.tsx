@@ -34,7 +34,7 @@ export function CartItemCard({
         </span>
       </div>
       <div className="flex items-start p-5 font-sans text-sm font-bold uppercase md:justify-center">
-        <StorePrice amountUsd={item.price} />
+        <StorePrice amountLkr={item.price} />
       </div>
       <div className="flex items-start p-5">
         <div className="flex border border-ink font-sans text-sm font-bold">

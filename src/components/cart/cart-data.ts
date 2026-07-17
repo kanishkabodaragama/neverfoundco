@@ -17,7 +17,7 @@ export const mockCartItems: CartProduct[] = [
     color: "Black",
     size: "L",
     stockLabel: "12 LEFT",
-    price: 100,
+    price: 30000,
     quantity: 1,
     image: "/images/landing/tee-black.svg",
     alt: "Black Lost Paradise graphic t-shirt",
@@ -28,7 +28,7 @@ export const mockCartItems: CartProduct[] = [
     color: "Sand",
     size: "M",
     stockLabel: "10 LEFT",
-    price: 100,
+    price: 30000,
     quantity: 1,
     image: "/images/landing/tee-yellow.svg",
     alt: "Sand Heat Wave graphic t-shirt",
@@ -39,14 +39,14 @@ export const mockCartItems: CartProduct[] = [
     color: "Blue",
     size: "XL",
     stockLabel: "2 LEFT",
-    price: 100,
+    price: 30000,
     quantity: 1,
     image: "/images/landing/tee-cream.svg",
     alt: "Blue Ocean Drive graphic t-shirt",
   },
 ];
 
-export const shippingFee = 8;
+export const shippingFee = 2400;
 
 export const cartCultureItems = [
   {

@@ -40,7 +40,7 @@ export const dropProducts: DropProduct[] = [
   {
     slug: "ded-summer-tee",
     name: "D.E.D Summer Tee",
-    price: 100,
+    price: 30000,
     stockLabel: "12 LEFT",
     image: "/images/landing/tee-cream.svg",
     alt: "Cream D.E.D Summer graphic t-shirt",
@@ -48,7 +48,7 @@ export const dropProducts: DropProduct[] = [
   {
     slug: "heat-wave-tee",
     name: "Heat Wave Tee",
-    price: 100,
+    price: 30000,
     stockLabel: "8 LEFT",
     image: "/images/landing/tee-black.svg",
     alt: "Black Heat Wave graphic t-shirt",
@@ -56,7 +56,7 @@ export const dropProducts: DropProduct[] = [
   {
     slug: "paradise-lost-tee",
     name: "Paradise Lost Tee",
-    price: 100,
+    price: 30000,
     stockLabel: "6 LEFT",
     image: "/images/landing/tee-yellow.svg",
     alt: "Faded yellow Paradise Lost graphic t-shirt",
@@ -64,7 +64,7 @@ export const dropProducts: DropProduct[] = [
   {
     slug: "daydream-tee",
     name: "Daydream Tee",
-    price: 100,
+    price: 30000,
     stockLabel: "SOLD OUT",
     image: "/images/landing/tee-sold.svg",
     alt: "Sold out black Daydream graphic t-shirt",

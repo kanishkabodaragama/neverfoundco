@@ -437,7 +437,7 @@ export function ProductDetailClient({ product }: { product: MockProductDetail })
             marginTop: `${productTextControls.price.yPx}px`,
           }}
         >
-          <StorePrice amountUsd={displayPrice} />
+          <StorePrice amountLkr={displayPrice} />
         </p>
         {shortDescription ? (
           <p className="max-w-md whitespace-pre-line text-sm font-semibold italic leading-relaxed text-ink/70">

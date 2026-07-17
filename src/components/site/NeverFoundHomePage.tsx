@@ -138,7 +138,7 @@ function EvidenceProductCard({
             className="font-display uppercase leading-tight"
             style={{ fontSize: `${homeProductCardPriceControl.fontSizePx}px` }}
           >
-            <StorePrice amountUsd={product.price} />
+            <StorePrice amountLkr={product.price} />
           </div>
         </div>
       </div>

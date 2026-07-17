@@ -22,10 +22,6 @@ export async function getUsdToLkrRate(): Promise<UsdToLkrRate> {
   };
 }
 
-export function convertUsdToLkr(amountUsd: number, rate: number) {
-  return Number((amountUsd * rate).toFixed(2));
-}
-
 async function getGoogleFinanceRate(from: string, to: string) {
   try {
     const response = await fetch(

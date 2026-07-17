@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { formatColomboDateTime } from "@/lib/date-time";
 import { listCustomerOrders } from "@/lib/db/orders";
+import { formatCurrency } from "@/lib/utils";
 
 export async function GET(
   _request: Request,
@@ -30,13 +31,13 @@ export async function GET(
     `Status: ${order.order_status}`,
     "",
     ...order.order_items.map(
-      (item) => `${item.quantity} x ${item.product_name} - USD ${Number(item.total_price).toFixed(2)}`,
+      (item) => `${item.quantity} x ${item.product_name} - ${formatCurrency(Number(item.total_price))}`,
     ),
     "",
-    `Subtotal: USD ${Number(order.subtotal).toFixed(2)}`,
-    `Discount: USD ${Number(order.discount_amount ?? 0).toFixed(2)}`,
-    `Shipping: USD ${Number(order.shipping_fee).toFixed(2)}`,
-    `Total: USD ${Number(order.total).toFixed(2)}`,
+    `Subtotal: ${formatCurrency(Number(order.subtotal))}`,
+    `Discount: ${formatCurrency(Number(order.discount_amount ?? 0))}`,
+    `Shipping: ${formatCurrency(Number(order.shipping_fee))}`,
+    `Total: ${formatCurrency(Number(order.total))}`,
   ];
 
   return new NextResponse(lines.join("\n"), {

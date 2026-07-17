@@ -214,9 +214,6 @@ export async function updateOrderPayHereQuote(orderId: string, quote: PayHereQuo
     .from("orders")
     .update({
       payhere_amount_lkr: quote.amountLkr,
-      payhere_exchange_rate: quote.usdToLkrRate,
-      payhere_exchange_source: quote.rateSource,
-      payhere_exchange_updated_at: quote.rateUpdatedAt,
     })
     .eq("id", orderId);
 

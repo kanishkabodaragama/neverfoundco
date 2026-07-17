@@ -49,7 +49,7 @@ export default async function AdminCustomersPage() {
               { key: "email", label: "Email" },
               { key: "phone", label: "Phone" },
               { key: "orders", label: "Orders" },
-              { key: "spent", label: "Total Spent" },
+              { key: "spent", label: "Total Spent (LKR)" },
               { key: "latest_order", label: "Latest Order" },
             ]}
             filename="neverfoundco-customers"
@@ -65,7 +65,7 @@ export default async function AdminCustomersPage() {
               <th>Email</th>
               <th>Phone</th>
               <th>Orders</th>
-              <th>Total spent</th>
+              <th>Total spent (LKR)</th>
               <th>Latest order</th>
             </tr>
           </thead>

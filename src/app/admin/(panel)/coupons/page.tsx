@@ -27,7 +27,7 @@ export default async function AdminCouponsPage({
     code: coupon.code,
     discount:
       coupon.discount_type === "flat"
-        ? Number(coupon.discount_value).toFixed(2)
+        ? formatCurrency(Number(coupon.discount_value))
         : `${coupon.discount_value}%`,
     usage: coupon.used_count,
     limit: coupon.usage_limit ?? "Unlimited",

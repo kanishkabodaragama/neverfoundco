@@ -1,5 +1,4 @@
 import crypto from "node:crypto";
-import { convertUsdToLkr, getUsdToLkrRate } from "@/lib/currency-rates";
 import { getPayHereEnv, isPayHereSandbox } from "@/lib/env";
 import type { PayHereCheckoutPayload } from "@/types/commerce";
 
@@ -45,14 +44,11 @@ export function verifyPayHereNotificationSignature(params: {
 
 export type PayHereQuote = {
   amountLkr: number;
-  usdToLkrRate: number;
-  rateSource: string;
-  rateUpdatedAt: string;
 };
 
 export async function createPayHerePayload(input: {
   orderNumber: string;
-  amountUsd: number;
+  amountLkr: number;
   publicOrigin: string;
   firstName: string;
   lastName: string;
@@ -63,8 +59,7 @@ export async function createPayHerePayload(input: {
   items: string;
 }): Promise<{ payhere: PayHereCheckoutPayload; quote: PayHereQuote }> {
   const env = getPayHereEnv();
-  const rate = await getUsdToLkrRate();
-  const amountLkr = convertUsdToLkr(input.amountUsd, rate.rate);
+  const amountLkr = Number(input.amountLkr.toFixed(2));
   const publicOrigin = input.publicOrigin.replace(/\/+$/, "");
   const actionUrl = isPayHereSandbox()
     ? "https://sandbox.payhere.lk/pay/checkout"
@@ -73,9 +68,6 @@ export async function createPayHerePayload(input: {
   return {
     quote: {
       amountLkr,
-      usdToLkrRate: rate.rate,
-      rateSource: rate.source,
-      rateUpdatedAt: rate.updatedAt,
     },
     payhere: {
       sandbox: isPayHereSandbox(),
@@ -97,8 +89,8 @@ export async function createPayHerePayload(input: {
         city: input.city,
         country: "Sri Lanka",
         hash: createPayHereCheckoutHash(input.orderNumber, amountLkr),
-        custom_1: `USD ${input.amountUsd.toFixed(2)}`,
-        custom_2: `USD_TO_LKR ${rate.rate.toFixed(6)}`,
+        custom_1: `LKR ${amountLkr.toFixed(2)}`,
+        custom_2: "BASE_CURRENCY LKR",
       },
     },
   };

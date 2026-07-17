@@ -71,7 +71,7 @@ export default async function AdminOrdersPage({
               { key: "time", label: "Time" },
               { key: "customer", label: "Customer" },
               { key: "email", label: "Email" },
-              { key: "total", label: "Total" },
+              { key: "total", label: "Total (LKR)" },
               { key: "payment", label: "Payment" },
               { key: "status", label: "Order Status" },
               { key: "city", label: "City" },
@@ -90,7 +90,7 @@ export default async function AdminOrdersPage({
               <th className="px-4 py-4">Date</th>
               <th className="px-4 py-4">Time</th>
               <th className="px-4 py-4">Customer</th>
-              <th className="px-4 py-4">Total</th>
+              <th className="px-4 py-4">Total (LKR)</th>
               <th className="px-4 py-4">Payment</th>
               <th className="px-4 py-4">Order Status</th>
               <th className="px-4 py-4">Details</th>

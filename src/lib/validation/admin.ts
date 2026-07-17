@@ -63,7 +63,7 @@ export const shippingCountrySchema = z.object({
   country_name: z.string().min(2),
   country_code: z.string().min(2).max(3).transform((value) => value.toUpperCase()),
   default_fee: z.coerce.number().nonnegative(),
-  currency: z.string().min(3).max(3).default("LKR"),
+  currency: z.literal("LKR").default("LKR"),
   is_active: z.coerce.boolean().default(true),
 });
 
@@ -77,7 +77,7 @@ export const shippingRuleSchema = z.object({
   country_id: z.string().uuid().optional().nullable(),
   region_ids: z.array(z.string().uuid()).default([]),
   fee: z.coerce.number().nonnegative(),
-  currency: z.string().min(3).max(3).default("USD"),
+  currency: z.literal("LKR").default("LKR"),
   is_active: z.coerce.boolean().default(true),
 });
 

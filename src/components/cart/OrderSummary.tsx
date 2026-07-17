@@ -21,22 +21,22 @@ export function OrderSummary({
         <div className="mt-7 space-y-4 font-sans text-sm font-bold uppercase">
           <div className="flex justify-between gap-4">
             <span>Subtotal</span>
-            <span><StorePrice amountUsd={subtotal} /></span>
+            <span><StorePrice amountLkr={subtotal} /></span>
           </div>
           {discount > 0 ? (
             <div className="flex justify-between gap-4 text-acid">
               <span>Discount {couponCode ? `(${couponCode})` : ""}</span>
-              <span>-<StorePrice amountUsd={discount} /></span>
+              <span>-<StorePrice amountLkr={discount} /></span>
             </div>
           ) : null}
           <div className="flex justify-between gap-4">
             <span>Shipping</span>
-            <span><StorePrice amountUsd={shipping} /></span>
+            <span><StorePrice amountLkr={shipping} /></span>
           </div>
           <div className="flex items-end justify-between gap-4">
             <span className="text-xl font-black">Total</span>
             <span className="text-xl font-black text-rust">
-              <StorePrice amountUsd={total} />
+              <StorePrice amountLkr={total} />
             </span>
           </div>
         </div>

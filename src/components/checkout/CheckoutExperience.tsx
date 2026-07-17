@@ -4,9 +4,9 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { useCart } from "@/components/store/cart-provider";
-import { useStoreCurrency } from "@/components/store/currency-provider";
 import type { ShippingCountry } from "@/lib/db/shipping";
 import { isUuid } from "@/lib/ids";
+import { formatCurrency } from "@/lib/utils";
 import type { PayHereCheckoutPayload } from "@/types/commerce";
 
 type CheckoutItem = {
@@ -20,7 +20,6 @@ export function CheckoutExperience({ countries }: {
   countries: ShippingCountry[];
 }) {
   const cart = useCart();
-  const { format, rateSource } = useStoreCurrency();
   const initialCountry = getInitialCountry(countries);
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -468,17 +467,17 @@ export function CheckoutExperience({ countries }: {
                   </p>
                 </div>
                 <p className="font-black uppercase">
-                  {format(item.price * item.quantity)}
+                  {formatCurrency(item.price * item.quantity)}
                 </p>
               </div>
             ))}
           </div>
           <div className="mt-6 space-y-3 font-sans text-sm font-bold uppercase">
-            <SummaryRow label="Subtotal" value={format(subtotal)} />
+            <SummaryRow label="Subtotal" value={formatCurrency(subtotal)} />
             {appliedDiscount > 0 ? (
               <SummaryRow
                 label={`Discount ${cart.couponCode ? `(${cart.couponCode})` : ""}`}
-                value={`-${format(appliedDiscount)}`}
+                value={`-${formatCurrency(appliedDiscount)}`}
               />
             ) : null}
             <SummaryRow
@@ -488,18 +487,17 @@ export function CheckoutExperience({ countries }: {
                   ? "Select region"
                   : visibleShippingFee === null
                     ? "Calculating..."
-                    : format(visibleShippingFee)
+                    : formatCurrency(visibleShippingFee)
               }
             />
             <SummaryRow
               highlight
               label="Total"
-              value={format(total)}
+              value={formatCurrency(total)}
             />
           </div>
           <p className="mt-4 text-xs font-bold leading-relaxed text-ink/65">
-            Converted using live exchange data from {rateSource}. Actual bank
-            buying and selling rates may differ slightly.
+            Checkout totals and payment are always calculated and charged in LKR.
           </p>
         </div>
       </aside>
@@ -531,7 +529,7 @@ function getCallingCode(countryCode: string) {
 function getInitialCountry(countries: ShippingCountry[]) {
   const fallback = countries[0] ?? {
     country_code: "US",
-    currency: "USD",
+    currency: "LKR",
     shipping_regions: [],
   };
 
