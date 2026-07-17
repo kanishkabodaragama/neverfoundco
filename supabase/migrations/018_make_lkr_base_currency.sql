@@ -3,6 +3,15 @@
 -- once at LKR 300 per USD. Historical orders use their captured PayHere rate
 -- when one is available.
 
+-- Repair projects whose migration ledger contains 011 but whose PayHere quote
+-- columns were not persisted. These columns are also used to preserve the
+-- original conversion rate on historical orders below.
+alter table public.orders
+add column if not exists payhere_amount_lkr numeric(12,2),
+add column if not exists payhere_exchange_rate numeric(12,6),
+add column if not exists payhere_exchange_source text,
+add column if not exists payhere_exchange_updated_at timestamptz;
+
 update public.products
 set price = round(price * 300, 2),
     sale_price = case when sale_price is null then null else round(sale_price * 300, 2) end,
