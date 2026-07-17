@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/admin-auth";
 import { listPaymentGateways } from "@/lib/db/payment-gateways";
 import {
   getCheckoutPaymentTimeoutMinutes,
+  getFallbackUsdToLkrRate,
   getProductRecommendationsEnabled,
 } from "@/lib/db/site-settings";
 
@@ -15,10 +16,17 @@ export default async function AdminSettingsPage({
   searchParams: Promise<{ error?: string; success?: string }>;
 }) {
   await requireAdmin();
-  const [flash, gateways, checkoutPaymentTimeoutMinutes, recommendationsEnabled] = await Promise.all([
+  const [
+    flash,
+    gateways,
+    checkoutPaymentTimeoutMinutes,
+    fallbackUsdToLkrRate,
+    recommendationsEnabled,
+  ] = await Promise.all([
     searchParams,
     listPaymentGateways(),
     getCheckoutPaymentTimeoutMinutes(),
+    getFallbackUsdToLkrRate(),
     getProductRecommendationsEnabled(),
   ]);
 
@@ -81,6 +89,45 @@ export default async function AdminSettingsPage({
             <p className="admin-muted p-4 text-sm">No payment gateways have been seeded yet.</p>
           ) : null}
         </div>
+      </section>
+
+      <section className="admin-card overflow-hidden">
+        <div className="border-b border-[#ece7df] p-4">
+          <h2 className="flex items-center gap-2 font-semibold">
+            <CreditCard className="h-4 w-4" />
+            Currency fallback
+          </h2>
+          <p className="admin-muted mt-1 text-sm">
+            Set the USD conversion rate used only when both live exchange-rate
+            providers are unavailable.
+          </p>
+        </div>
+        <form
+          action="/api/admin/currency-settings"
+          className="grid gap-4 p-4 sm:max-w-sm"
+          method="post"
+        >
+          <label className="grid gap-2 text-sm font-semibold">
+            1 USD equals how many LKR?
+            <input
+              className="admin-input"
+              defaultValue={fallbackUsdToLkrRate}
+              max={10000}
+              min={1}
+              name="fallback_usd_to_lkr_rate"
+              required
+              step="0.000001"
+              type="number"
+            />
+          </label>
+          <p className="admin-muted text-xs">
+            Google Finance is tried first, then ExchangeRate API. This value is
+            used only if neither live source returns a valid USD-to-LKR rate.
+          </p>
+          <button className="admin-action w-fit px-4 py-2.5" type="submit">
+            Save fallback rate
+          </button>
+        </form>
       </section>
 
       <section className="admin-card overflow-hidden">

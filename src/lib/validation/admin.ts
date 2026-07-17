@@ -59,6 +59,13 @@ export const checkoutSettingsSchema = z.object({
     .max(120, "Payment timeout cannot be more than 120 minutes."),
 });
 
+export const currencySettingsSchema = z.object({
+  fallback_usd_to_lkr_rate: z.coerce
+    .number()
+    .min(1, "The fallback rate must be at least 1 LKR per USD.")
+    .max(10000, "The fallback rate cannot exceed 10,000 LKR per USD."),
+});
+
 export const shippingCountrySchema = z.object({
   country_name: z.string().min(2),
   country_code: z.string().min(2).max(3).transform((value) => value.toUpperCase()),

@@ -6,9 +6,12 @@ export const CHECKOUT_PAYMENT_TIMEOUT_SETTING_KEY =
 export const PRODUCT_RECOMMENDATIONS_ENABLED_SETTING_KEY =
   "product_recommendations_enabled";
 export const LEGAL_PAGE_DETAILS_SETTING_KEY = "legal_page_details";
+export const FALLBACK_USD_TO_LKR_RATE_SETTING_KEY =
+  "fallback_usd_to_lkr_rate";
 
 export const DEFAULT_CHECKOUT_PAYMENT_TIMEOUT_MINUTES = 15;
 export const DEFAULT_PRODUCT_RECOMMENDATIONS_ENABLED = true;
+export const DEFAULT_FALLBACK_USD_TO_LKR_RATE = 300;
 
 export type LegalPageSettings = {
   businessAddress: string;
@@ -51,6 +54,36 @@ export async function updateCheckoutPaymentTimeoutMinutes(minutes: number) {
 
   if (error) throw error;
   return normalizedMinutes;
+}
+
+export async function getFallbackUsdToLkrRate() {
+  if (!hasSupabaseServerEnv()) return DEFAULT_FALLBACK_USD_TO_LKR_RATE;
+
+  const supabase = getSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from("site_settings")
+    .select("value")
+    .eq("key", FALLBACK_USD_TO_LKR_RATE_SETTING_KEY)
+    .maybeSingle();
+
+  if (error) return DEFAULT_FALLBACK_USD_TO_LKR_RATE;
+
+  return normalizeFallbackUsdToLkrRate(data?.value);
+}
+
+export async function updateFallbackUsdToLkrRate(rate: number) {
+  const normalizedRate = normalizeFallbackUsdToLkrRate(rate);
+  const supabase = getSupabaseAdminClient();
+  const { error } = await supabase.from("site_settings").upsert(
+    {
+      key: FALLBACK_USD_TO_LKR_RATE_SETTING_KEY,
+      value: normalizedRate,
+    },
+    { onConflict: "key" },
+  );
+
+  if (error) throw error;
+  return normalizedRate;
 }
 
 export async function getProductRecommendationsEnabled() {
@@ -159,6 +192,16 @@ function normalizeCheckoutPaymentTimeoutMinutes(value: unknown) {
   if (!Number.isFinite(parsed)) return DEFAULT_CHECKOUT_PAYMENT_TIMEOUT_MINUTES;
 
   return Math.min(120, Math.max(1, Math.round(parsed)));
+}
+
+function normalizeFallbackUsdToLkrRate(value: unknown) {
+  const parsed = Number(value);
+
+  if (!Number.isFinite(parsed) || parsed < 1 || parsed > 10000) {
+    return DEFAULT_FALLBACK_USD_TO_LKR_RATE;
+  }
+
+  return Number(parsed.toFixed(6));
 }
 
 function normalizeProductRecommendationsEnabled(value: unknown) {

@@ -1,4 +1,4 @@
-export const FALLBACK_USD_TO_LKR = 300;
+import { getFallbackUsdToLkrRate } from "@/lib/db/site-settings";
 
 export type UsdToLkrRate = {
   rate: number;
@@ -8,16 +8,23 @@ export type UsdToLkrRate = {
 
 export async function getUsdToLkrRate(): Promise<UsdToLkrRate> {
   const googleRate = await getGoogleFinanceRate("USD", "LKR");
-  const fallbackRate = googleRate ? null : await getExchangeRateApiRate("USD", "LKR");
-  const rate = googleRate ?? fallbackRate ?? FALLBACK_USD_TO_LKR;
 
+  if (googleRate) return createRateResult(googleRate, "Google Finance");
+
+  const exchangeRateApiRate = await getExchangeRateApiRate("USD", "LKR");
+
+  if (exchangeRateApiRate) {
+    return createRateResult(exchangeRateApiRate, "ExchangeRate API");
+  }
+
+  const adminFallbackRate = await getFallbackUsdToLkrRate();
+  return createRateResult(adminFallbackRate, "Admin fallback rate");
+}
+
+function createRateResult(rate: number, source: string): UsdToLkrRate {
   return {
     rate,
-    source: googleRate
-      ? "Google Finance"
-      : fallbackRate
-        ? "ExchangeRate API"
-        : "Fallback rate",
+    source,
     updatedAt: new Date().toISOString(),
   };
 }
