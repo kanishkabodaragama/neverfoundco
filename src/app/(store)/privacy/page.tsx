@@ -36,7 +36,7 @@ export default async function PrivacyPage() {
               <strong>Effective Date:</strong> {effectiveDate}
             </p>
             <p>
-              At {legalSettings.businessName} (&quot;Never Found&quot;, &quot;we&quot;,
+              At {legalSettings.businessName}{" "}(&quot;Never Found&quot;, &quot;we&quot;,
               &quot;our&quot;, or &quot;us&quot;), we value your privacy and are
               committed to protecting your personal information. This Privacy Policy
               explains how we collect, use, disclose, and protect your information
