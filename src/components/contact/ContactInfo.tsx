@@ -1,11 +1,11 @@
 const contactItems = [
   { icon: "✉", label: "Email", value: "hello@neverfoundco.com" },
-  { icon: "☎", label: "Phone", value: "+94 70 123 4567" },
+  { icon: "☎", label: "Phone", value: "+94 77 519 8584" },
   { icon: "◎", label: "Instagram", value: "@neverfoundco" },
   {
     icon: "⌖",
     label: "Address",
-    value: "No. 27, Loop Street, Colombo 01, Sri Lanka.",
+    value: "No. 51 Kanaththa Road, Boralesgamuwa, 10290, Sri Lanka",
   },
 ];
 
