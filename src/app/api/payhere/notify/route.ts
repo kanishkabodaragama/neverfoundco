@@ -5,6 +5,7 @@ import {
   deductPaidOrderStock,
   isMissingPayHereQuoteColumnError,
 } from "@/lib/db/orders";
+import { sendOrderPlacedEmails } from "@/lib/email/order-emails";
 import { verifyPayHereNotificationSignature } from "@/lib/payhere";
 
 type PayHereNotifyOrder = {
@@ -66,6 +67,7 @@ export async function POST(request: Request) {
   }
 
   const paymentStatus = mapPaymentStatus(statusCode);
+  const wasAlreadyPaid = order.payment_status === "paid";
   const orderStatus =
     paymentStatus === "paid"
       ? "processing"
@@ -112,6 +114,10 @@ export async function POST(request: Request) {
         { error: "Payment saved, but stock deduction failed" },
         { status: 500 },
       );
+    }
+
+    if (!wasAlreadyPaid) {
+      await sendOrderPlacedEmails(order.id, request);
     }
   }
 

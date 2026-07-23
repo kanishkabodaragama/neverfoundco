@@ -30,6 +30,7 @@ export function CheckoutExperience({ countries }: {
   const initialCountry = getInitialCountry(countries);
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRedirectingToPayHere, setIsRedirectingToPayHere] = useState(false);
   const [billingCountryCode, setBillingCountryCode] = useState(initialCountry.country_code);
   const [billingRegion, setBillingRegion] = useState("");
   const [deliverySameAsBilling, setDeliverySameAsBilling] = useState(true);
@@ -188,7 +189,6 @@ export function CheckoutExperience({ countries }: {
       return;
     }
 
-    setIsSubmitting(true);
     const formData = new FormData(event.currentTarget);
     const firstName = getFormValue(formData, "firstName");
     const lastName = getFormValue(formData, "lastName");
@@ -260,9 +260,10 @@ export function CheckoutExperience({ countries }: {
 
     if (orderItems.length === 0) {
       setMessage("Your cart has old items. Please re-add the current products.");
-      setIsSubmitting(false);
       return;
     }
+
+    setIsSubmitting(true);
 
     try {
       const response = await fetch("/api/checkout/create-order", {
@@ -298,9 +299,12 @@ export function CheckoutExperience({ countries }: {
       }
 
       cart.clearCart();
+      setIsRedirectingToPayHere(true);
+      await waitForSecureHandoff();
       submitPayHere(result.payhere);
     } catch {
       setMessage("Checkout failed. Please try again.");
+      setIsRedirectingToPayHere(false);
       setIsSubmitting(false);
     }
   }
@@ -496,7 +500,7 @@ export function CheckoutExperience({ countries }: {
           disabled={isSubmitting || cart.items.length === 0}
           type="submit"
         >
-          {isSubmitting ? "Preparing payment..." : "Continue With PayHere"}
+          {isSubmitting ? "Preparing payment..." : "Pay now"}
         </button>
         {message ? (
           <p className="font-sans text-xs font-bold uppercase tracking-normal text-rust">
@@ -628,6 +632,34 @@ export function CheckoutExperience({ countries }: {
           </div>
         </div>
       ) : null}
+      {isSubmitting ? (
+        <div
+          aria-live="polite"
+          aria-modal="true"
+          className="fixed inset-0 z-[110] grid place-items-center bg-ink/90 p-5"
+          role="dialog"
+        >
+          <div className="w-full max-w-md border-2 border-ink bg-acid p-7 text-center text-ink shadow-[10px_10px_0_#d9532f]">
+            <div
+              aria-hidden="true"
+              className="mx-auto h-14 w-14 animate-spin rounded-full border-[5px] border-ink/20 border-t-rust"
+            />
+            <p className="mt-6 font-sans text-[11px] font-black uppercase tracking-normal text-rust">
+              Secure payment
+            </p>
+            <h2 className="mt-2 font-display text-4xl uppercase leading-none">
+              {isRedirectingToPayHere
+                ? "Taking you to PayHere"
+                : "Securing your order"}
+            </h2>
+            <p className="mt-4 font-sans text-sm font-bold uppercase leading-relaxed text-ink/65">
+              {isRedirectingToPayHere
+                ? "Secure connection ready. Please wait while PayHere opens."
+                : "We’re validating your items and preparing an encrypted payment handoff."}
+            </p>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }
@@ -744,6 +776,10 @@ function submitPayHere(payload: PayHereCheckoutPayload) {
 
   document.body.appendChild(form);
   form.submit();
+}
+
+function waitForSecureHandoff() {
+  return new Promise((resolve) => window.setTimeout(resolve, 900));
 }
 
 function SummaryRow({
