@@ -74,8 +74,8 @@ export async function createPayHerePayload(input: {
       actionUrl,
       fields: {
         merchant_id: env.PAYHERE_MERCHANT_ID,
-        return_url: `${publicOrigin}/checkout?order=${input.orderNumber}`,
-        cancel_url: `${publicOrigin}/checkout?order=${input.orderNumber}`,
+        return_url: `${publicOrigin}/checkout?payment=returned&order=${encodeURIComponent(input.orderNumber)}`,
+        cancel_url: `${publicOrigin}/checkout?payment=cancelled&order=${encodeURIComponent(input.orderNumber)}`,
         notify_url: `${publicOrigin}/api/payhere/notify`,
         order_id: input.orderNumber,
         items: input.items,

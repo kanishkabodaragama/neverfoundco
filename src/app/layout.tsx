@@ -3,6 +3,7 @@ import { CartProvider } from "@/components/store/cart-provider";
 import { CurrencyProvider } from "@/components/store/currency-provider";
 import "./globals.css";
 import { Anton, Inter, Space_Mono } from "next/font/google";
+import { PRODUCTION_APP_ORIGIN } from "@/lib/app-origin";
 import { cn } from "@/lib/utils";
 
 const display = Anton({
@@ -27,7 +28,7 @@ const admin = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+    process.env.NEXT_PUBLIC_APP_URL || PRODUCTION_APP_ORIGIN,
   ),
   title: {
     default: "Never Found Co",

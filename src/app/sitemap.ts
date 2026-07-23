@@ -1,8 +1,11 @@
 import type { MetadataRoute } from "next";
 import { listActiveProducts } from "@/lib/db/products";
+import { PRODUCTION_APP_ORIGIN } from "@/lib/app-origin";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").replace(/\/$/, "");
+  const baseUrl = (
+    process.env.NEXT_PUBLIC_APP_URL || PRODUCTION_APP_ORIGIN
+  ).replace(/\/$/, "");
   const products = await listActiveProducts();
   const staticRoutes = [
     { path: "", priority: 1 },

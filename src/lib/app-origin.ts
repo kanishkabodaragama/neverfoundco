@@ -1,4 +1,5 @@
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "0.0.0.0", "::1"]);
+export const PRODUCTION_APP_ORIGIN = "https://neverfoundco.com";
 
 export function normalizeOrigin(value: string | null | undefined) {
   const trimmed = value?.trim().replace(/\/+$/, "");
@@ -43,6 +44,7 @@ export function resolveRequestOrigin(request: Request) {
 export function resolvePublicAppOrigin(request?: Request) {
   const candidates = [
     process.env.PAYHERE_APP_URL,
+    process.env.NODE_ENV === "production" ? PRODUCTION_APP_ORIGIN : null,
     process.env.NEXT_PUBLIC_APP_URL,
     process.env.URL,
     process.env.DEPLOY_PRIME_URL,

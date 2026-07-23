@@ -68,6 +68,14 @@ Checkout creates a pending order through `/api/checkout/create-order`, then post
 
 For local sandbox testing, keep `PAYHERE_SANDBOX=true` and set `NEXT_PUBLIC_APP_URL` to the public URL PayHere can reach when testing callbacks.
 
+For live payments, set `PAYHERE_SANDBOX=false`. Production PayHere requests use
+`https://neverfoundco.com` by default (or `PAYHERE_APP_URL` when explicitly set):
+
+- Website URL: `https://neverfoundco.com`
+- Return URL: `https://neverfoundco.com/checkout?payment=returned&order=ORDER_NUMBER`
+- Cancel URL: `https://neverfoundco.com/checkout?payment=cancelled&order=ORDER_NUMBER`
+- Notify URL: `https://neverfoundco.com/api/payhere/notify`
+
 ## Order Email Setup
 
 Order emails are sent through Resend and always use
