@@ -25,6 +25,7 @@ type CurrencyContextValue = {
   currency: StoreCurrency;
   setCurrency: (currency: StoreCurrency) => void;
   format: (amountLkr: number) => string;
+  formatAs: (amountLkr: number, currency: StoreCurrency) => string;
   selectedOption: (typeof currencyOptions)[number];
   rateSource: string;
   rateUpdatedAt: string | null;
@@ -32,7 +33,7 @@ type CurrencyContextValue = {
 };
 
 const CurrencyContext = createContext<CurrencyContextValue | null>(null);
-const STORAGE_KEY = "neverfoundco-currency-lkr-base-v1";
+const STORAGE_KEY = "neverfoundco-currency-usd-default-v2";
 const DEFAULT_RATES: Record<StoreCurrency, number> = {
   LKR: 1,
   USD: 1 / 300,
@@ -41,7 +42,7 @@ const RATE_DISCLAIMER =
   "USD display amounts use live currency rates. Checkout and all calculations remain in LKR.";
 
 export function CurrencyProvider({ children }: { children: ReactNode }) {
-  const [currency, setCurrency] = useState<StoreCurrency>("LKR");
+  const [currency, setCurrency] = useState<StoreCurrency>("USD");
   const [rates, setRates] = useState<Record<StoreCurrency, number>>(DEFAULT_RATES);
   const [rateSource, setRateSource] = useState("Google Finance");
   const [rateUpdatedAt, setRateUpdatedAt] = useState<string | null>(null);
@@ -92,8 +93,16 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<CurrencyContextValue>(() => {
     const selectedOption =
-      currencyOptions.find((option) => option.code === currency) ?? currencyOptions[0];
-    const rate = rates[currency] ?? 1;
+      currencyOptions.find((option) => option.code === currency) ??
+      currencyOptions.find((option) => option.code === "USD")!;
+    const formatAs = (amountLkr: number, targetCurrency: StoreCurrency) =>
+      new Intl.NumberFormat(targetCurrency === "LKR" ? "en-LK" : "en-US", {
+        style: "currency",
+        currency: targetCurrency,
+        currencyDisplay: "code",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(amountLkr * (rates[targetCurrency] ?? 1));
 
     return {
       currency,
@@ -102,14 +111,9 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
       rateSource,
       rateUpdatedAt,
       rateDisclaimer: RATE_DISCLAIMER,
+      formatAs,
       format(amountLkr) {
-        return new Intl.NumberFormat(currency === "LKR" ? "en-LK" : "en-US", {
-          style: "currency",
-          currency,
-          currencyDisplay: "code",
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }).format(amountLkr * rate);
+        return formatAs(amountLkr, currency);
       },
     };
   }, [currency, rateSource, rateUpdatedAt, rates]);

@@ -40,12 +40,22 @@ export function getPayHereEnv() {
   return payHereEnvSchema.parse({
     PAYHERE_MERCHANT_ID: process.env.PAYHERE_MERCHANT_ID,
     PAYHERE_MERCHANT_SECRET: process.env.PAYHERE_MERCHANT_SECRET,
-    PAYHERE_SANDBOX: process.env.PAYHERE_SANDBOX ?? "true",
+    PAYHERE_SANDBOX: getPayHereSandboxValue(),
   });
 }
 
 export function isPayHereSandbox() {
-  return (process.env.PAYHERE_SANDBOX ?? "true") === "true";
+  return getPayHereSandboxValue() === "true";
+}
+
+function getPayHereSandboxValue() {
+  const configuredValue = process.env.PAYHERE_SANDBOX?.trim().toLowerCase();
+
+  if (configuredValue === "true" || configuredValue === "false") {
+    return configuredValue;
+  }
+
+  return process.env.NODE_ENV === "production" ? "false" : "true";
 }
 
 export function hasSupabaseServerEnv() {

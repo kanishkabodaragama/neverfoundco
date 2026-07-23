@@ -1,19 +1,26 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { useCart } from "@/components/store/cart-provider";
+import { StorePrice } from "@/components/site/StorePrice";
 import type { ShippingCountry } from "@/lib/db/shipping";
 import { isUuid } from "@/lib/ids";
-import { formatCurrency } from "@/lib/utils";
 import type { PayHereCheckoutPayload } from "@/types/commerce";
 
 type CheckoutItem = {
+  itemKey: string;
   id: string;
+  variantId?: string;
   name: string;
   price: number;
   quantity: number;
+  image?: string;
+  gender?: string;
+  size?: string;
+  color?: string;
 };
 
 export function CheckoutExperience({ countries }: {
@@ -31,15 +38,25 @@ export function CheckoutExperience({ countries }: {
   const [phoneCode, setPhoneCode] = useState(getCallingCode(initialCountry.country_code));
   const [shippingFee, setShippingFee] = useState<number | null>(null);
   const [discountAmount, setDiscountAmount] = useState(0);
+  const [unavailableItemKeys, setUnavailableItemKeys] = useState<string[]>([]);
 
   const items = useMemo<CheckoutItem[]>(() => {
     return cart.items.map((item) => ({
+      itemKey: getCartItemKey(item),
       id: item.productId,
+      variantId: item.variantId,
       name: item.name,
       price: item.unitPrice,
       quantity: item.quantity,
+      image: item.image,
+      gender: item.gender,
+      size: item.size,
+      color: item.color,
     }));
   }, [cart.items]);
+  const unavailableItems = items.filter((item) =>
+    unavailableItemKeys.includes(item.itemKey),
+  );
 
   const billingCountry = countries.find((country) => country.country_code === billingCountryCode);
   const deliveryCountry = countries.find((country) => country.country_code === deliveryCountryCode);
@@ -57,6 +74,38 @@ export function CheckoutExperience({ countries }: {
   );
   const appliedDiscount = cart.couponCode ? discountAmount : 0;
   const total = Math.max(0, subtotal - appliedDiscount) + shippingForTotal;
+
+  useEffect(() => {
+    if (items.length === 0) {
+      return;
+    }
+
+    const controller = new AbortController();
+
+    fetch("/api/cart/availability", {
+      body: JSON.stringify({
+        items: items.map((item) => ({
+          itemKey: item.itemKey,
+          productId: item.id,
+          variantId: item.variantId,
+          quantity: item.quantity,
+        })),
+      }),
+      headers: { "Content-Type": "application/json" },
+      method: "POST",
+      signal: controller.signal,
+    })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((result: { unavailableItemKeys?: string[] } | null) => {
+        setUnavailableItemKeys(result?.unavailableItemKeys ?? []);
+      })
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        setUnavailableItemKeys([]);
+      });
+
+    return () => controller.abort();
+  }, [items]);
 
   useEffect(() => {
     if (!shippingRegion) {
@@ -128,6 +177,11 @@ export function CheckoutExperience({ countries }: {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage("");
+
+    if (unavailableItems.length > 0) {
+      setMessage("Remove unavailable items before continuing.");
+      return;
+    }
 
     if (cart.items.length === 0) {
       setMessage("Your cart is empty.");
@@ -466,18 +520,19 @@ export function CheckoutExperience({ countries }: {
                     Qty {item.quantity}
                   </p>
                 </div>
-                <p className="font-black uppercase">
-                  {formatCurrency(item.price * item.quantity)}
-                </p>
+                <StorePrice
+                  amountLkr={item.price * item.quantity}
+                  className="items-end text-right uppercase"
+                />
               </div>
             ))}
           </div>
           <div className="mt-6 space-y-3 font-sans text-sm font-bold uppercase">
-            <SummaryRow label="Subtotal" value={formatCurrency(subtotal)} />
+            <SummaryRow label="Subtotal" value={<StorePrice amountLkr={subtotal} />} />
             {appliedDiscount > 0 ? (
               <SummaryRow
                 label={`Discount ${cart.couponCode ? `(${cart.couponCode})` : ""}`}
-                value={`-${formatCurrency(appliedDiscount)}`}
+                value={<span className="flex items-start">-<StorePrice amountLkr={appliedDiscount} /></span>}
               />
             ) : null}
             <SummaryRow
@@ -487,13 +542,13 @@ export function CheckoutExperience({ countries }: {
                   ? "Select region"
                   : visibleShippingFee === null
                     ? "Calculating..."
-                    : formatCurrency(visibleShippingFee)
+                    : <StorePrice amountLkr={visibleShippingFee} />
               }
             />
             <SummaryRow
               highlight
               label="Total"
-              value={formatCurrency(total)}
+              value={<StorePrice amountLkr={total} />}
             />
           </div>
           <p className="mt-4 text-xs font-bold leading-relaxed text-ink/65">
@@ -501,6 +556,78 @@ export function CheckoutExperience({ countries }: {
           </p>
         </div>
       </aside>
+      {unavailableItems.length > 0 ? (
+        <div
+          aria-labelledby="out-of-stock-title"
+          aria-modal="true"
+          className="fixed inset-0 z-[100] grid place-items-center overflow-y-auto bg-ink/80 p-4"
+          role="dialog"
+        >
+          <div className="w-full max-w-2xl border-2 border-ink bg-acid p-5 text-ink shadow-[10px_10px_0_#d9532f] md:p-7">
+            <p className="font-sans text-[11px] font-black uppercase tracking-normal text-rust">
+              Checkout update
+            </p>
+            <h2
+              className="mt-2 font-display text-4xl uppercase leading-none md:text-6xl"
+              id="out-of-stock-title"
+            >
+              Out of stock
+            </h2>
+            <p className="mt-3 max-w-xl font-sans text-sm font-bold uppercase leading-relaxed">
+              These pieces are no longer available in the selected options.
+            </p>
+            <div className="mt-6 max-h-[46vh] space-y-3 overflow-y-auto">
+              {unavailableItems.map((item) => (
+                <article
+                  className="grid grid-cols-[100px_1fr] border border-ink bg-transparent sm:grid-cols-[130px_1fr]"
+                  key={item.itemKey}
+                >
+                  <div className="relative min-h-[120px]">
+                    <Image
+                      alt={item.name}
+                      className="object-contain p-3"
+                      fill
+                      sizes="130px"
+                      src={item.image ?? "/images/products/black-heavyweight-tee.png"}
+                    />
+                  </div>
+                  <div className="flex flex-col justify-center border-l border-ink p-4">
+                    <h3 className="font-display text-2xl uppercase leading-none">
+                      {item.name}
+                    </h3>
+                    <p className="mt-2 font-sans text-xs font-bold uppercase text-ink/65">
+                      {[item.gender, item.color, item.size]
+                        .filter(Boolean)
+                        .join(" / ") || "Default option"}
+                    </p>
+                    <p className="mt-1 font-sans text-xs font-bold uppercase text-rust">
+                      Qty {item.quantity} · Out of stock
+                    </p>
+                  </div>
+                </article>
+              ))}
+            </div>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              <button
+                className="bg-ink px-5 py-4 font-sans text-xs font-black uppercase tracking-normal text-acid transition-colors hover:bg-rust hover:text-ink"
+                onClick={() => {
+                  unavailableItems.forEach((item) => cart.removeItem(item.itemKey));
+                  setUnavailableItemKeys([]);
+                }}
+                type="button"
+              >
+                Remove {unavailableItems.length > 1 ? "items" : "item"} & continue
+              </button>
+              <Link
+                className="border border-ink px-5 py-4 text-center font-sans text-xs font-black uppercase tracking-normal transition-colors hover:bg-ink hover:text-acid"
+                href="/"
+              >
+                Back to shop
+              </Link>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }
@@ -541,6 +668,21 @@ function getInitialCountry(countries: ShippingCountry[]) {
 
 function getFormValue(formData: FormData, name: string) {
   return String(formData.get(name) ?? "").trim();
+}
+
+function getCartItemKey(item: {
+  productId: string;
+  variantId?: string;
+  gender?: string;
+  size?: string;
+  color?: string;
+}) {
+  return (
+    item.variantId ??
+    [item.productId, item.gender, item.size, item.color]
+      .filter(Boolean)
+      .join(":")
+  );
 }
 
 function Panel({
@@ -610,7 +752,7 @@ function SummaryRow({
   highlight,
 }: {
   label: string;
-  value: string;
+  value: ReactNode;
   highlight?: boolean;
 }) {
   return (
